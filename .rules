@@ -1,0 +1,32 @@
+# Directrices de Desarrollo - Catálogo y Arriendo de Eventos
+- Stack: Laravel 11, PHP 8.3+, FilamentPHP v3, Tailwind CSS, Alpine.js, Pest / PHPUnit.
+- Siempre usa `declare(strict_types=1);` al inicio de cada archivo PHP.
+- Patrón de arquitectura: Controladores delgados (Thin Controllers) delegando en "Action Classes" unitarias dentro de `app/Actions/`.
+- Tipado estricto: Todo parámetro y retorno de método debe tener typehint explícito.
+- Seguridad:
+  * Nunca accedas a `$request->all()` en lógica de persistencia; usa Form Requests específicos.
+  * Valida y sanitiza cualquier parámetro que se use en búsquedas `LIKE` o URLs (evitar inyecciones SQL y XSS).
+  * En Filament, protege las acciones destructivas con confirmaciones modales.
+- Testing: Por cada funcionalidad o Action creada, escribe su respectivo test en `tests/Unit/` o `tests/Feature/`.
+- Respuestas de la IA: Código limpio, sin librerías de terceros innecesarias, optimizado para bajo consumo de memoria.
+
+app/
+├── Actions/
+│   ├── Catalog/
+│   │   ├── FilterProductsAction.php        # Lógica de búsqueda, filtros y stock
+│   │   └── BuildWhatsAppQuoteUrlAction.php # Sanitización y formato del enlace de WhatsApp
+│   └── Admin/
+│       └── BulkUpdateStockAction.php       # Ajustes rápidos de inventario
+├── DTOs/
+│   ├── CartItemData.php                    # Objeto tipado para cada ítem cotizado
+│   └── QuoteRequestData.php                # Datos del cliente, fecha y comuna
+├── Http/
+│   ├── Controllers/
+│   │   └── CatalogController.php           # Invocación directa a FilterProductsAction
+│   └── Requests/
+│       └── ValidateQuoteRequest.php        # Reglas de validación para entradas de usuario
+└── Models/
+    ├── Category.php
+    └── Product.php
+
+    

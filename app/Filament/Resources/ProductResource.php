@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
@@ -9,41 +11,103 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
+
+    protected static ?string $navigationGroup = 'Catálogo & Inventario';
+
+    protected static ?int $navigationSort = 1;
+
+    protected static ?string $modelLabel = 'Producto';
+
+    protected static ?string $pluralModelLabel = 'Productos y Menaje';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::where('is_active', true)->count();
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('category');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('rental_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('stock')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
-                Forms\Components\Toggle::make('is_sale')
-                    ->required(),
+                Forms\Components\Section::make('Información del Producto')
+                    ->description('Detalles principales para el catálogo y cálculo de cotizaciones')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('category_id')
+                            ->label('Categoría')
+                            ->relationship('category', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->required(),
+
+                        Forms\Components\TextInput::make('code')
+                            ->label('Código de Referencia')
+                            ->helperText('Código único numérico (ej: 10, 220, 1030)')
+                            ->required()
+                            ->numeric()
+                            ->unique(ignoreRecord: true),
+
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nombre del Producto')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+
+                        Forms\Components\Textarea::make('description')
+                            ->label('Descripción / Medidas / Material')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
+
+                Forms\Components\Section::make('Precios, Disponibilidad e Imagen')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('rental_price')
+                            ->label('Precio Arriendo (CLP)')
+                            ->prefix('$')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0),
+
+                        Forms\Components\TextInput::make('stock')
+                            ->label('Stock Disponible (Unidades)')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(0),
+
+                        Forms\Components\FileUpload::make('image')
+                            ->label('Fotografía de Producto')
+                            ->image()
+                            ->directory('products')
+                            ->columnSpanFull(),
+
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Visible en Catálogo')
+                            ->helperText('Determina si los clientes pueden ver y cotizar este artículo')
+                            ->default(true),
+
+                        Forms\Components\Toggle::make('is_featured')
+                            ->label('Producto Destacado')
+                            ->helperText('Se muestra con prioridad en la vitrina de la página principal')
+                            ->default(false),
+
+                        Forms\Components\Toggle::make('is_sale')
+                            ->label('Disponible para Venta Directa')
+                            ->default(false),
+                    ]),
             ]);
     }
 
@@ -51,39 +115,85 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category.name')
-                    ->numeric()
-                    ->sortable(),
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Foto')
+                    ->circular()
+                    ->defaultImageUrl('https://placehold.co/80x80/FAF8F5/1C1814?text=Item'),
+
                 Tables\Columns\TextColumn::make('code')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('rental_price')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('stock')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('image'),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('is_sale')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Cód.')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->searchable()
+                    ->badge()
+                    ->color('gray'),
+
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Producto')
+                    ->searchable()
+                    ->weight('bold')
+                    ->wrap(),
+
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Categoría')
+                    ->badge()
+                    ->color('info')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('rental_price')
+                    ->label('Arriendo')
+                    ->formatStateUsing(fn ($state): string => '$ '.number_format((float) $state, 0, ',', '.'))
+                    ->sortable()
+                    ->alignEnd(),
+
+                Tables\Columns\TextColumn::make('stock')
+                    ->label('Stock')
+                    ->badge()
+                    ->color(fn (int $state): string => match (true) {
+                        $state === 0 => 'danger',
+                        $state < 10 => 'warning',
+                        default => 'success',
+                    })
+                    ->sortable()
+                    ->alignCenter(),
+
+                Tables\Columns\IconColumn::make('is_featured')
+                    ->label('Destacado')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-star')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('warning')
+                    ->alignCenter(),
+
+                Tables\Columns\IconColumn::make('is_active')
+                    ->label('Activo')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->alignCenter(),
+
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('code', 'asc')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Filtrar por Categoría')
+                    ->relationship('category', 'name'),
+
+                Tables\Filters\TernaryFilter::make('is_active')
+                    ->label('Estado Activo'),
+
+                Tables\Filters\TernaryFilter::make('is_featured')
+                    ->label('Destacados'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->slideOver(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

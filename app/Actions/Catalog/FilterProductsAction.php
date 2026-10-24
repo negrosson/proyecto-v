@@ -16,7 +16,7 @@ final class FilterProductsAction
     public function execute(?string $search = null, ?string $categorySlug = null, int $perPage = 20): LengthAwarePaginator
     {
         $query = Product::query()
-            ->with('category')
+            ->with('category:id,name,slug')
             ->where('is_active', true);
 
         if ($categorySlug !== null && trim($categorySlug) !== '') {
@@ -26,13 +26,34 @@ final class FilterProductsAction
         }
 
         if ($search !== null && trim($search) !== '') {
-            $sanitizedSearch = trim($search);
-            $escapedSearch = addcslashes($sanitizedSearch, '%_\\');
+            $trimmedSearch = trim($search);
 
-            $query->where(function (Builder $q) use ($escapedSearch): void {
-                $q->where('name', 'like', '%'.$escapedSearch.'%')
-                    ->orWhere('code', 'like', '%'.$escapedSearch.'%');
-            });
+            if (ctype_digit($trimmedSearch)) {
+                $code = (int) $trimmedSearch;
+                $escapedSearch = addcslashes($trimmedSearch, '%_\\');
+
+                $query->where(function (Builder $q) use ($code, $escapedSearch): void {
+                    $q->where('code', $code);
+
+                    if ($q->getConnection()->getDriverName() === 'sqlite') {
+                        $q->orWhereRaw('name like ? escape \'\\\'', ['%'.$escapedSearch.'%']);
+                    } else {
+                        $q->orWhere('name', 'like', '%'.$escapedSearch.'%');
+                    }
+                });
+            } else {
+                $escapedSearch = addcslashes($trimmedSearch, '%_\\');
+
+                $query->where(function (Builder $q) use ($escapedSearch): void {
+                    if ($q->getConnection()->getDriverName() === 'sqlite') {
+                        $q->whereRaw('name like ? escape \'\\\'', ['%'.$escapedSearch.'%'])
+                            ->orWhereRaw('code like ? escape \'\\\'', ['%'.$escapedSearch.'%']);
+                    } else {
+                        $q->where('name', 'like', '%'.$escapedSearch.'%')
+                            ->orWhere('code', 'like', '%'.$escapedSearch.'%');
+                    }
+                });
+            }
         }
 
         return $query->orderBy('name')->paginate($perPage)->withQueryString();
