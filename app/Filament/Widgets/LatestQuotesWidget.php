@@ -12,7 +12,7 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class LatestQuotesWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Últimas Solicitudes de Cotización (WhatsApp)';
+    protected static ?string $heading = 'Últimas Cotizaciones de Menaje & Mobiliario Recibidas (WhatsApp)';
 
     protected static ?int $sort = -1;
 

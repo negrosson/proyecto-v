@@ -11,7 +11,7 @@ use Filament\Widgets\TableWidget as BaseWidget;
 
 class ProductInterestRankingWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Ranking de Productos Más Clickeados y Demandados';
+    protected static ?string $heading = 'Artículos de Menaje con Mayor Interés & Demanda en Vitrina';
 
     protected static ?int $sort = -2;
 

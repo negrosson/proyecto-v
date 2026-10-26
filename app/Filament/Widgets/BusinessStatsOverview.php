@@ -65,29 +65,29 @@ class BusinessStatsOverview extends BaseWidget
         };
 
         return [
-            Stat::make('Interés de Clientes (Clics)', number_format($totalClicks, 0, ',', '.'))
+            Stat::make('Interés en Vitrina (Clics)', number_format($totalClicks, 0, ',', '.'))
                 ->description($topClickedProduct
-                    ? "Líder: {$topClickedProduct->name} ({$topClickedProduct->clicks_count} clics)"
-                    : 'Registrando interacciones en vitrina')
+                    ? "Más consultado: {$topClickedProduct->name} ({$topClickedProduct->clicks_count} interacciones)"
+                    : 'Registrando interacciones en catálogo')
                 ->descriptionIcon('heroicon-m-cursor-arrow-rays')
                 ->color('amber')
                 ->chart($clicksChart),
 
             Stat::make('Cotizaciones WhatsApp', (string) $totalQuotes)
-                ->description("{$formattedQuotedAmount} CLP acumulado")
+                ->description($totalQuotes > 0 ? "{$formattedQuotedAmount} CLP en arriendos cotizados" : 'Bandeja de cotizaciones al día')
                 ->descriptionIcon('heroicon-m-chat-bubble-left-right')
                 ->color('success')
                 ->chart($quotesChart),
 
-            Stat::make('Tasa de Interés a Cotización', "{$conversionRate}%")
+            Stat::make('Tasa de Conversión a Cotización', "{$conversionRate}%")
                 ->description($unreadMessages > 0
-                    ? "{$unreadMessages} mensajes de contacto pendientes"
-                    : 'Bandeja de contacto sin pendientes')
+                    ? "{$unreadMessages} consultas de clientes por responder"
+                    : 'Todas las consultas web al día')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color($conversionRate > 0 ? 'amber' : 'gray'),
 
-            Stat::make('Capacidad de Inventario', "{$activeProductsCount} ítems")
-                ->description("{$formattedStock} piezas ({$highDemandCount} ítems con alta demanda)")
+            Stat::make('Catálogo Activo de Menaje', "{$activeProductsCount} artículos")
+                ->description("{$formattedStock} piezas en inventario ({$highDemandCount} con alta demanda)")
                 ->descriptionIcon('heroicon-m-archive-box')
                 ->color('gray'),
         ];
