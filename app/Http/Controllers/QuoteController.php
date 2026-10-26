@@ -9,7 +9,9 @@ use App\DTOs\CartItemData;
 use App\DTOs\QuoteRequestData;
 use App\Http\Requests\SubmitQuoteRequest;
 use App\Models\Product;
+use App\Models\QuoteLog;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class QuoteController extends Controller
@@ -37,6 +39,9 @@ class QuoteController extends Controller
             ->keyBy('id');
 
         $cartItems = [];
+        $totalAmount = 0;
+        $totalPieces = 0;
+        $itemsPayload = [];
 
         foreach ($itemsData as $index => $item) {
             /** @var Product|null $product */
@@ -56,13 +61,47 @@ class QuoteController extends Controller
                 ]);
             }
 
-            $cartItems[] = new CartItemData(
+            $cartItem = new CartItemData(
                 code: $product->code,
                 name: $product->name,
                 unitPrice: $product->rental_price,
                 quantity: (int) $item['quantity'],
             );
+
+            $cartItems[] = $cartItem;
+            $subtotal = $cartItem->subtotal();
+            $totalAmount += $subtotal;
+            $totalPieces += $cartItem->quantity;
+
+            $itemsPayload[] = [
+                'product_id' => $product->id,
+                'code' => $product->code,
+                'name' => $product->name,
+                'unit_price' => $product->rental_price,
+                'quantity' => (int) $item['quantity'],
+                'subtotal' => $subtotal,
+            ];
         }
+
+        DB::transaction(function () use ($validated, $totalAmount, $totalPieces, $itemsPayload, $request, $itemsData): void {
+            QuoteLog::create([
+                'customer_name' => (string) $validated['customer_name'],
+                'event_date' => isset($validated['event_date']) && is_string($validated['event_date'])
+                    ? $validated['event_date']
+                    : null,
+                'location' => (string) $validated['location'],
+                'total_amount' => $totalAmount,
+                'items_count' => $totalPieces,
+                'items_payload' => $itemsPayload,
+                'status' => 'pendiente',
+                'ip_address' => $request->ip(),
+            ]);
+
+            foreach ($itemsData as $item) {
+                Product::where('id', $item['product_id'])->increment('quoted_count');
+                Product::where('id', $item['product_id'])->increment('units_quoted_count', (int) $item['quantity']);
+            }
+        });
 
         $quoteRequest = new QuoteRequestData(
             customerName: (string) $validated['customer_name'],

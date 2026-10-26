@@ -94,11 +94,13 @@ class ContactMessageResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('event_address')
                     ->label('Lugar Evento')
-                    ->limit(25),
+                    ->limit(25)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Recibido')
                     ->dateTime('d/m/Y H:i')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
@@ -107,7 +109,7 @@ class ContactMessageResource extends Resource
                     ->query(fn ($query) => $query->where('is_read', false)),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->slideOver(),
                 Tables\Actions\Action::make('markAsRead')
                     ->label('Marcar leído')
                     ->icon('heroicon-o-check')

@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
 
 class SiteSetting extends Model
 {
@@ -40,13 +41,50 @@ class SiteSetting extends Model
 
     protected static function booted(): void
     {
+        static::saving(static function (SiteSetting $setting): void {
+            if (! empty($setting->map_embed_url)) {
+                $pattern = '/\Ahttps:\/\/(www\.google\.com\/maps\/embed|maps\.google\.com\/maps|www\.openstreetmap\.org\/export\/embed)\?[a-zA-Z0-9%\._\-=&!:]+\z/';
+                if (! preg_match($pattern, (string) $setting->map_embed_url)) {
+                    throw ValidationException::withMessages([
+                        'map_embed_url' => ['La URL de inserción del mapa no es válida o contiene protocolos inseguros (Anti-SSRF / Anti-XSS).'],
+                    ]);
+                }
+            }
+        });
+
         static::saved(static function (): void {
+            Cache::forget('site_settings.current');
+        });
+
+        static::updated(static function (): void {
             Cache::forget('site_settings.current');
         });
 
         static::deleted(static function (): void {
             Cache::forget('site_settings.current');
         });
+    }
+
+    /**
+     * Retorna el número de WhatsApp limpio (solo dígitos) listo para enlaces directos wa.me/.
+     */
+    public function cleanWhatsappPhone(): string
+    {
+        $raw = (string) ($this->whatsapp_phone ?: $this->company_phone ?: config('services.whatsapp.phone', '56900000000'));
+        $clean = preg_replace('/\D+/', '', $raw) ?? '';
+
+        return $clean !== '' ? $clean : '56900000000';
+    }
+
+    /**
+     * Retorna el teléfono formateado con prefijo + para enlaces tel:+.
+     */
+    public function cleanTelPhone(): string
+    {
+        $raw = (string) ($this->company_phone ?: $this->whatsapp_phone ?: '+56229876543');
+        $clean = preg_replace('/\D+/', '', $raw) ?? '';
+
+        return $clean !== '' ? "+{$clean}" : '+56229876543';
     }
 
     /**

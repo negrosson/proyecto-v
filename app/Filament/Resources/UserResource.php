@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\SecurityAuditLog;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -40,7 +41,7 @@ class UserResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Identidad del Usuario')
                     ->description('Datos personales y de contacto para el acceso corporativo')
-                    ->columns(2)
+                    ->columns(['default' => 1, 'sm' => 2])
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nombre Completo')
@@ -57,7 +58,7 @@ class UserResource extends Resource
 
                 Forms\Components\Section::make('Permisos de Seguridad & Credenciales (OWASP A01/A07)')
                     ->description('Gestión de privilegios administrativos y control de estado de la cuenta')
-                    ->columns(2)
+                    ->columns(['default' => 1, 'sm' => 2])
                     ->schema([
                         Forms\Components\Toggle::make('is_admin')
                             ->label('Privilegios de Administrador')
@@ -100,15 +101,33 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('is_admin')
                     ->label('Rol de Acceso')
                     ->badge()
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Super Administrador' : 'Operador')
-                    ->color(fn (bool $state): string => $state ? 'amber' : 'gray')
-                    ->icon(fn (bool $state): string => $state ? 'heroicon-m-shield-check' : 'heroicon-m-user')
+                    ->formatStateUsing(function (bool $state, User $record): string {
+                        if ($record->isDeveloper()) {
+                            return 'Desarrollador';
+                        }
+
+                        return $state ? 'Super Administrador' : 'Operador';
+                    })
+                    ->color(function (bool $state, User $record): string {
+                        if ($record->isDeveloper()) {
+                            return 'warning';
+                        }
+
+                        return $state ? 'info' : 'gray';
+                    })
+                    ->icon(function (bool $state, User $record): string {
+                        if ($record->isDeveloper()) {
+                            return 'heroicon-m-command-line';
+                        }
+
+                        return $state ? 'heroicon-m-shield-check' : 'heroicon-m-user';
+                    })
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('is_active')
-                    ->label('Estado de Cuenta')
+                    ->label('Estado')
                     ->badge()
-                    ->formatStateUsing(fn (bool $state): string => $state ? 'Acceso Activo' : 'Suspendido')
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Activo' : 'Suspendido')
                     ->color(fn (bool $state): string => $state ? 'success' : 'danger')
                     ->icon(fn (bool $state): string => $state ? 'heroicon-m-check-circle' : 'heroicon-m-no-symbol')
                     ->sortable(),
@@ -117,7 +136,8 @@ class UserResource extends Resource
                     ->label('Miembro Desde')
                     ->dateTime('d/m/Y')
                     ->since()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('id', 'asc')
             ->filters([
@@ -167,7 +187,7 @@ class UserResource extends Resource
                     ->label(fn (User $record): string => $record->is_active ? 'Suspender' : 'Activar')
                     ->icon(fn (User $record): string => $record->is_active ? 'heroicon-o-no-symbol' : 'heroicon-o-check')
                     ->color(fn (User $record): string => $record->is_active ? 'danger' : 'success')
-                    ->hidden(fn (User $record): bool => $record->id === auth()->id() || $record->email === 'admin@arriendoseventos.cl')
+                    ->hidden(fn (User $record): bool => $record->id === auth()->id() || $record->email === 'admin@arriendoseventos.cl' || $record->email === 'dev@catalogo-arriendo.cl')
                     ->requiresConfirmation()
                     ->modalHeading(fn (User $record): string => $record->is_active ? "Suspender acceso a {$record->name}" : "Reactivar acceso a {$record->name}")
                     ->modalDescription(fn (User $record): string => $record->is_active
@@ -184,7 +204,22 @@ class UserResource extends Resource
 
                 // Acción de eliminación protegida
                 Tables\Actions\DeleteAction::make()
-                    ->hidden(fn (User $record): bool => $record->id === auth()->id() || $record->email === 'admin@arriendoseventos.cl')
+                    ->hidden(fn (User $record): bool => $record->id === auth()->id() || $record->email === 'admin@arriendoseventos.cl' || $record->email === 'dev@catalogo-arriendo.cl')
+                    ->before(function (User $record): void {
+                        if ($record->id === auth()->id()) {
+                            throw new \DomainException('No puedes eliminar tu propia cuenta de administrador.');
+                        }
+
+                        SecurityAuditLog::record(
+                            eventType: 'user.deleted',
+                            severity: 'critical',
+                            context: [
+                                'deleted_user_id' => $record->id,
+                                'email' => $record->email,
+                                'deleted_by' => auth()->id(),
+                            ]
+                        );
+                    })
                     ->modalHeading('¿Eliminar cuenta definitivamente?')
                     ->modalDescription('Esta acción es irreversible y removerá las credenciales permanentemente. Se recomienda "Suspender" si solo deseas revocar el acceso temporalmente.'),
             ])
@@ -192,7 +227,7 @@ class UserResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->action(function ($records): void {
-                            $records->filter(fn (User $user) => $user->id !== auth()->id() && $user->email !== 'admin@arriendoseventos.cl')->each->delete();
+                            $records->filter(fn (User $user) => $user->id !== auth()->id() && $user->email !== 'admin@arriendoseventos.cl' && $user->email !== 'dev@catalogo-arriendo.cl')->each->delete();
                         }),
                 ]),
             ]);

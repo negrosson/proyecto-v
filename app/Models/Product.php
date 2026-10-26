@@ -23,6 +23,9 @@ class Product extends Model
         'is_active',
         'is_sale',
         'is_featured',
+        'clicks_count',
+        'quoted_count',
+        'units_quoted_count',
     ];
 
     /**
@@ -39,6 +42,9 @@ class Product extends Model
             'is_active' => 'boolean',
             'is_sale' => 'boolean',
             'is_featured' => 'boolean',
+            'clicks_count' => 'integer',
+            'quoted_count' => 'integer',
+            'units_quoted_count' => 'integer',
         ];
     }
 

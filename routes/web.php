@@ -12,6 +12,10 @@ Route::get('/catalogo/buscar', [CatalogController::class, 'search'])
     ->name('catalog.search')
     ->middleware('throttle:catalog-search');
 
+Route::post('/catalogo/productos/{product}/click', [CatalogController::class, 'trackClick'])
+    ->name('catalog.track-click')
+    ->middleware('throttle:product-telemetry');
+
 Route::post('/cotizacion', [QuoteController::class, 'store'])
     ->name('quote.store')
     ->middleware('throttle:quote-submission');

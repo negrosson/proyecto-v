@@ -9,11 +9,12 @@ use App\Filament\Resources\SiteSettingResource;
 use App\Filament\Resources\UserResource;
 use App\Models\ContactMessage;
 use App\Models\Product;
+use App\Models\QuoteLog;
 use Filament\Widgets\Widget;
 
 class ExecutiveOverviewWidget extends Widget
 {
-    protected static ?int $sort = -2;
+    protected static ?int $sort = -10;
 
     protected int|string|array $columnSpan = 'full';
 
@@ -24,6 +25,8 @@ class ExecutiveOverviewWidget extends Widget
         return [
             'totalProducts' => Product::where('is_active', true)->count(),
             'totalStock' => (int) Product::where('is_active', true)->sum('stock'),
+            'totalQuotes' => QuoteLog::count(),
+            'pendingQuotes' => QuoteLog::where('status', 'pendiente')->count(),
             'unreadMessages' => ContactMessage::where('is_read', false)->count(),
             'userName' => auth()->user()?->name ?? 'Administrador',
             'createProductUrl' => ProductResource::getUrl('create'),

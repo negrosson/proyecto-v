@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
+use App\Models\Category;
 use App\Models\Product;
+use App\Services\Security\SafeImageSanitizer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 
 class ProductResource extends Resource
 {
@@ -43,55 +47,116 @@ class ProductResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Información del Producto')
                     ->description('Detalles principales para el catálogo y cálculo de cotizaciones')
-                    ->columns(2)
+                    ->columns(['default' => 1, 'md' => 2])
                     ->schema([
                         Forms\Components\Select::make('category_id')
                             ->label('Categoría')
                             ->relationship('category', 'name')
                             ->preload()
                             ->searchable()
-                            ->required(),
+                            ->required()
+                            ->exists('categories', 'id')
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nombre de la Categoría')
+                                    ->required()
+                                    ->string()
+                                    ->minLength(2)
+                                    ->maxLength(80)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (Forms\Set $set, ?string $state) => filled($state) ? $set('slug', Str::slug($state)) : null),
+
+                                Forms\Components\TextInput::make('slug')
+                                    ->label('Slug URL')
+                                    ->required()
+                                    ->string()
+                                    ->minLength(2)
+                                    ->maxLength(80)
+                                    ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
+                                    ->unique(Category::class, 'slug')
+                                    ->helperText('Solo minúsculas, números y guiones (ej: manteleria)'),
+                            ])
+                            ->editOptionForm([
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Nombre de la Categoría')
+                                    ->required()
+                                    ->string()
+                                    ->minLength(2)
+                                    ->maxLength(80)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (Forms\Set $set, ?string $state, ?Category $record): void {
+                                        if ($record && filled($state)) {
+                                            $set('slug', Str::slug($state));
+                                        }
+                                    }),
+
+                                Forms\Components\TextInput::make('slug')
+                                    ->label('Slug URL')
+                                    ->required()
+                                    ->string()
+                                    ->minLength(2)
+                                    ->maxLength(80)
+                                    ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
+                                    ->unique(Category::class, 'slug', ignoreRecord: true)
+                                    ->helperText('Solo minúsculas, números y guiones (ej: manteleria)'),
+                            ]),
 
                         Forms\Components\TextInput::make('code')
                             ->label('Código de Referencia')
                             ->helperText('Código único numérico (ej: 10, 220, 1030)')
                             ->required()
                             ->numeric()
+                            ->integer()
+                            ->minValue(1)
+                            ->maxValue(99999999)
                             ->unique(ignoreRecord: true),
 
                         Forms\Components\TextInput::make('name')
                             ->label('Nombre del Producto')
                             ->required()
-                            ->maxLength(255)
+                            ->string()
+                            ->minLength(2)
+                            ->maxLength(120)
                             ->columnSpanFull(),
 
                         Forms\Components\Textarea::make('description')
                             ->label('Descripción / Medidas / Material')
+                            ->nullable()
+                            ->string()
+                            ->maxLength(800)
                             ->rows(3)
                             ->columnSpanFull(),
                     ]),
 
                 Forms\Components\Section::make('Precios, Disponibilidad e Imagen')
-                    ->columns(2)
+                    ->columns(['default' => 1, 'md' => 2])
                     ->schema([
                         Forms\Components\TextInput::make('rental_price')
                             ->label('Precio Arriendo (CLP)')
                             ->prefix('$')
                             ->required()
                             ->numeric()
-                            ->minValue(0),
+                            ->integer()
+                            ->minValue(0)
+                            ->maxValue(50000000),
 
                         Forms\Components\TextInput::make('stock')
                             ->label('Stock Disponible (Unidades)')
                             ->required()
                             ->numeric()
+                            ->integer()
                             ->minValue(0)
+                            ->maxValue(1000000)
                             ->default(0),
 
                         Forms\Components\FileUpload::make('image')
                             ->label('Fotografía de Producto')
                             ->image()
-                            ->directory('products')
+                            ->maxSize(2048)
+                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->saveUploadedFileUsing(function (UploadedFile $file): string {
+                                return SafeImageSanitizer::sanitize($file, 'public', 'products');
+                            })
                             ->columnSpanFull(),
 
                         Forms\Components\Toggle::make('is_active')
@@ -107,6 +172,34 @@ class ProductResource extends Resource
                         Forms\Components\Toggle::make('is_sale')
                             ->label('Disponible para Venta Directa')
                             ->default(false),
+                    ]),
+
+                Forms\Components\Section::make('Telemetría de Interés (Solo Lectura)')
+                    ->description('Estadísticas automáticas de clics y cotizaciones generadas por los clientes')
+                    ->collapsible()
+                    ->collapsed()
+                    ->columns(['default' => 1, 'sm' => 3])
+                    ->schema([
+                        Forms\Components\TextInput::make('clicks_count')
+                            ->label('Clics / Interés')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->prefixIcon('heroicon-m-cursor-arrow-rays'),
+
+                        Forms\Components\TextInput::make('quoted_count')
+                            ->label('Veces Cotizado')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->prefixIcon('heroicon-m-chat-bubble-left'),
+
+                        Forms\Components\TextInput::make('units_quoted_count')
+                            ->label('Total Piezas Cotizadas')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->prefixIcon('heroicon-m-shopping-bag'),
                     ]),
             ]);
     }
@@ -156,13 +249,32 @@ class ProductResource extends Resource
                     ->sortable()
                     ->alignCenter(),
 
+                Tables\Columns\TextColumn::make('clicks_count')
+                    ->label('Clics')
+                    ->badge()
+                    ->color('warning')
+                    ->icon('heroicon-m-cursor-arrow-rays')
+                    ->sortable()
+                    ->alignCenter()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('quoted_count')
+                    ->label('Cotizado')
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-m-chat-bubble-left-right')
+                    ->sortable()
+                    ->alignCenter()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\IconColumn::make('is_featured')
                     ->label('Destacado')
                     ->boolean()
                     ->trueIcon('heroicon-o-star')
                     ->falseIcon('heroicon-o-minus')
                     ->trueColor('warning')
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Activo')

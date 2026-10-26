@@ -38,6 +38,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(3)->by($request->ip() ?: '127.0.0.1');
         });
 
+        RateLimiter::for('product-telemetry', static function (Request $request): Limit {
+            return Limit::perMinute(60)->by($request->ip() ?: '127.0.0.1');
+        });
+
         // 2. Reglas Globales de Contraseña Estricta (OWASP A07)
         Password::defaults(static function (): Password {
             return Password::min(10)

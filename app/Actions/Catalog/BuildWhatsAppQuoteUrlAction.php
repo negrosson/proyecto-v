@@ -5,25 +5,28 @@ declare(strict_types=1);
 namespace App\Actions\Catalog;
 
 use App\DTOs\QuoteRequestData;
+use App\Models\SiteSetting;
 
 final class BuildWhatsAppQuoteUrlAction
 {
-    private string $phoneNumber;
+    private ?string $explicitPhoneNumber;
 
     /**
-     * @param  string|null  $phoneNumber  Número de teléfono de contacto (código de país + número, ej: 56912345678)
+     * @param  string|null  $phoneNumber  Número de teléfono de contacto (opcional para override en pruebas)
      */
     public function __construct(?string $phoneNumber = null)
     {
-        $phone = $phoneNumber ?? (string) config('services.whatsapp.phone', '56912345678');
-        $this->phoneNumber = str_replace(['+', ' ', '-', '(', ')', '.'], '', $phone);
+        $this->explicitPhoneNumber = $phoneNumber !== null ? preg_replace('/\D+/', '', $phoneNumber) : null;
     }
 
     /**
      * Construye y retorna la URL directa de WhatsApp con el mensaje estructurado de cotización.
      */
-    public function execute(QuoteRequestData $quote): string
+    public function execute(QuoteRequestData $quote, ?string $overridePhone = null): string
     {
+        $phone = $overridePhone !== null
+            ? (preg_replace('/\D+/', '', $overridePhone) ?? '56900000000')
+            : ($this->explicitPhoneNumber ?? SiteSetting::current()->cleanWhatsappPhone());
         $customerName = $this->sanitize($quote->customerName);
         $location = $this->sanitize($quote->location);
         $eventDate = $quote->eventDate !== null && trim($quote->eventDate) !== ''
@@ -59,7 +62,7 @@ final class BuildWhatsAppQuoteUrlAction
 
         $message = implode("\n", $lines);
 
-        return sprintf('https://wa.me/%s?text=%s', $this->phoneNumber, rawurlencode($message));
+        return sprintf('https://wa.me/%s?text=%s', $phone, rawurlencode($message));
     }
 
     /**

@@ -43,12 +43,14 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Detalles de la Categoría')
-                    ->columns(2)
+                    ->columns(['default' => 1, 'sm' => 2])
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nombre de la Categoría')
                             ->required()
-                            ->maxLength(255)
+                            ->string()
+                            ->minLength(2)
+                            ->maxLength(80)
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (string $operation, ?string $state, Forms\Set $set): void {
                                 if ($operation === 'create' && filled($state)) {
@@ -59,9 +61,12 @@ class CategoryResource extends Resource
                         Forms\Components\TextInput::make('slug')
                             ->label('Slug URL')
                             ->required()
-                            ->maxLength(255)
+                            ->string()
+                            ->minLength(2)
+                            ->maxLength(80)
+                            ->regex('/^[a-z0-9]+(?:-[a-z0-9]+)*$/')
                             ->unique(ignoreRecord: true)
-                            ->helperText('Identificador único para enlaces (ej: vajilla, manteleria, sillas)'),
+                            ->helperText('Solo minúsculas, números y guiones (ej: vajilla, manteleria, sillas)'),
                     ]),
             ]);
     }
@@ -86,7 +91,7 @@ class CategoryResource extends Resource
                     ->label('Productos Vinculados')
                     ->counts('products')
                     ->badge()
-                    ->color('amber')
+                    ->color('info')
                     ->sortable()
                     ->alignCenter(),
 

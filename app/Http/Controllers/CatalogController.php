@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\Catalog\FilterProductsAction;
+use App\Actions\Catalog\TrackProductClickAction;
 use App\Models\Category;
 use App\Models\Faq;
 use App\Models\Product;
@@ -99,6 +100,19 @@ class CatalogController extends Controller
         return response()->json([
             'data' => $data,
             'total' => $products->total(),
+        ]);
+    }
+
+    /**
+     * Registra la interacción o clic de interés sobre un producto del catálogo.
+     */
+    public function trackClick(Request $request, Product $product, TrackProductClickAction $action): JsonResponse
+    {
+        $action->execute($product->id);
+
+        return response()->json([
+            'success' => true,
+            'clicks_count' => (int) $product->fresh()->clicks_count,
         ]);
     }
 }

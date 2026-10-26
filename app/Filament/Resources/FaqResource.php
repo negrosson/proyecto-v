@@ -33,6 +33,8 @@ class FaqResource extends Resource
                 Forms\Components\TextInput::make('question')
                     ->label('Pregunta')
                     ->required()
+                    ->string()
+                    ->minLength(5)
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\Select::make('category')
@@ -47,6 +49,9 @@ class FaqResource extends Resource
                 Forms\Components\TextInput::make('sort_order')
                     ->label('Orden de Visualización')
                     ->numeric()
+                    ->integer()
+                    ->minValue(0)
+                    ->maxValue(9999)
                     ->default(0)
                     ->required(),
                 Forms\Components\Toggle::make('is_active')
@@ -55,6 +60,9 @@ class FaqResource extends Resource
                 Forms\Components\Textarea::make('answer')
                     ->label('Respuesta Detallada')
                     ->required()
+                    ->string()
+                    ->minLength(10)
+                    ->maxLength(2000)
                     ->rows(4)
                     ->columnSpanFull(),
             ]);
@@ -67,6 +75,7 @@ class FaqResource extends Resource
                 Tables\Columns\TextColumn::make('question')
                     ->label('Pregunta')
                     ->searchable()
+                    ->wrap()
                     ->limit(60),
                 Tables\Columns\TextColumn::make('category')
                     ->label('Categoría')
@@ -74,7 +83,8 @@ class FaqResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('sort_order')
                     ->label('Orden')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Activa')
                     ->boolean()
@@ -96,7 +106,7 @@ class FaqResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->slideOver(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

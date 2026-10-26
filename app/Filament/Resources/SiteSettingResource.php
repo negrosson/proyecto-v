@@ -6,11 +6,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SiteSettingResource\Pages;
 use App\Models\SiteSetting;
+use App\Services\Security\SafeImageSanitizer;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Http\UploadedFile;
 
 class SiteSettingResource extends Resource
 {
@@ -47,8 +49,9 @@ class SiteSettingResource extends Resource
                                 Forms\Components\FileUpload::make('logo_path')
                                     ->label('Logo Oficial (Opcional)')
                                     ->image()
-                                    ->directory('site')
-                                    ->disk('public'),
+                                    ->maxSize(2048)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site')),
                                 Forms\Components\TextInput::make('hero_badge')
                                     ->label('Badge Superior del Hero')
                                     ->required()
@@ -65,9 +68,10 @@ class SiteSettingResource extends Resource
                                 Forms\Components\FileUpload::make('hero_bg_image')
                                     ->label('Imagen de Fondo del Hero (Opcional)')
                                     ->image()
-                                    ->directory('site')
-                                    ->disk('public'),
-                            ])->columns(2),
+                                    ->maxSize(2048)
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site')),
+                            ])->columns(['default' => 1, 'md' => 2]),
 
                         // Pestaña 2: Empresa, Mapa & Redes
                         Forms\Components\Tabs\Tab::make('Empresa, Mapa & Redes')
@@ -115,7 +119,7 @@ class SiteSettingResource extends Resource
                                     ->label('URL TikTok')
                                     ->url()
                                     ->maxLength(255),
-                            ])->columns(2),
+                            ])->columns(['default' => 1, 'md' => 2]),
 
                         // Pestaña 3: Políticas de Envíos
                         Forms\Components\Tabs\Tab::make('Políticas de Envíos')
@@ -147,7 +151,7 @@ class SiteSettingResource extends Resource
                                     ->label('4. Ventanas Horarias y Conteo con Guía')
                                     ->required()
                                     ->rows(3),
-                            ])->columns(2),
+                            ])->columns(['default' => 1, 'md' => 2]),
                     ])->columnSpanFull(),
             ]);
     }
@@ -164,7 +168,8 @@ class SiteSettingResource extends Resource
                     ->label('WhatsApp')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('company_email')
-                    ->label('Email'),
+                    ->label('Email')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Última Actualización')
                     ->dateTime('d/m/Y H:i')
