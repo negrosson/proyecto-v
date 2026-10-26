@@ -152,8 +152,9 @@ class ProductResource extends Resource
                         Forms\Components\FileUpload::make('image')
                             ->label('Fotografía de Producto')
                             ->image()
-                            ->maxSize(2048)
+                            ->maxSize(4096)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                            ->helperText('Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 4 MB. El sistema optimiza y sanitiza automáticamente a WebP de alta fidelidad.')
                             ->saveUploadedFileUsing(function (UploadedFile $file): string {
                                 return SafeImageSanitizer::sanitize($file, 'public', 'products');
                             })

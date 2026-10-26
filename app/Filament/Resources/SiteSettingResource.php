@@ -49,8 +49,9 @@ class SiteSettingResource extends Resource
                                 Forms\Components\FileUpload::make('logo_path')
                                     ->label('Logo Oficial (Opcional)')
                                     ->image()
-                                    ->maxSize(2048)
+                                    ->maxSize(4096)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->helperText('Formato PNG, WebP o JPG. Tamaño máx: 4 MB.')
                                     ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site')),
                                 Forms\Components\TextInput::make('hero_badge')
                                     ->label('Badge Superior del Hero')
@@ -68,8 +69,9 @@ class SiteSettingResource extends Resource
                                 Forms\Components\FileUpload::make('hero_bg_image')
                                     ->label('Imagen de Fondo del Hero (Opcional)')
                                     ->image()
-                                    ->maxSize(2048)
+                                    ->maxSize(4096)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                    ->helperText('Fotografía de fondo (JPG, PNG, WebP). Tamaño máx: 4 MB.')
                                     ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site')),
                             ])->columns(['default' => 1, 'md' => 2]),
 

@@ -84,6 +84,9 @@ El sistema protege todas las capas de la aplicación:
    * El servicio carga la matriz de píxeles pura en memoria con `imagecreatefromstring()`, crea un lienzo virgen y recompila la imagen desde cero en formato `.webp` sobrescribiéndola con un nombre aleatorio criptográfico generado con `Str::ulid()`. Este proceso destruye el 100% de los metadatos EXIF y los bytes residuales.
 4. **Contención a Nivel de Servidor Web:**
    * El archivo `.htaccess` en el almacenamiento público desactiva el listado de directorios y la ejecución de CGI/PHP (`Options -Indexes -ExecCGI` y `RemoveHandler .php`).
+5. **Límite de Tamaño y Guía de Modificación:**
+   * Límite actual configurado en **4 MB** (`4096 KB` en Filament y `4 * 1024 * 1024` bytes en `SafeImageSanitizer`).
+   * Para instrucciones paso a paso sobre cómo ampliar o reducir este límite, consultar la [`Documentos/GUIA_SUBIDA_IMAGENES_Y_LIMITES.md`](file:///c:/laragon/www/catalogo-arriendo/Documentos/GUIA_SUBIDA_IMAGENES_Y_LIMITES.md).
 
 ---
 

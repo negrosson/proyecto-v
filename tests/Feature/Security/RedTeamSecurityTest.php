@@ -169,6 +169,31 @@ class RedTeamSecurityTest extends TestCase
     }
 
     /**
+     * ESCENARIO 4.1: Control estricto de tamaño máximo de 4MB en subida de imágenes.
+     */
+    public function test_image_sanitizer_enforces_4mb_maximum_size_limit(): void
+    {
+        $im = imagecreatetruecolor(10, 10);
+        $tmpFile = tempnam(sys_get_temp_dir(), 'size_test_').'.jpg';
+        imagejpeg($im, $tmpFile);
+        imagedestroy($im);
+
+        // Agrandar artificialmente el archivo superando 4MB (4MB + 10KB)
+        $padding = str_repeat('A', 4 * 1024 * 1024 + 10240);
+        file_put_contents($tmpFile, $padding, FILE_APPEND);
+
+        try {
+            $this->expectException(InvalidArgumentException::class);
+            $this->expectExceptionMessage('4MB');
+            SafeImageSanitizer::sanitize($tmpFile, 'public', 'test');
+        } finally {
+            if (file_exists($tmpFile)) {
+                @unlink($tmpFile);
+            }
+        }
+    }
+
+    /**
      * ESCENARIO 5: Inmutabilidad forense de SecurityAuditLog y detección de adulteración en MySQL.
      */
     public function test_security_audit_log_is_immutable_and_detects_database_tampering(): void

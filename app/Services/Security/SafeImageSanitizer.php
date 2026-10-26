@@ -17,7 +17,7 @@ use InvalidArgumentException;
  */
 final class SafeImageSanitizer
 {
-    private const MAX_BYTES = 2 * 1024 * 1024; // 2 MB
+    public const MAX_BYTES = 4 * 1024 * 1024; // 4 MB (4.194.304 bytes)
 
     private const ALLOWED_IMAGE_TYPES = [
         IMAGETYPE_JPEG,
@@ -51,7 +51,7 @@ final class SafeImageSanitizer
         // 1. Control estricto de tamaño
         $fileSize = filesize($realPath);
         if ($fileSize === false || $fileSize <= 0 || $fileSize > self::MAX_BYTES) {
-            throw new InvalidArgumentException('El archivo supera el tamaño máximo permitido de 2MB o está vacío.');
+            throw new InvalidArgumentException('El archivo supera el tamaño máximo permitido de 4MB o está vacío.');
         }
 
         // 2. Control de cabecera mágica MIME con getimagesize
