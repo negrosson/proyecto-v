@@ -57,7 +57,11 @@ class QuoteLogResource extends Resource
                             ->maxLength(255),
 
                         Forms\Components\DatePicker::make('event_date')
-                            ->label('Fecha del Evento'),
+                            ->label('Fecha del Evento')
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->minDate(now()->subMonths(6))
+                            ->maxDate(now()->addYears(2)),
 
                         Forms\Components\Select::make('status')
                             ->label('Estado de la Cotización')

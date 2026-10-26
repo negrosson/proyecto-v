@@ -108,7 +108,7 @@ class SubmitQuoteRequest extends FormRequest
             'location.max' => 'El lugar no puede superar los 100 caracteres.',
             'location.regex' => 'El lugar contiene caracteres inválidos o no permitidos.',
             'event_date.date' => 'La fecha del evento debe ser una fecha válida.',
-            'event_date.after_or_equal' => 'La fecha del evento no puede ser anterior a hoy.',
+            'event_date.after_or_equal' => 'La fecha del evento no puede ser en el pasado. Debe ser desde hoy en adelante.',
             'event_date.before' => 'La fecha del evento no puede superar los 2 años en el futuro.',
             'items.required' => 'Debes incluir al menos un producto en la cotización.',
             'items.min' => 'Debes incluir al menos un producto en la cotización.',

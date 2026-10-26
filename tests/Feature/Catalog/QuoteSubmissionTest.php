@@ -141,4 +141,61 @@ class QuoteSubmissionTest extends TestCase
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['items.0.quantity']);
     }
+
+    /**
+     * Comprueba que la cotización rechace fechas pasadas o incoherentemente lejanas.
+     */
+    public function test_quote_submission_rejects_past_or_incoherent_event_dates(): void
+    {
+        $category = Category::factory()->create();
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Copas de Cristal',
+            'stock' => 100,
+            'rental_price' => 800,
+        ]);
+
+        // Caso A: Fecha en el pasado
+        $pastResponse = $this->postJson(route('quote.store'), [
+            'customer_name' => 'Rodrigo Silva',
+            'location' => 'Providencia',
+            'event_date' => now()->subDay()->format('Y-m-d'),
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 10],
+            ],
+        ]);
+
+        $pastResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['event_date']);
+
+        $this->assertStringContainsString(
+            'no puede ser en el pasado',
+            $pastResponse->json('errors.event_date.0')
+        );
+
+        // Caso B: Fecha mayor a 2 años en el futuro
+        $futureResponse = $this->postJson(route('quote.store'), [
+            'customer_name' => 'Rodrigo Silva',
+            'location' => 'Providencia',
+            'event_date' => now()->addYears(3)->format('Y-m-d'),
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 10],
+            ],
+        ]);
+
+        $futureResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['event_date']);
+
+        // Caso C: Fecha de hoy (válida)
+        $todayResponse = $this->postJson(route('quote.store'), [
+            'customer_name' => 'Rodrigo Silva',
+            'location' => 'Providencia',
+            'event_date' => now()->format('Y-m-d'),
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 10],
+            ],
+        ]);
+
+        $todayResponse->assertOk();
+    }
 }

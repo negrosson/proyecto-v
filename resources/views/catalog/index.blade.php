@@ -1207,9 +1207,16 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">Fecha del Evento *</label>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Fecha del Evento *</label>
+                                    <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">Desde hoy en adelante</span>
+                                </div>
                                 <input type="date" 
                                        x-model="form.event_date" 
+                                       min="{{ now()->format('Y-m-d') }}"
+                                       max="{{ now()->addYears(2)->format('Y-m-d') }}"
+                                       :min="minDate"
+                                       :max="maxDate"
                                        class="w-full px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm"
                                        :class="{ 'border-rose-400 ring-2 ring-rose-400/20': errors.event_date }">
                                 <template x-if="errors.event_date">
@@ -1660,21 +1667,40 @@
                     </div>
                 </div>
 
-                <div class="space-y-2.5 pt-1 text-xs">
+                <div class="space-y-3 pt-1 text-xs">
                     <label class="block font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[10px]">Datos para la reserva:</label>
                     <div>
+                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px] mb-1">Nombre y Apellido *</label>
                         <input type="text" x-model="form.name" placeholder="Tu Nombre y Apellido *" 
-                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
+                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
                     </div>
                     <div>
-                        <input type="date" x-model="form.date" 
-                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px]">Fecha del Evento <span class="text-zinc-400 font-normal">(opcional)</span></label>
+                            <span class="text-[10px] text-zinc-400 dark:text-zinc-500">Mínimo hoy</span>
+                        </div>
+                        <input type="date" 
+                               x-model="form.date" 
+                               min="{{ now()->format('Y-m-d') }}"
+                               max="{{ now()->addYears(2)->format('Y-m-d') }}"
+                               :min="minDate"
+                               :max="maxDate"
+                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
                     </div>
                     <div>
+                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px] mb-1">Comuna o Lugar del Evento *</label>
                         <input type="text" x-model="form.location" placeholder="Comuna / Lugar del Evento *" 
-                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
+                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
                     </div>
                 </div>
+
+                <!-- Alerta de Error visible en el pie del carrito -->
+                <template x-if="errorMessage">
+                    <div class="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs rounded-xl flex items-start gap-2 shadow-sm animate-pulse">
+                        <svg class="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        <span x-text="errorMessage"></span>
+                    </div>
+                </template>
 
                 <!-- Botón de Envío POST a route('quote.store') y Apertura de WhatsApp -->
                 <button @click="submitQuote()" 
@@ -1716,6 +1742,8 @@
                     message: '',
                     website_hp: ''
                 },
+                minDate: '{{ now()->format('Y-m-d') }}',
+                maxDate: '{{ now()->addYears(2)->format('Y-m-d') }}',
                 errors: {},
                 isSubmitting: false,
                 successMessage: '',
@@ -1725,6 +1753,23 @@
                     this.errors = {};
                     this.generalError = '';
                     this.successMessage = '';
+
+                    // Validación de coherencia de fecha en cliente
+                    if (!this.form.event_date) {
+                        this.errors = { event_date: ['La fecha del evento es obligatoria para verificar disponibilidad de arriendo.'] };
+                        return;
+                    }
+
+                    if (this.form.event_date < this.minDate) {
+                        this.errors = { event_date: ['La fecha del evento no puede ser en el pasado. Debe ser desde hoy en adelante.'] };
+                        return;
+                    }
+
+                    if (this.form.event_date > this.maxDate) {
+                        this.errors = { event_date: ['La fecha del evento no puede superar los 2 años en el futuro.'] };
+                        return;
+                    }
+
                     this.isSubmitting = true;
 
                     try {
@@ -1771,6 +1816,8 @@
                 mobileMenuOpen: false,
                 isSubmitting: false,
                 errorMessage: '',
+                minDate: '{{ now()->format('Y-m-d') }}',
+                maxDate: '{{ now()->addYears(2)->format('Y-m-d') }}',
                 toast: { show: false, message: '', timeout: null },
                 isDark: document.documentElement.classList.contains('dark'),
 
@@ -2002,6 +2049,18 @@
                     if (!this.form.location || !this.form.location.trim()) {
                         this.errorMessage = 'Por favor ingresa la Comuna o Lugar del Evento.';
                         return;
+                    }
+
+                    if (this.form.date) {
+                        if (this.form.date < this.minDate) {
+                            this.errorMessage = 'La fecha del evento no puede ser en el pasado. Debe ser desde hoy en adelante.';
+                            return;
+                        }
+
+                        if (this.form.date > this.maxDate) {
+                            this.errorMessage = 'La fecha del evento no puede superar los 2 años en el futuro.';
+                            return;
+                        }
                     }
 
                     this.isSubmitting = true;

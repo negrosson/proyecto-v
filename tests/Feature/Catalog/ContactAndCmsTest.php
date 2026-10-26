@@ -155,4 +155,59 @@ class ContactAndCmsTest extends TestCase
         $freshSetting = SiteSetting::current();
         $this->assertSame('Banquetería Imperial Gourmet', $freshSetting->site_name);
     }
+
+    /**
+     * 6. Verifica que no se puedan agendar eventos en el pasado ni con más de 2 años en el futuro.
+     */
+    public function test_contact_form_rejects_past_or_incoherent_event_dates(): void
+    {
+        // Caso A: Fecha en el pasado (ayer)
+        $pastPayload = [
+            'name' => 'Felipe Morales',
+            'email' => 'felipe@empresa.cl',
+            'phone' => '+56977112233',
+            'event_address' => 'Santiago Centro',
+            'event_date' => now()->subDay()->format('Y-m-d'),
+            'message' => 'Intento de agendar con fecha pasada.',
+            'website_hp' => '',
+        ];
+
+        $pastResponse = $this->postJson(route('contact.store'), $pastPayload);
+        $pastResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['event_date']);
+
+        $this->assertStringContainsString(
+            'no puede ser en el pasado',
+            $pastResponse->json('errors.event_date.0')
+        );
+
+        // Caso B: Fecha incoherentemente lejana (3 años en el futuro)
+        $futurePayload = [
+            'name' => 'Felipe Morales',
+            'email' => 'felipe@empresa.cl',
+            'phone' => '+56977112233',
+            'event_address' => 'Santiago Centro',
+            'event_date' => now()->addYears(3)->format('Y-m-d'),
+            'message' => 'Intento de agendar a 3 años futuro.',
+            'website_hp' => '',
+        ];
+
+        $futureResponse = $this->postJson(route('contact.store'), $futurePayload);
+        $futureResponse->assertStatus(422)
+            ->assertJsonValidationErrors(['event_date']);
+
+        // Caso C: Fecha de hoy (válida para arriendos inmediatos)
+        $todayPayload = [
+            'name' => 'Felipe Morales',
+            'email' => 'felipe@empresa.cl',
+            'phone' => '+56977112233',
+            'event_address' => 'Santiago Centro',
+            'event_date' => now()->format('Y-m-d'),
+            'message' => 'Arriendo urgente para evento de hoy.',
+            'website_hp' => '',
+        ];
+
+        $todayResponse = $this->postJson(route('contact.store'), $todayPayload);
+        $todayResponse->assertOk();
+    }
 }
