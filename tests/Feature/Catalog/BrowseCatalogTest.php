@@ -200,7 +200,7 @@ class BrowseCatalogTest extends TestCase
     }
 
     /**
-     * Comprueba que la vista principal cargue productos destacados y showcase sincronizados con la BD.
+     * Comprueba que la vista principal cargue productos para el carrusel y la sección de montajes.
      */
     public function test_catalog_homepage_loads_featured_and_showcase_collections(): void
     {
@@ -220,10 +220,28 @@ class BrowseCatalogTest extends TestCase
         $response->assertOk();
         $response->assertViewHas('featuredProducts');
         $response->assertViewHas('showcaseProducts');
+        $response->assertViewHas('carouselProducts');
+        $response->assertViewHas('montajes');
         $response->assertSee('Silla Chiavari Imperial Dorada');
-        $response->assertSee('Disfruta de Nuestro');
-        $response->assertSee('Productos');
-        $response->assertSee('Destacados');
-        $response->assertSee('Celebra con');
+        $response->assertSee('Vitrina en Carrusel');
+        $response->assertSee('T E N O');
+        $response->assertSee('Montaje de Eventos en Santiago');
+        $response->assertSee(route('catalog.montajes'));
+    }
+
+    /**
+     * Comprueba que la vista dedicada de montajes cargue correctamente con el portafolio de trabajos.
+     */
+    public function test_can_browse_dedicated_montajes_page(): void
+    {
+        $response = $this->get(route('catalog.montajes'));
+
+        $response->assertOk();
+        $response->assertViewIs('catalog.montajes');
+        $response->assertViewHas('montajes');
+        $response->assertSee('T E N O   2 0 2 3');
+        $response->assertSee('Agrozzi');
+        $response->assertSee('Montaje de Eventos en Santiago');
+        $response->assertSee('Gala Nocturna &amp; Ambientación Dorada', false);
     }
 }

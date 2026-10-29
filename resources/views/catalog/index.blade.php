@@ -146,7 +146,7 @@
                 </div>
             </a>
 
-            <!-- Enlaces de Navegación Desktop (Menú limpio: Inicio, Destacados, Catálogo, Envíos, Contacto, WhatsApp) -->
+            <!-- Enlaces de Navegación Desktop (Menú limpio: Inicio, Destacados, Catálogo, Montajes, Envíos, Contacto, WhatsApp) -->
             <nav class="hidden md:flex items-center gap-6 text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400">
                 <a href="{{ route('catalog.index') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1 relative {{ !request('categoria') && !request('buscar') ? 'text-zinc-950 dark:text-white font-bold border-b-2 border-zinc-900 dark:border-amber-400' : '' }}">
                     Inicio
@@ -156,6 +156,10 @@
                 </a>
                 <a href="#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Catálogo
+                </a>
+                <a href="#montajes" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1 flex items-center gap-1">
+                    <span>Montajes</span>
+                    <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/30">Nuevo</span>
                 </a>
                 <a href="#envios" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Envíos
@@ -226,7 +230,7 @@
             </div>
         </div>
 
-        <!-- Menú Móvil Desplegable (Limpio: sin FAQ) -->
+        <!-- Menú Móvil Desplegable -->
         <div x-show="mobileMenuOpen" 
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-2"
@@ -243,20 +247,27 @@
                     <span class="text-xs text-zinc-400 font-mono">01</span>
                 </a>
                 <a @click="mobileMenuOpen = false" href="#destacados" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
-                    <span>Productos Destacados</span>
+                    <span>Colección en Carrusel</span>
                     <span class="text-xs text-zinc-400 font-mono">02</span>
                 </a>
                 <a @click="mobileMenuOpen = false" href="#catalogo" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Catálogo Completo</span>
                     <span class="text-xs text-zinc-400 font-mono">03</span>
                 </a>
+                <a @click="mobileMenuOpen = false" href="#montajes" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between font-bold text-amber-700 dark:text-amber-400">
+                    <span class="flex items-center gap-2">
+                        <span>Montajes & Puesta en Escena</span>
+                        <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded">Nuevo</span>
+                    </span>
+                    <span class="text-xs text-zinc-400 font-mono">04</span>
+                </a>
                 <a @click="mobileMenuOpen = false" href="#envios" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Envíos & Logística</span>
-                    <span class="text-xs text-zinc-400 font-mono">04</span>
+                    <span class="text-xs text-zinc-400 font-mono">05</span>
                 </a>
                 <a @click="mobileMenuOpen = false" href="#contacto" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Contacto & Ubicación</span>
-                    <span class="text-xs text-zinc-400 font-mono">05</span>
+                    <span class="text-xs text-zinc-400 font-mono">06</span>
                 </a>
                 <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico desde el catálogo de ' . ($settings->site_name ?? 'Arriendos & Eventos') . '.') }}" 
                    target="_blank" 
@@ -278,13 +289,13 @@
 
     @if(!request('categoria') && !request('buscar'))
         <!-- Hero Banner Editorial (Blanco Puro en Claro + Modo Oscuro Obsidian) -->
-        <section class="relative bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 py-16 sm:py-24 overflow-hidden"
+        <section class="relative bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 py-10 sm:py-16 overflow-hidden"
                  @if(!empty($settings?->hero_bg_image)) style="background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.98)), url('{{ asset('storage/' . $settings->hero_bg_image) }}'); background-size: cover; background-position: center;" @endif>
             <!-- Patrón de fondo geométrico sutil -->
             <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(#18181B 1px, transparent 1px); background-size: 24px 24px;"></div>
             
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                <div class="inline-flex items-center gap-2 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 py-1.5 rounded-full mb-6 shadow-sm">
+                <div class="inline-flex items-center gap-2 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 py-1.5 rounded-full mb-4 sm:mb-6 shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
                     <span class="text-[10px] sm:text-xs font-mono font-medium tracking-widest uppercase text-zinc-700 dark:text-zinc-300">
                         {{ $settings->hero_badge ?? 'Catálogo Oficial • Temporada 2026' }}
@@ -295,79 +306,78 @@
                     {{ $settings->hero_title ?? 'Equipamiento y ambientación para ocasiones extraordinarias' }}
                 </h1>
 
-                <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-5 max-w-2xl mx-auto font-light leading-relaxed">
+                <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 sm:mt-5 max-w-2xl mx-auto font-light leading-relaxed">
                     {{ $settings->hero_subtitle ?? 'Mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y celebraciones corporativas. Celebra con distinción y logística puntual garantizada.' }}
                 </p>
 
                 <!-- Mini-Stats de Confianza Boutique -->
-                <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-sm text-center">
-                        <span class="block font-serif text-2xl font-bold text-zinc-900 dark:text-white">+190</span>
+                <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto">
+                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 rounded-2xl shadow-sm text-center">
+                        <span class="block font-serif text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">+190</span>
                         <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Ítems de colección</span>
                     </div>
-                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-sm text-center">
-                        <span class="block font-serif text-2xl font-bold text-emerald-600 dark:text-emerald-400">100%</span>
+                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 rounded-2xl shadow-sm text-center">
+                        <span class="block font-serif text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">100%</span>
                         <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Sanitización certificada</span>
                     </div>
-                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-4 rounded-2xl shadow-sm text-center">
-                        <span class="block font-serif text-2xl font-bold text-amber-600 dark:text-amber-400">Puntual</span>
+                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 rounded-2xl shadow-sm text-center">
+                        <span class="block font-serif text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">Puntual</span>
                         <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Entrega y retiro coordinado</span>
                     </div>
                 </div>
 
-                <div class="mt-8">
-                    <a href="#catalogo" class="inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 font-medium text-xs sm:text-sm px-6 py-3.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
-                        <span>Explorar Colección Completa</span>
+                <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+                    <a href="#destacados" class="inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 font-medium text-xs sm:text-sm px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                        <span>Ver Vitrina en Carrusel</span>
                         <svg class="w-4 h-4 text-amber-400 dark:text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </a>
+                    <a href="#montajes" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700 font-medium text-xs sm:text-sm px-5 py-3 rounded-full shadow-sm transition-all duration-300">
+                        <span>Montajes Realizados</span>
+                        <span class="text-[10px] font-mono bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded font-bold">2023-2026</span>
                     </a>
                 </div>
             </div>
         </section>
 
         <!-- Barra de 3 Pasos de Reserva Visual -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-5 sm:p-7 shadow-xl shadow-zinc-900/5">
-                <div class="text-center mb-6">
-                    <span class="text-[10px] font-mono tracking-widest uppercase text-zinc-500 dark:text-zinc-400 block mb-1">Paso a Paso</span>
-                    <h3 class="font-serif text-xl sm:text-2xl text-zinc-900 dark:text-white font-semibold">Proceso de Reserva Simple y Transparente</h3>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 relative">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-5 sm:-mt-6 relative z-20">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-4 sm:p-6 shadow-xl shadow-zinc-900/5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 relative">
                     <!-- Paso 1 -->
-                    <div class="flex items-start gap-4 p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
-                        <div class="w-10 h-10 rounded-full bg-zinc-900 dark:bg-zinc-700 text-amber-300 font-serif text-lg font-bold flex items-center justify-center shrink-0 shadow-sm">
+                    <div class="flex items-start gap-3.5 p-3 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-900 dark:bg-zinc-700 text-amber-300 font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm">
                             1
                         </div>
                         <div>
-                            <h4 class="font-semibold text-zinc-900 dark:text-white text-sm">Selecciona tu mobiliario</h4>
-                            <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
-                                Agrega las piezas y cantidades que necesitas. Cada artículo muestra su stock en tiempo real.
+                            <h4 class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm">Selecciona tu mobiliario</h4>
+                            <p class="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-relaxed">
+                                Agrega piezas y cantidades requeridas con stock en tiempo real.
                             </p>
                         </div>
                     </div>
 
                     <!-- Paso 2 -->
-                    <div class="flex items-start gap-4 p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
-                        <div class="w-10 h-10 rounded-full bg-zinc-900 dark:bg-zinc-700 text-amber-300 font-serif text-lg font-bold flex items-center justify-center shrink-0 shadow-sm">
+                    <div class="flex items-start gap-3.5 p-3 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-900 dark:bg-zinc-700 text-amber-300 font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm">
                             2
                         </div>
                         <div>
-                            <h4 class="font-semibold text-zinc-900 dark:text-white text-sm">Envía tu cotización</h4>
-                            <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
-                                Ingresa tu nombre, fecha y comuna en el drawer lateral para consolidar tu solicitud.
+                            <h4 class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm">Revisa tu cotización</h4>
+                            <p class="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-relaxed">
+                                Ingresa tu nombre, fecha y comuna en el drawer lateral consolidado.
                             </p>
                         </div>
                     </div>
 
                     <!-- Paso 3 -->
-                    <div class="flex items-start gap-4 p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
-                        <div class="w-10 h-10 rounded-full bg-emerald-700 text-white font-serif text-lg font-bold flex items-center justify-center shrink-0 shadow-sm">
+                    <div class="flex items-start gap-3.5 p-3 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-700 text-white font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm">
                             3
                         </div>
                         <div>
-                            <h4 class="font-semibold text-zinc-900 dark:text-white text-sm">Coordinación y flete vía WhatsApp</h4>
-                            <p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-relaxed">
-                                Te confirmamos disponibilidad de fecha, coordinamos el flete y aseguramos la reserva.
+                            <h4 class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm">Confirmación por WhatsApp</h4>
+                            <p class="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-relaxed">
+                                Confirmamos disponibilidad de fecha, flete y reserva inmediata.
                             </p>
                         </div>
                     </div>
@@ -375,259 +385,363 @@
             </div>
         </section>
 
-        <!-- SECCIÓN: SHOWROOM "DISFRUTA DE NUESTRO MOBILIARIO" -->
-        <section id="mobiliario-rotacion" class="py-14 sm:py-20 border-b border-zinc-200/80 dark:border-zinc-800">
+        <!-- SECCIÓN: CARRUSEL INTERACTIVO DE INICIO (Compacto & Elegante) -->
+        <section id="destacados" 
+                 class="py-12 sm:py-16 border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 overflow-hidden"
+                 x-data="{
+                     currentIndex: 0,
+                     width: window.innerWidth,
+                     touchStartX: 0,
+                     total: {{ $carouselProducts->count() }},
+                     get perPage() {
+                         if (this.width >= 1024) return 4;
+                         if (this.width >= 640) return 2;
+                         return 1;
+                     },
+                     get maxIndex() {
+                         return Math.max(0, this.total - this.perPage);
+                     },
+                     next() {
+                         this.currentIndex = (this.currentIndex >= this.maxIndex) ? 0 : this.currentIndex + 1;
+                     },
+                     prev() {
+                         this.currentIndex = (this.currentIndex <= 0) ? this.maxIndex : this.currentIndex - 1;
+                     },
+                     autoplayTimer: null,
+                     startAutoplay() {
+                         this.stopAutoplay();
+                         this.autoplayTimer = setInterval(() => { this.next(); }, 4500);
+                     },
+                     stopAutoplay() {
+                         if (this.autoplayTimer) clearInterval(this.autoplayTimer);
+                     }
+                 }"
+                 x-init="startAutoplay()"
+                 @resize.window.debounce.100ms="width = window.innerWidth; if (currentIndex > maxIndex) currentIndex = maxIndex"
+                 @mouseenter="stopAutoplay()"
+                 @mouseleave="startAutoplay()">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-12">
-                    <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 py-1 rounded-full inline-block mb-3 font-semibold">
-                        Showroom &bull; Colección Exclusiva
-                    </span>
-                    <h2 class="font-serif text-2xl sm:text-4xl md:text-5xl font-light text-zinc-900 dark:text-white tracking-wide uppercase">
-                        Disfruta de Nuestro <span class="italic font-normal text-amber-700 dark:text-amber-500">Mobiliario</span>
-                    </h2>
-                    <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-3 font-light max-w-xl mx-auto">
-                        Piezas seleccionadas con acabados de alta gama, maderas nobles y metales finamente trabajados para montajes distinguidos.
-                    </p>
+                <!-- Header con Título Editorial y Botones Deslizadores -->
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                    <div>
+                        <div class="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3 py-1 rounded-full mb-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                            <span class="text-[10px] font-mono uppercase tracking-[0.22em] text-amber-800 dark:text-amber-400 font-semibold">
+                                Vitrina en Carrusel • Colección en Rotación
+                            </span>
+                        </div>
+                        <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-light text-zinc-900 dark:text-white tracking-wide">
+                            Disfruta de Nuestro <span class="italic font-normal text-amber-700 dark:text-amber-500">Mobiliario & Destacados</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 font-light max-w-xl">
+                            Desliza para explorar nuestras piezas de mayor distinción para bodas, aniversarios y recepciones corporativas.
+                        </p>
+                    </div>
+
+                    <!-- Controles Flechas Prev / Next con Contador -->
+                    <div class="flex items-center gap-3 self-end sm:self-auto">
+                        <div class="text-xs font-mono text-zinc-500 dark:text-zinc-400 hidden sm:block">
+                            <span x-text="currentIndex + 1" class="font-bold text-zinc-900 dark:text-white"></span>
+                            <span> / </span>
+                            <span x-text="maxIndex + 1"></span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button @click="prev()" 
+                                    aria-label="Diapositiva anterior"
+                                    class="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <button @click="next()" 
+                                    aria-label="Siguiente diapositiva"
+                                    class="w-10 h-10 rounded-full bg-white dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:scale-105 active:scale-95 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Grid de Mobiliario Showcase -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach ($showcaseProducts->take(6) as $item)
-                        @php
-                            $imgSrc = $getProductImage($item);
-                        @endphp
-                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
-                            <div>
-                                <!-- Imagen Fotográfica de Alta Resolución -->
-                                <div @click="openDetail({
-                                        id: {{ $item->id }},
-                                        name: '{{ addslashes($item->name) }}',
-                                        code: {{ $item->code }},
-                                        price: {{ $item->rental_price }},
-                                        stock: {{ $item->stock }},
-                                        category: '{{ addslashes($item->category->name ?? 'Mobiliario') }}',
-                                        description: '{{ addslashes($item->description ?? 'Pieza de alta calidad para ambientación de bodas y banquetes. Se entrega completamente sanitizado e inspeccionado.') }}',
-                                        is_sale: {{ $item->is_sale ? 'true' : 'false' }},
-                                        image: '{{ $imgSrc }}'
-                                     })"
-                                     class="cursor-pointer relative h-60 sm:h-64 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                                    <img src="{{ $imgSrc }}" 
-                                         alt="{{ $item->name }}" 
-                                         loading="lazy"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                                    
-                                    <!-- Badges Flotantes de Cristal -->
-                                    <span class="absolute top-3 left-3 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-zinc-900 dark:text-zinc-100 text-[10px] font-mono font-medium px-2.5 py-1 rounded-md shadow-sm border border-white/50 dark:border-zinc-700">
-                                        Cód: {{ $item->code }}
-                                    </span>
+                <!-- Slider Track (Touch Swipeable en Móvil) -->
+                <div class="relative overflow-hidden rounded-2xl"
+                     @touchstart.passive="touchStartX = $event.touches[0].clientX"
+                     @touchend.passive="if ($event.changedTouches[0].clientX - touchStartX > 45) prev(); if (touchStartX - $event.changedTouches[0].clientX > 45) next();">
+                    <div class="flex transition-transform duration-500 ease-out"
+                         :style="'transform: translateX(-' + (currentIndex * (100 / perPage)) + '%)'">
+                        @foreach ($carouselProducts as $item)
+                            @php
+                                $imgSrc = $getProductImage($item);
+                            @endphp
+                            <div class="w-full sm:w-1/2 lg:w-1/4 shrink-0 p-2 sm:p-2.5">
+                                <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full group">
+                                    <div>
+                                        <!-- Imagen con Zoom & Click para Ficha Completa -->
+                                        <div @click="openDetail({
+                                                id: {{ $item->id }},
+                                                name: '{{ addslashes($item->name) }}',
+                                                code: {{ $item->code }},
+                                                price: {{ $item->rental_price }},
+                                                stock: {{ $item->stock }},
+                                                category: '{{ addslashes($item->category->name ?? 'Mobiliario') }}',
+                                                description: '{{ addslashes($item->description ?? 'Pieza de alta calidad para ambientación de bodas y banquetes.') }}',
+                                                is_sale: {{ $item->is_sale ? 'true' : 'false' }},
+                                                image: '{{ $imgSrc }}'
+                                             })"
+                                             class="cursor-pointer relative h-48 sm:h-52 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                            <img src="{{ $imgSrc }}" 
+                                                 alt="{{ $item->name }}" 
+                                                 loading="lazy"
+                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
 
-                                    <span class="absolute top-3 right-3 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-emerald-800 dark:text-emerald-400 text-[10px] font-semibold px-2.5 py-1 rounded-md shadow-sm border border-white/50 dark:border-zinc-700">
-                                        {{ $item->stock }} un. disponibles
-                                    </span>
-                                </div>
+                                            <span class="absolute top-2.5 left-2.5 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-zinc-900 dark:text-zinc-100 text-[10px] font-mono font-medium px-2 py-0.5 rounded shadow-sm border border-white/50 dark:border-zinc-700">
+                                                Cód: {{ $item->code }}
+                                            </span>
 
-                                <!-- Detalles del Producto -->
-                                <div class="p-5">
-                                    <span class="text-[10px] font-mono tracking-widest uppercase text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 inline-block font-semibold">
-                                        {{ $item->category->name ?? 'Mobiliario' }}
-                                    </span>
-
-                                    <h3 @click="openDetail({
-                                            id: {{ $item->id }},
-                                            name: '{{ addslashes($item->name) }}',
-                                            code: {{ $item->code }},
-                                            price: {{ $item->rental_price }},
-                                            stock: {{ $item->stock }},
-                                            category: '{{ addslashes($item->category->name ?? 'Mobiliario') }}',
-                                            description: '{{ addslashes($item->description ?? 'Pieza de alta calidad para ambientación de bodas y banquetes.') }}',
-                                            is_sale: {{ $item->is_sale ? 'true' : 'false' }},
-                                            image: '{{ $imgSrc }}'
-                                         })"
-                                        class="cursor-pointer font-serif font-bold text-zinc-900 dark:text-white text-lg sm:text-xl mt-2 line-clamp-1 group-hover:text-amber-800 dark:group-hover:text-amber-400 transition-colors" title="{{ $item->name }}">
-                                        {{ $item->name }}
-                                    </h3>
-
-                                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
-                                        {{ $item->description ?? 'Pieza de alta calidad para ambientación de bodas y banquetes.' }}
-                                    </p>
-
-                                    <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex items-baseline justify-between">
-                                        <div>
-                                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block uppercase tracking-wider">Valor arriendo:</span>
-                                            <p class="text-xl font-bold font-mono text-zinc-900 dark:text-white mt-0.5">
-                                                ${{ number_format($item->rental_price, 0, ',', '.') }}
-                                                <span class="text-xs font-normal text-zinc-500 dark:text-zinc-400">/ un.</span>
-                                            </p>
+                                            @if($item->is_featured)
+                                                <span class="absolute top-2.5 right-2.5 bg-amber-400 text-zinc-950 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm">
+                                                    ★ Destacado
+                                                </span>
+                                            @elseif($item->stock > 0)
+                                                <span class="absolute top-2.5 right-2.5 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-emerald-700 dark:text-emerald-400 text-[10px] font-semibold px-2 py-0.5 rounded shadow-sm border border-white/50 dark:border-zinc-700">
+                                                    {{ $item->stock }} un.
+                                                </span>
+                                            @else
+                                                <span class="absolute top-2.5 right-2.5 bg-zinc-700 text-white text-[10px] font-medium px-2 py-0.5 rounded shadow-sm">
+                                                    Agotado
+                                                </span>
+                                            @endif
                                         </div>
-                                        <div class="text-right">
-                                            <button @click="openDetail({
-                                                        id: {{ $item->id }},
-                                                        name: '{{ addslashes($item->name) }}',
-                                                        code: {{ $item->code }},
-                                                        price: {{ $item->rental_price }},
-                                                        stock: {{ $item->stock }},
-                                                        category: '{{ addslashes($item->category->name ?? 'Mobiliario') }}',
-                                                        description: '{{ addslashes($item->description ?? 'Pieza de alta calidad para ambientación de bodas y banquetes.') }}',
-                                                        is_sale: {{ $item->is_sale ? 'true' : 'false' }},
-                                                        image: '{{ $imgSrc }}'
-                                                     })" 
-                                                    class="text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white underline">
-                                                Ficha completa
+
+                                        <!-- Detalles del Producto -->
+                                        <div class="p-4 sm:p-5">
+                                            <span class="text-[10px] font-mono tracking-widest uppercase text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 inline-block font-semibold">
+                                                {{ $item->category->name ?? 'Catálogo' }}
+                                            </span>
+
+                                            <h3 @click="openDetail({
+                                                    id: {{ $item->id }},
+                                                    name: '{{ addslashes($item->name) }}',
+                                                    code: {{ $item->code }},
+                                                    price: {{ $item->rental_price }},
+                                                    stock: {{ $item->stock }},
+                                                    category: '{{ addslashes($item->category->name ?? 'Catálogo') }}',
+                                                    description: '{{ addslashes($item->description ?? 'Pieza de alta calidad para ambientación.') }}',
+                                                    is_sale: {{ $item->is_sale ? 'true' : 'false' }},
+                                                    image: '{{ $imgSrc }}'
+                                                 })"
+                                                class="cursor-pointer font-serif font-bold text-zinc-900 dark:text-white text-base sm:text-lg mt-1.5 leading-snug line-clamp-1 group-hover:text-amber-800 dark:group-hover:text-amber-400 transition-colors" title="{{ $item->name }}">
+                                                {{ $item->name }}
+                                            </h3>
+
+                                            <div class="mt-3 pt-2.5 border-t border-zinc-100 dark:border-zinc-800 flex items-baseline justify-between">
+                                                <div>
+                                                    <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block uppercase tracking-wider">Arriendo:</span>
+                                                    <p class="text-base sm:text-lg font-bold font-mono text-zinc-900 dark:text-white mt-0.5">
+                                                        ${{ number_format($item->rental_price, 0, ',', '.') }}
+                                                        <span class="text-xs font-normal text-zinc-500 dark:text-zinc-400">/ un.</span>
+                                                    </p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <button @click="openDetail({
+                                                                id: {{ $item->id }},
+                                                                name: '{{ addslashes($item->name) }}',
+                                                                code: {{ $item->code }},
+                                                                price: {{ $item->rental_price }},
+                                                                stock: {{ $item->stock }},
+                                                                category: '{{ addslashes($item->category->name ?? 'Catálogo') }}',
+                                                                description: '{{ addslashes($item->description ?? 'Pieza de alta calidad para ambientación.') }}',
+                                                                is_sale: {{ $item->is_sale ? 'true' : 'false' }},
+                                                                image: '{{ $imgSrc }}'
+                                                             })" 
+                                                            class="text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white underline">
+                                                        Ficha
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Botón Agregar al Arriendo -->
+                                    <div class="p-4 sm:p-5 pt-0" x-data="{ added: false }">
+                                        @if($item->stock > 0)
+                                            <button @click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->rental_price }}, {{ $item->stock }}, {{ $item->code }}); added = true; setTimeout(() => added = false, 1000)"
+                                                    :class="added ? 'bg-emerald-600 text-white shadow-md' : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white shadow-sm'"
+                                                    class="w-full py-2 px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-98">
+                                                <template x-if="!added">
+                                                    <span class="flex items-center gap-1">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                                        <span>+ Agregar</span>
+                                                    </span>
+                                                </template>
+                                                <template x-if="added">
+                                                    <span class="flex items-center gap-1 font-bold">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                        <span>✓ Agregado</span>
+                                                    </span>
+                                                </template>
                                             </button>
-                                        </div>
+                                        @else
+                                            <button disabled class="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700 cursor-not-allowed">
+                                                Sin stock
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
+                        @endforeach
+                    </div>
+                </div>
 
-                            <!-- Botón de Agregar con Feedback Táctil de 1 segundo -->
-                            <div class="p-5 pt-0" x-data="{ added: false }">
-                                @if($item->stock > 0)
-                                    <button @click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->rental_price }}, {{ $item->stock }}, {{ $item->code }}); added = true; setTimeout(() => added = false, 1000)"
-                                            :class="added ? 'bg-emerald-600 text-white shadow-md' : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white shadow-sm'"
-                                            class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2 active:scale-98">
-                                        <template x-if="!added">
-                                            <span class="flex items-center gap-1.5">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                                <span>+ Agregar al Arriendo</span>
-                                            </span>
-                                        </template>
-                                        <template x-if="added">
-                                            <span class="flex items-center gap-1.5 font-bold">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                <span>✓ Agregado</span>
-                                            </span>
-                                        </template>
-                                    </button>
-                                @else
-                                    <button disabled class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700 cursor-not-allowed">
-                                        Sin stock disponible
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
-                    @endforeach
+                <!-- Indicadores de Posición en Carrusel -->
+                <div class="mt-6 flex items-center justify-center gap-2">
+                    <template x-for="i in (maxIndex + 1)" :key="i">
+                        <button @click="currentIndex = (i - 1)" 
+                                :class="currentIndex === (i - 1) ? 'w-8 bg-zinc-900 dark:bg-amber-400' : 'w-2 bg-zinc-300 dark:bg-zinc-700 hover:bg-zinc-400'"
+                                class="h-2 rounded-full transition-all duration-300"
+                                :aria-label="'Ir a diapositiva ' + i"></button>
+                    </template>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN: PRODUCTOS DESTACADOS -->
-        <section id="destacados" class="py-14 sm:py-20 border-b border-zinc-200/80 dark:border-zinc-800">
+        <!-- SECCIÓN: MONTAJES & PUESTA EN ESCENA (Basado en Galería Real de Eventos del Cliente) -->
+        <section id="montajes" class="py-14 sm:py-20 border-b border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-                    <div>
-                        <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 py-1 rounded-full inline-block mb-3 font-semibold">
-                            Selección de Gala
-                        </span>
-                        <h2 class="font-serif text-2xl sm:text-4xl font-light text-zinc-900 dark:text-white tracking-wide">
-                            Productos <span class="italic font-normal text-amber-700 dark:text-amber-500">Destacados</span>
-                        </h2>
-                        <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-2 font-light max-w-xl">
-                            Artículos icónicos de alta demanda para recepciones nupciales, cócteles de gala y banquetes corporativos.
-                        </p>
-                    </div>
-
-                    <a href="#catalogo" class="self-start sm:self-auto inline-flex items-center gap-2 text-xs font-semibold text-zinc-900 dark:text-zinc-200 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-700 px-4 py-2.5 rounded-full transition shadow-sm">
-                        <span>Explorar todo el catálogo</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </a>
+                <!-- Encabezado Editorial Idéntico a la Referencia del Cliente -->
+                <div class="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
+                    <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-4 py-1.5 rounded-full inline-block mb-4 font-semibold">
+                        Puesta en Escena &bull; Experiencia Real
+                    </span>
+                    <h2 class="font-serif text-2xl sm:text-4xl md:text-5xl font-light text-zinc-900 dark:text-white tracking-wide">
+                        Montaje de Eventos en Santiago &ndash; <span class="italic font-normal text-amber-700 dark:text-amber-500">Tu Solución Completa</span>
+                    </h2>
+                    <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 font-light leading-relaxed max-w-3xl mx-auto">
+                        En Fiesta Rent, nos especializamos en el montaje de eventos en Santiago, proporcionando un servicio integral para tus celebraciones. Desde mesas hasta sillas y otros mobiliarios, nuestras soluciones están diseñadas para que disfrutes de cada momento sin preocupaciones. Ya sea que planifiques un evento corporativo, una boda o una reunión especial, contamos con opciones ideales para cada necesidad. Nuestro enfoque está en asegurar que el montaje de eventos en Santiago sea sencillo, confiable y con resultados excepcionales. Contáctanos y descubre cómo podemos hacer de tu evento un éxito inolvidable.
+                    </p>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                    @foreach ($featuredProducts as $feat)
-                        @php
-                            $featImg = $getProductImage($feat);
-                        @endphp
-                        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
-                            <div>
-                                <div @click="openDetail({
-                                        id: {{ $feat->id }},
-                                        name: '{{ addslashes($feat->name) }}',
-                                        code: {{ $feat->code }},
-                                        price: {{ $feat->rental_price }},
-                                        stock: {{ $feat->stock }},
-                                        category: '{{ addslashes($feat->category->name ?? 'Catálogo') }}',
-                                        description: '{{ addslashes($feat->description ?? 'Artículo de alta gama para ambientación de eventos.') }}',
-                                        is_sale: {{ $feat->is_sale ? 'true' : 'false' }},
-                                        image: '{{ $featImg }}'
-                                     })"
-                                     class="cursor-pointer relative h-48 sm:h-52 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                                    <img src="{{ $featImg }}" 
-                                         alt="{{ $feat->name }}" 
-                                         loading="lazy"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                                    
-                                    <span class="absolute top-2.5 left-2.5 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-zinc-900 dark:text-zinc-100 text-[10px] font-mono font-medium px-2 py-0.5 rounded shadow-sm border border-white/50 dark:border-zinc-700">
-                                        Cód: {{ $feat->code }}
-                                    </span>
-
-                                    <span class="absolute top-2.5 right-2.5 bg-amber-400 text-zinc-950 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm">
-                                        ★ Destacado
-                                    </span>
+                <!-- Montaje Destacado T E N O   2 0 2 3 (Fiel a la Composición Fotográfica del Cliente) -->
+                <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-10 mb-12 shadow-sm">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800 mb-8">
+                        <div>
+                            <h3 class="font-serif text-2xl sm:text-4xl font-light tracking-[0.35em] text-zinc-900 dark:text-white uppercase mb-4">
+                                T E N O &nbsp; 2 0 2 3
+                            </h3>
+                            <dl class="space-y-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                                <div>
+                                    <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Tipo de proyecto</dt>
+                                    <dd class="text-zinc-500 dark:text-zinc-400">Evento Empresa</dd>
                                 </div>
-
-                                <div class="p-4 sm:p-5">
-                                    <span class="text-[10px] font-mono tracking-widest uppercase text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 inline-block font-semibold">
-                                        {{ $feat->category->name ?? 'Catálogo' }}
-                                    </span>
-
-                                    <h3 @click="openDetail({
-                                            id: {{ $feat->id }},
-                                            name: '{{ addslashes($feat->name) }}',
-                                            code: {{ $feat->code }},
-                                            price: {{ $feat->rental_price }},
-                                            stock: {{ $feat->stock }},
-                                            category: '{{ addslashes($feat->category->name ?? 'Catálogo') }}',
-                                            description: '{{ addslashes($feat->description ?? 'Artículo de alta gama para ambientación de eventos.') }}',
-                                            is_sale: {{ $feat->is_sale ? 'true' : 'false' }},
-                                            image: '{{ $featImg }}'
-                                         })"
-                                        class="cursor-pointer font-serif font-bold text-zinc-900 dark:text-white text-base sm:text-lg mt-2 leading-snug line-clamp-1 group-hover:text-amber-800 dark:group-hover:text-amber-400 transition-colors" title="{{ $feat->name }}">
-                                        {{ $feat->name }}
-                                    </h3>
-
-                                    <div class="mt-3 pt-2.5 border-t border-zinc-100 dark:border-zinc-800 flex items-baseline justify-between">
-                                        <div>
-                                            <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block uppercase tracking-wider">Arriendo:</span>
-                                            <p class="text-base sm:text-lg font-bold font-mono text-zinc-900 dark:text-white mt-0.5">
-                                                ${{ number_format($feat->rental_price, 0, ',', '.') }}
-                                                <span class="text-xs font-normal text-zinc-500 dark:text-zinc-400">/ un.</span>
-                                            </p>
-                                        </div>
-                                        <div class="text-right">
-                                            <span class="text-[10px] font-mono font-semibold {{ $feat->stock > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-zinc-400 dark:text-zinc-500' }}">
-                                                {{ $feat->stock > 0 ? $feat->stock . ' un.' : 'Agotado' }}
-                                            </span>
-                                        </div>
-                                    </div>
+                                <div>
+                                    <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Fecha</dt>
+                                    <dd class="text-zinc-500 dark:text-zinc-400">2023</dd>
                                 </div>
-                            </div>
-
-                            <div class="p-4 sm:p-5 pt-0" x-data="{ added: false }">
-                                @if($feat->stock > 0)
-                                    <button @click="addItem({{ $feat->id }}, '{{ addslashes($feat->name) }}', {{ $feat->rental_price }}, {{ $feat->stock }}, {{ $feat->code }}); added = true; setTimeout(() => added = false, 1000)"
-                                            :class="added ? 'bg-emerald-600 text-white shadow-md' : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white shadow-sm'"
-                                            class="w-full py-2 px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-98">
-                                        <template x-if="!added">
-                                            <span class="flex items-center gap-1">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                                <span>+ Agregar</span>
-                                            </span>
-                                        </template>
-                                        <template x-if="added">
-                                            <span class="flex items-center gap-1 font-bold">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                <span>✓ Agregado</span>
-                                            </span>
-                                        </template>
-                                    </button>
-                                @else
-                                    <button disabled class="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700 cursor-not-allowed">
-                                        Sin stock
-                                    </button>
-                                @endif
+                                <div>
+                                    <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Ubicación</dt>
+                                    <dd class="text-zinc-500 dark:text-zinc-400">Teno, Curicó</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <div class="max-w-md text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 md:text-right font-light leading-relaxed">
+                            <p class="font-medium text-zinc-900 dark:text-white mb-1">Evento para Agrozzi en Teno, realizado el 2023.</p>
+                            <p>Montaje completo para 250 personas con mesas vestidas, centro floral, vajilla de 5 tiempos y sillería Chiavari blanca.</p>
+                            <div class="mt-4 flex md:justify-end gap-2">
+                                <a href="{{ route('catalog.montajes') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline">
+                                    <span>Ver especificaciones de este montaje</span>
+                                    <span>&rarr;</span>
+                                </a>
                             </div>
                         </div>
-                    @endforeach
+                    </div>
+
+                    <!-- Composición Fotográfica Teno 2023 -->
+                    <div class="space-y-4 sm:space-y-6">
+                        <!-- Foto 1: Mesa Principal Gran Angular -->
+                        <div class="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-200/80 dark:border-zinc-700/80 group">
+                            <img src="{{ asset('images/montajes/teno-mesa-principal.jpg') }}" 
+                                 alt="Montaje Banquete Teno 2023 - Mesa Principal" 
+                                 class="w-full h-72 sm:h-96 md:h-[480px] object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4 sm:p-6">
+                                <div class="text-white">
+                                    <span class="text-[10px] font-mono tracking-widest uppercase bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded border border-white/20">Mesa Principal de Banquete</span>
+                                    <p class="text-xs sm:text-sm mt-1 text-zinc-200">Caminos de arpillera natural, copas de cristal templado y plato base esmaltado.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2 Fotos Inferiores en Perspectiva -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                            <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
+                                <img src="{{ asset('images/montajes/teno-salon-250p.jpg') }}" 
+                                     alt="Montaje de salón para 250 personas" 
+                                     class="w-full h-60 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
+                                    <span class="text-white text-xs font-medium">Distribución radial para 250 comensales</span>
+                                </div>
+                            </div>
+                            <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
+                                <img src="{{ asset('images/montajes/teno-salon-250p.jpg') }}" 
+                                     alt="Perspectiva de montaje de sillas y vajilla" 
+                                     class="w-full h-60 sm:h-72 object-cover scale-x-[-1] group-hover:scale-105 transition-transform duration-500 ease-out">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
+                                    <span class="text-white text-xs font-medium">Alineación simétrica de sillería y mantelería</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grilla de Otros Montajes Realizados -->
+                <div>
+                    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 font-semibold block mb-1">
+                                Portafolio Fotográfico
+                            </span>
+                            <h3 class="font-serif text-xl sm:text-3xl font-light text-zinc-900 dark:text-white">
+                                Galería de <span class="italic font-normal text-amber-700 dark:text-amber-500">Puestas en Escena</span>
+                            </h3>
+                        </div>
+                        <a href="{{ route('catalog.montajes') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-zinc-900 dark:text-white bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 px-4 py-2.5 rounded-full transition border border-zinc-300 dark:border-zinc-700 shadow-sm">
+                            <span>Ver Todos los Montajes & Fichas</span>
+                            <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        @foreach ($montajes as $montaje)
+                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                                <div>
+                                    <div class="relative h-52 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                        <img src="{{ $montaje['image'] }}" 
+                                             alt="{{ $montaje['title'] }}" 
+                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                                        <span class="absolute top-2.5 left-2.5 bg-black/70 backdrop-blur-md text-white text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-white/20">
+                                            {{ $montaje['year'] }}
+                                        </span>
+                                        <span class="absolute top-2.5 right-2.5 bg-amber-400 text-zinc-950 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                            {{ $montaje['capacity'] }}
+                                        </span>
+                                    </div>
+                                    <div class="p-4 sm:p-5">
+                                        <span class="text-[10px] font-mono uppercase tracking-wider text-amber-800 dark:text-amber-400 font-semibold block mb-1">
+                                            {{ $montaje['type'] }} &bull; {{ $montaje['location'] }}
+                                        </span>
+                                        <h4 class="font-serif font-bold text-base sm:text-lg text-zinc-900 dark:text-white line-clamp-1 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+                                            {{ $montaje['title'] }}
+                                        </h4>
+                                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                                            {{ $montaje['description'] }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="p-4 sm:p-5 pt-0">
+                                    <a href="{{ route('catalog.montajes') }}" class="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">
+                                        <span>Ver Detalle del Montaje</span>
+                                        <span>&rarr;</span>
+                                    </a>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </section>
@@ -1343,6 +1457,12 @@
                         <li>
                             <a href="#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition">
                                 Catálogo de Productos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('catalog.montajes') }}" class="hover:text-zinc-900 dark:hover:text-white transition font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                <span>Montajes & Puesta en Escena</span>
+                                <span class="text-[9px] font-mono uppercase bg-amber-500/10 px-1 py-0.2 rounded border border-amber-500/30">Nuevo</span>
                             </a>
                         </li>
                         <li>
