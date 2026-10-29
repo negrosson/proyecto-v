@@ -175,8 +175,7 @@ class ProductResource extends Resource
                             ->default(false),
                     ]),
 
-                Forms\Components\Section::make('Telemetría de Interés (Solo Lectura)')
-                    ->description('Estadísticas automáticas de clics y cotizaciones generadas por los clientes')
+                Forms\Components\Section::make('Estadísticas')
                     ->collapsible()
                     ->collapsed()
                     ->columns(['default' => 1, 'sm' => 3])

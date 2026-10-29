@@ -35,11 +35,11 @@ final class BuildWhatsAppQuoteUrlAction
 
         $lines = [
             '*SOLICITUD DE COTIZACIÓN - ARRIENDO*',
-            '',
+            '────────────────────────────',
             "👤 *Cliente:* {$customerName}",
             "📅 *Fecha Evento:* {$eventDate}",
             "📍 *Lugar / Comuna:* {$location}",
-            '',
+            '────────────────────────────',
             '*DETALLE DE ARTÍCULOS:*',
         ];
 
@@ -55,12 +55,13 @@ final class BuildWhatsAppQuoteUrlAction
 
         $totalFormatted = $this->formatCurrency($quote->total());
 
-        $lines[] = '';
+        $lines[] = '────────────────────────────';
         $lines[] = "*TOTAL ESTIMADO:* {$totalFormatted}";
+        $lines[] = '────────────────────────────';
         $lines[] = '';
         $lines[] = '_Hola, me gustaría saber si tienen disponibilidad para esta fecha y cuál sería el valor del flete._';
 
-        $message = implode("\n", $lines);
+        $message = implode("\r\n", $lines);
 
         return sprintf('https://wa.me/%s?text=%s', $phone, rawurlencode($message));
     }

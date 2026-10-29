@@ -1464,6 +1464,11 @@
                                  class="w-full h-72 object-cover rounded-xl shadow-inner">
                             <span class="absolute top-4 left-4 backdrop-blur-md bg-white/90 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 text-xs font-mono font-medium px-3 py-1 rounded shadow-sm border border-zinc-200 dark:border-zinc-700" 
                                   x-text="'Cód: ' + detailModal.product?.code"></span>
+                            <template x-if="detailModal.product?.is_sale">
+                                <span class="absolute top-4 right-4 bg-amber-400 text-zinc-950 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded shadow-sm">
+                                    Venta Directa
+                                </span>
+                            </template>
                         </div>
 
                         <!-- Detalles & Controles -->
@@ -1479,7 +1484,8 @@
                                     <div>
                                         <p class="text-3xl font-bold font-mono text-zinc-900 dark:text-white" 
                                            x-text="'$' + (detailModal.product?.price || 0).toLocaleString('es-CL')"></p>
-                                        <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block mt-0.5">IVA incluido &bull; Arriendo por evento</span>
+                                        <span class="text-[11px] text-zinc-500 dark:text-zinc-400 block mt-0.5" 
+                                              x-text="detailModal.product?.is_sale ? 'IVA incluido • Venta directa' : 'IVA incluido • Arriendo por evento'"></span>
                                     </div>
                                     <div class="text-right">
                                         <span class="text-xs font-mono font-bold" 

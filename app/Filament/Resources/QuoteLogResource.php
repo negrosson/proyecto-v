@@ -82,10 +82,6 @@ class QuoteLogResource extends Resource
                             ->label('Total Piezas Cotizadas')
                             ->numeric()
                             ->required(),
-
-                        Forms\Components\TextInput::make('ip_address')
-                            ->label('Dirección IP de Registro')
-                            ->disabled(),
                     ]),
             ]);
     }
