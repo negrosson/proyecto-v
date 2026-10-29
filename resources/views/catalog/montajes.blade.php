@@ -132,6 +132,9 @@
                     <span>Montajes</span>
                     <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/30">Nuevo</span>
                 </a>
+                <a href="{{ route('catalog.como-cotizar') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
+                    Cómo Cotizar
+                </a>
                 <a href="{{ route('catalog.index') }}#envios" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Envíos
                 </a>
@@ -190,6 +193,7 @@
             <a href="{{ route('catalog.index') }}#destacados" class="block px-3 py-2 rounded-lg text-sm font-medium">Destacados</a>
             <a href="{{ route('catalog.index') }}#catalogo" class="block px-3 py-2 rounded-lg text-sm font-medium">Catálogo</a>
             <a href="{{ route('catalog.montajes') }}" class="block px-3 py-2 rounded-lg text-sm font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white">Montajes & Puesta en Escena</a>
+            <a href="{{ route('catalog.como-cotizar') }}" class="block px-3 py-2 rounded-lg text-sm font-medium">Cómo Cotizar</a>
             <a href="{{ route('catalog.index') }}#envios" class="block px-3 py-2 rounded-lg text-sm font-medium">Envíos</a>
             <a href="{{ route('catalog.index') }}#contacto" class="block px-3 py-2 rounded-lg text-sm font-medium">Contacto</a>
         </div>
@@ -494,6 +498,7 @@
                 <a href="{{ route('catalog.index') }}" class="hover:text-white transition">Inicio</a>
                 <a href="{{ route('catalog.index') }}#catalogo" class="hover:text-white transition">Catálogo</a>
                 <a href="{{ route('catalog.montajes') }}" class="hover:text-white transition font-bold text-amber-400">Montajes</a>
+                <a href="{{ route('catalog.como-cotizar') }}" class="hover:text-white transition">Cómo Cotizar</a>
                 <a href="{{ route('catalog.index') }}#envios" class="hover:text-white transition">Envíos</a>
                 <a href="{{ route('catalog.index') }}#contacto" class="hover:text-white transition">Contacto</a>
             </div>

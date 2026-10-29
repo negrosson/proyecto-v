@@ -227,6 +227,13 @@ class BrowseCatalogTest extends TestCase
         $response->assertSee('T E N O');
         $response->assertSee('Montaje de Eventos en Santiago');
         $response->assertSee(route('catalog.montajes'));
+        $response->assertSee('como-cotizar');
+        $response->assertSee('COTIZA');
+        $response->assertSee('ABONA');
+        $response->assertSee('RECIBE');
+        $response->assertSee('DEVUELVE');
+        $response->assertSee('GARANTÍA');
+        $response->assertSee('LAVAMOS POR TI');
     }
 
     /**
@@ -243,5 +250,25 @@ class BrowseCatalogTest extends TestCase
         $response->assertSee('Agrozzi');
         $response->assertSee('Montaje de Eventos en Santiago');
         $response->assertSee('Gala Nocturna &amp; Ambientación Dorada', false);
+    }
+
+    /**
+     * Comprueba que la vista dedicada de cómo cotizar cargue correctamente los 5 pasos y banner de valor.
+     */
+    public function test_can_browse_dedicated_como_cotizar_page(): void
+    {
+        $response = $this->get(route('catalog.como-cotizar'));
+
+        $response->assertOk();
+        $response->assertViewIs('catalog.como-cotizar');
+        $response->assertSee('Guía completa:');
+        $response->assertSee('cómo cotizar mobiliario');
+        $response->assertSee('COTIZA');
+        $response->assertSee('ABONA');
+        $response->assertSee('RECIBE');
+        $response->assertSee('DEVUELVE');
+        $response->assertSee('GARANTÍA');
+        $response->assertSee('LAVAMOS POR TI');
+        $response->assertSee('CELEBRA CON ESTILO');
     }
 }

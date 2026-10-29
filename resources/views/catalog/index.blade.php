@@ -161,6 +161,9 @@
                     <span>Montajes</span>
                     <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/30">Nuevo</span>
                 </a>
+                <a href="#como-cotizar" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
+                    Cómo Cotizar
+                </a>
                 <a href="#envios" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Envíos
                 </a>
@@ -261,13 +264,17 @@
                     </span>
                     <span class="text-xs text-zinc-400 font-mono">04</span>
                 </a>
+                <a @click="mobileMenuOpen = false" href="#como-cotizar" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
+                    <span>Cómo Cotizar Mobiliario</span>
+                    <span class="text-xs text-zinc-400 font-mono">05</span>
+                </a>
                 <a @click="mobileMenuOpen = false" href="#envios" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Envíos & Logística</span>
-                    <span class="text-xs text-zinc-400 font-mono">05</span>
+                    <span class="text-xs text-zinc-400 font-mono">06</span>
                 </a>
                 <a @click="mobileMenuOpen = false" href="#contacto" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Contacto & Ubicación</span>
-                    <span class="text-xs text-zinc-400 font-mono">06</span>
+                    <span class="text-xs text-zinc-400 font-mono">07</span>
                 </a>
                 <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico desde el catálogo de ' . ($settings->site_name ?? 'Arriendos & Eventos') . '.') }}" 
                    target="_blank" 
@@ -1015,7 +1022,302 @@
         </div>
 
         <!-- Paginación -->
-        <div class="mt-    <!-- SECCIÓN DE ENVÍOS Y LOGÍSTICA EDITORIAL -->
+        @if($products->hasPages())
+            <div class="mt-10 flex justify-center">
+                {{ $products->links() }}
+            </div>
+        @endif
+    </main>
+
+    <!-- SECCIÓN CÓMO COTIZAR (GUÍA COMPLETA, CAJONES ELEGANTES Y MODO OSCURO) -->
+    <section id="como-cotizar" class="py-20 sm:py-24 bg-white dark:bg-zinc-950 border-t border-b border-zinc-200/80 dark:border-zinc-800 scroll-mt-16 relative overflow-hidden">
+        <!-- Decoración geométrica sutil -->
+        <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] pointer-events-none" style="background-image: radial-gradient(#18181B 1px, transparent 1px); background-size: 28px 28px;"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Encabezado Editorial Fiel al Contenido del Cliente -->
+            <div class="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+                <div class="inline-flex items-center gap-2 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-4 py-1.5 rounded-full mb-4 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+                    <span class="text-[10px] sm:text-xs font-mono font-medium tracking-widest uppercase text-amber-800 dark:text-amber-400">
+                        CELEBRA CON ESTILO &bull; TU EVENTO, NUESTRO MOBILIARIO
+                    </span>
+                </div>
+
+                <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-zinc-900 dark:text-white tracking-tight leading-tight">
+                    Guía Completa: <span class="italic font-normal text-amber-700 dark:text-amber-500">Cómo Cotizar Mobiliario</span> para tu Evento
+                </h2>
+
+                <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 font-light leading-relaxed max-w-2xl mx-auto">
+                    ¿Buscas la manera de cómo cotizar mobiliario para tu próximo evento? En <span class="font-medium text-zinc-900 dark:text-white">{{ $settings->site_name ?? 'Fiesta Rent' }}</span> te ayudamos a hacerlo fácil y rápido. Nuestro servicio incluye una amplia variedad de mobiliario para eventos, perfecto para cualquier ocasión. Ya sea que necesites sillas, mesas o decoración, nuestro equipo está listo para asistirte. Consulta cómo cotizar mobiliario con nosotros y haz de tu celebración una experiencia inolvidable.
+                </p>
+            </div>
+
+            <!-- Cajones de Pasos del Proceso (5 Cajones Bonitos & Ordenados) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+                <!-- Cajón 1: COTIZA -->
+                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="text-xs font-mono font-bold tracking-widest text-amber-700 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 px-3 py-1 rounded-full uppercase">
+                                Paso 01
+                            </span>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                            </div>
+                        </div>
+
+                        <h3 class="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-4 tracking-wide group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+                            COTIZA
+                        </h3>
+
+                        <ul class="space-y-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 font-light leading-relaxed">
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0"></span>
+                                <span>Primero debes elegir los productos y cantidades que requiera tu evento.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0"></span>
+                                <span>Indica Dirección, Fecha y si existe alguna restricción en la entrega y retiro.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 shrink-0"></span>
+                                <span>Haz llegar tu solicitud a nuestro equipo agregando al carrito y completando el formulario o también vía WhatsApp o correo.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-zinc-200/70 dark:border-zinc-800 text-xs font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span>¡Te daremos respuesta lo más pronto posible!</span>
+                    </div>
+                </div>
+
+                <!-- Cajón 2: ABONA -->
+                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="text-xs font-mono font-bold tracking-widest text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-3 py-1 rounded-full uppercase">
+                                Paso 02
+                            </span>
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            </div>
+                        </div>
+
+                        <h3 class="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-4 tracking-wide group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
+                            ABONA
+                        </h3>
+
+                        <ul class="space-y-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 font-light leading-relaxed">
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0"></span>
+                                <span>Una vez que estés de acuerdo con la cotización solo faltará que formalicemos la reserva.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0"></span>
+                                <span>Se solicitará un abono previo para reservar el mobiliario el cual servirá como valor de garantía.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0"></span>
+                                <span>El valor total del arriendo deberá cancelarse como último plazo contra entrega.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-zinc-200/70 dark:border-zinc-800 text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>Reserva formal asegurada</span>
+                    </div>
+                </div>
+
+                <!-- Cajón 3: RECIBE -->
+                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="text-xs font-mono font-bold tracking-widest text-sky-700 dark:text-sky-400 bg-sky-100/70 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/80 px-3 py-1 rounded-full uppercase">
+                                Paso 03
+                            </span>
+                            <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                            </div>
+                        </div>
+
+                        <h3 class="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-4 tracking-wide group-hover:text-sky-700 dark:group-hover:text-sky-400 transition-colors">
+                            RECIBE
+                        </h3>
+
+                        <ul class="space-y-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 font-light leading-relaxed">
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 shrink-0"></span>
+                                <span>Previo al evento nos pondremos en contacto para coordinar la entrega.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 shrink-0"></span>
+                                <span>Es importante que alguien nos reciba para contabilizar el arriendo.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 shrink-0"></span>
+                                <span>Te entregaremos todo el mobiliario ordenado y apilado.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 mt-2 shrink-0"></span>
+                                <span>Recuerda informar si existen dificultades en la descarga.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-zinc-200/70 dark:border-zinc-800 text-xs font-semibold text-sky-700 dark:text-sky-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                        <span>Entrega ordenada y coordinada</span>
+                    </div>
+                </div>
+
+                <!-- Cajón 4: DEVUELVE -->
+                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="text-xs font-mono font-bold tracking-widest text-violet-700 dark:text-violet-400 bg-violet-100/70 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800/80 px-3 py-1 rounded-full uppercase">
+                                Paso 04
+                            </span>
+                            <div class="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center border border-violet-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            </div>
+                        </div>
+
+                        <h3 class="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-4 tracking-wide group-hover:text-violet-700 dark:group-hover:text-violet-400 transition-colors">
+                            DEVUELVE
+                        </h3>
+
+                        <ul class="space-y-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 font-light leading-relaxed">
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-violet-500 mt-2 shrink-0"></span>
+                                <span>Nuestro equipo se contactará previamente para coordinar el retiro.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-violet-500 mt-2 shrink-0"></span>
+                                <span>Es importante que haya alguien encargado de la devolución para contabilizar los productos.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-violet-500 mt-2 shrink-0"></span>
+                                <span>Recuerda que el mobiliario debe estar ordenado, apilado y en el mismo lugar que fue la entrega.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-zinc-200/70 dark:border-zinc-800 text-xs font-semibold text-violet-700 dark:text-violet-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                        <span>Retiro puntual en el lugar</span>
+                    </div>
+                </div>
+
+                <!-- Cajón 5: GARANTÍA -->
+                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="text-xs font-mono font-bold tracking-widest text-teal-700 dark:text-teal-400 bg-teal-100/70 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/80 px-3 py-1 rounded-full uppercase">
+                                Paso 05
+                            </span>
+                            <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                        </div>
+
+                        <h3 class="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-4 tracking-wide group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">
+                            GARANTÍA
+                        </h3>
+
+                        <ul class="space-y-3 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 font-light leading-relaxed">
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2 shrink-0"></span>
+                                <span>Para finalizar se le informarán las mermas del evento junto con su valor de reposición.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2 shrink-0"></span>
+                                <span>Se descontará de la garantía las mermas existentes.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2 shrink-0"></span>
+                                <span>El saldo restante se devolverá mediante transferencia electrónica directa.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-zinc-200/70 dark:border-zinc-800 text-xs font-semibold text-teal-700 dark:text-teal-400 flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+                        <span>Devolución rápida por transferencia</span>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Destacada Extra: Soporte Directo -->
+                <div class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-transparent dark:from-amber-950/30 dark:via-zinc-900 dark:to-zinc-900 rounded-3xl p-6 sm:p-8 border border-amber-300/80 dark:border-amber-700/60 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500 text-zinc-950 flex items-center justify-center font-bold text-xl shadow-md mb-5">
+                            ?
+                        </div>
+                        <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 block mb-1">Asesoría Inmediata</span>
+                        <h3 class="font-serif text-2xl font-bold text-zinc-900 dark:text-white mb-2.5">¿Dudas con tu cubicación?</h3>
+                        <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 font-light leading-relaxed">
+                            Si no estás seguro de cuántas mesas, copas o vajilla necesitas para tus invitados, escríbenos directamente y un asesor te armará la propuesta a la medida.
+                        </p>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-amber-200/60 dark:border-zinc-800">
+                        <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, quisiera asesoría para cotizar mobiliario para mi evento.') }}" 
+                           target="_blank" 
+                           class="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>Hablar con un asesor en WhatsApp &rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gran Banner de Valor: ¡NOSOTROS LAVAMOS POR TI! -->
+            <div class="mt-12 sm:mt-16 bg-gradient-to-r from-zinc-900 via-zinc-950 to-zinc-900 text-white rounded-3xl p-8 sm:p-12 border border-zinc-800 shadow-2xl relative overflow-hidden group">
+                <!-- Efecto de resplandor dorado -->
+                <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none group-hover:bg-amber-500/20 transition-all duration-700"></div>
+
+                <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                    <div class="max-w-2xl">
+                        <div class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3.5 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-4">
+                            <span>✨ Cero Preocupaciones</span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                            <span>Higiene & Desinfección Certificada</span>
+                        </div>
+
+                        <h3 class="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-white tracking-wide">
+                            ¡NOSOTROS <span class="font-bold text-amber-400">LAVAMOS POR TI!</span>
+                        </h3>
+
+                        <p class="text-sm sm:text-base text-zinc-300 font-light leading-relaxed mt-4">
+                            En nuestro servicio de alquiler de mobiliario, nos encargamos del lavado de todo el mobiliario para que tú solo disfrutes de la fiesta. Relájate y nosotros nos ocupamos de los detalles.
+                        </p>
+
+                        <p class="text-xs sm:text-sm text-amber-200/90 font-medium mt-2">
+                            ¡Haz de tu evento una experiencia inolvidable!
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+                        <a href="#catalogo" 
+                           class="inline-flex items-center justify-center gap-2.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold px-7 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm active:scale-98">
+                            <svg class="w-4 h-4 text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            <span>Armar Cotización Ahora</span>
+                        </a>
+                        <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, leí la guía de cómo cotizar y quisiera consultar por mobiliario.') }}" 
+                           target="_blank"
+                           class="inline-flex items-center justify-center gap-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6 py-3.5 rounded-2xl border border-zinc-700 transition text-xs sm:text-sm">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Consultar por WhatsApp</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN DE ENVÍOS Y LOGÍSTICA EDITORIAL -->
     <section id="envios" class="py-20 sm:py-24 bg-zinc-100/70 dark:bg-zinc-900/60 border-t border-b border-zinc-200/80 dark:border-zinc-800 scroll-mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto mb-16">
@@ -1463,6 +1765,11 @@
                             <a href="{{ route('catalog.montajes') }}" class="hover:text-zinc-900 dark:hover:text-white transition font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
                                 <span>Montajes & Puesta en Escena</span>
                                 <span class="text-[9px] font-mono uppercase bg-amber-500/10 px-1 py-0.2 rounded border border-amber-500/30">Nuevo</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#como-cotizar" class="hover:text-zinc-900 dark:hover:text-white transition">
+                                Cómo Cotizar Mobiliario
                             </a>
                         </li>
                         <li>

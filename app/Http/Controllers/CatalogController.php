@@ -106,6 +106,17 @@ class CatalogController extends Controller
     }
 
     /**
+     * Muestra la guía paso a paso sobre cómo cotizar mobiliario y el proceso de reserva.
+     */
+    public function comoCotizar(): View
+    {
+        $settings = SiteSetting::current();
+        $categories = Category::query()->where('is_active', true)->orderBy('sort_order')->get();
+
+        return view('catalog.como-cotizar', compact('settings', 'categories'));
+    }
+
+    /**
      * Retorna la colección de proyectos reales de montaje documentados con galería.
      *
      * @return array<int, array<string, mixed>>
