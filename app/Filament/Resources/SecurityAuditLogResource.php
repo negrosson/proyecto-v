@@ -52,6 +52,29 @@ class SecurityAuditLogResource extends Resource
         return static::getNavigationLabel();
     }
 
+    public static function canAccess(): bool
+    {
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        return (bool) ($user && method_exists($user, 'isDeveloper') && $user->isDeveloper());
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canAccess();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::canAccess();
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return static::canAccess();
+    }
+
     public static function canCreate(): bool
     {
         return false;

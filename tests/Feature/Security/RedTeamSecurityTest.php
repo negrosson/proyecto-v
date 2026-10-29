@@ -323,11 +323,15 @@ class RedTeamSecurityTest extends TestCase
 
         // Autenticado como desarrollador
         $this->actingAs($developer);
+        $this->assertTrue(SecurityAuditLogResource::canAccess());
+        $this->assertTrue(SecurityAuditLogResource::shouldRegisterNavigation());
         $this->assertSame('Auditoría', SecurityAuditLogResource::getNavigationLabel());
         $this->assertSame('Auditoría', SecurityAuditLogResource::getPluralModelLabel());
 
-        // Autenticado como administrador estándar
+        // Autenticado como administrador estándar (no desarrollador)
         $this->actingAs($standardAdmin);
+        $this->assertFalse(SecurityAuditLogResource::canAccess());
+        $this->assertFalse(SecurityAuditLogResource::shouldRegisterNavigation());
         $this->assertSame('Auditoría Forense & Logs', SecurityAuditLogResource::getNavigationLabel());
         $this->assertSame('Auditoría Forense & Logs', SecurityAuditLogResource::getPluralModelLabel());
     }

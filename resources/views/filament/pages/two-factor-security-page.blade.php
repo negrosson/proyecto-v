@@ -18,10 +18,6 @@
                                 RECOMENDADO
                             </span>
                         </div>
-                        <p class="text-xs leading-relaxed max-w-2xl">
-                            Añade una capa de defensa en profundidad de grado bancario a tu cuenta administrativa. Al activar 2FA bajo el estándar RFC 6238, necesitarás ingresar un código dinámico de 6 dígitos generado por tu teléfono inteligente en cada inicio de sesión, neutralizando intentos de robo de credenciales.
-                        </p>
-                        
                         <!-- Píldoras de Apps Compatibles -->
                         <div class="flex flex-wrap items-center gap-2 pt-2">
                             <span class="text-xs font-semibold mr-1">Compatible con:</span>
@@ -36,7 +32,7 @@
                 <div class="pt-5 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <span class="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
                         <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                        Protección contra accesos no autorizados y ataques de fuerza bruta.
+                        Protección contra accesos no autorizados
                     </span>
                     <button 
                         type="button" 
