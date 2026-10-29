@@ -229,8 +229,9 @@
 
     <!-- PROYECTO PRINCIPAL SPOTLIGHT: T E N O   2 0 2 3 (Inspirado en imagen 1) -->
     @php
-        $teno = collect($montajes)->firstWhere('id', 'teno-2023') ?? $montajes[0];
+        $teno = collect($montajes)->firstWhere('slug', 'teno-2023') ?? ($montajes[0] ?? null);
     @endphp
+    @if($teno)
     <section id="proyecto-destacado" class="py-14 sm:py-20 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-10 shadow-sm">
@@ -239,10 +240,14 @@
                 <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-6 border-b border-zinc-200/80 dark:border-zinc-800 mb-8">
                     <div>
                         <h2 class="font-serif text-3xl sm:text-5xl font-light tracking-[0.3em] uppercase text-zinc-900 dark:text-white">
-                            T E N O &nbsp; 2 0 2 3
+                            {{ $teno['title'] }}
                         </h2>
                         
-                        <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-6 text-xs">
+                        <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
+                            <div>
+                                <span class="text-zinc-500 dark:text-zinc-400 block font-medium">Cliente / Empresa</span>
+                                <span class="text-zinc-900 dark:text-zinc-100 font-semibold text-sm">{{ $teno['client'] ?: 'Cliente Privado' }}</span>
+                            </div>
                             <div>
                                 <span class="text-zinc-500 dark:text-zinc-400 block font-medium">Tipo de proyecto</span>
                                 <span class="text-zinc-900 dark:text-zinc-100 font-semibold text-sm">{{ $teno['type'] }}</span>
@@ -310,6 +315,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     <!-- GALERÍA GENERAL DE MONTAJES (Inspirado en imagen 2) -->
     <section class="py-14 sm:py-20 bg-zinc-50/50 dark:bg-zinc-950 flex-1">
@@ -327,7 +333,7 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                @foreach (collect($montajes)->where('id', '!=', 'teno-2023') as $m)
+                @foreach (collect($montajes)->where('slug', '!=', $teno['slug'] ?? 'teno-2023') as $m)
                     <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
                         <div>
                             <div @click="openProject({{ json_encode($m) }})"
@@ -348,6 +354,9 @@
 
                             <div class="p-6">
                                 <span class="text-[10px] font-mono tracking-widest uppercase text-amber-800 dark:text-amber-400 block mb-1 font-semibold">
+                                    @if(!empty($m['client']))
+                                        <span>{{ $m['client'] }}</span> &bull;
+                                    @endif
                                     {{ $m['capacity'] }} &bull; {{ $m['year'] }}
                                 </span>
 

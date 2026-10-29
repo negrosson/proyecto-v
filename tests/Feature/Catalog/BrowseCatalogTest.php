@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Catalog;
 
 use App\Models\Category;
+use App\Models\Montaje;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -270,5 +271,83 @@ class BrowseCatalogTest extends TestCase
         $response->assertSee('GARANTÍA');
         $response->assertSee('LAVAMOS POR TI');
         $response->assertSee('CELEBRA CON ESTILO');
+    }
+
+    /**
+     * Comprueba que la navegación por filtros vía AJAX retorne JSON con el HTML de la grilla de productos de forma instantánea.
+     */
+    public function test_can_filter_products_via_ajax_returning_json_grid(): void
+    {
+        $category = Category::factory()->create([
+            'name' => 'Mantelería',
+            'slug' => 'manteleria',
+        ]);
+
+        Product::factory()->create([
+            'category_id' => $category->id,
+            'name' => 'Mantel Redondo Blanco 3.30m',
+            'is_active' => true,
+        ]);
+
+        $response = $this->getJson(route('catalog.index', [
+            'categoria' => 'manteleria',
+            'ajax' => 1,
+        ]), [
+            'X-Requested-With' => 'XMLHttpRequest',
+            'X-Catalog-Filter' => '1',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonStructure([
+            'html',
+            'total',
+            'categoria',
+            'search',
+        ]);
+        $this->assertSame(1, $response->json('total'));
+        $this->assertSame('manteleria', $response->json('categoria'));
+        $this->assertStringContainsString('Mantel Redondo Blanco 3.30m', $response->json('html'));
+    }
+
+    /**
+     * Comprueba que la vista de montajes cargue registros dinámicos creados o editados desde el panel.
+     */
+    public function test_montajes_page_loads_dynamic_montajes_from_database(): void
+    {
+        Montaje::query()->create([
+            'title' => 'Festival Viña 2026',
+            'slug' => 'festival-vina-2026',
+            'client' => 'Municipalidad de Viña del Mar',
+            'type' => 'Evento Empresa',
+            'year' => '2026',
+            'location' => 'Viña del Mar',
+            'capacity' => '500 personas',
+            'summary' => 'Montaje exclusivo en carpa VIP con vajilla dorada.',
+            'description' => 'Producción a gran escala con 50 mesas imperiales.',
+            'cover_image' => 'images/montajes/gala-nocturna-dorada.jpg',
+            'gallery' => ['images/montajes/gala-nocturna-dorada.jpg'],
+            'items_used' => ['500x Sillas Tiffany Doradas'],
+            'sort_order' => 1,
+            'is_featured' => true,
+            'is_active' => true,
+        ]);
+
+        $response = $this->get(route('catalog.montajes'));
+
+        $response->assertOk();
+        $response->assertSee('Festival Viña 2026');
+        $response->assertSee('Municipalidad de Viña del Mar');
+        $response->assertSee('Viña del Mar');
+    }
+
+    /**
+     * Comprueba que la barra de navegación contenga el enlace directo a la sección / página de montajes.
+     */
+    public function test_navbar_has_montajes_route_link(): void
+    {
+        $response = $this->get(route('catalog.index'));
+
+        $response->assertOk();
+        $response->assertSee(route('catalog.montajes'));
     }
 }

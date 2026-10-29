@@ -157,7 +157,7 @@
                 <a href="#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Catálogo
                 </a>
-                <a href="#montajes" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1 flex items-center gap-1">
+                <a href="{{ route('catalog.montajes') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1 flex items-center gap-1">
                     <span>Montajes</span>
                     <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/30">Nuevo</span>
                 </a>
@@ -257,7 +257,7 @@
                     <span>Catálogo Completo</span>
                     <span class="text-xs text-zinc-400 font-mono">03</span>
                 </a>
-                <a @click="mobileMenuOpen = false" href="#montajes" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between font-bold text-amber-700 dark:text-amber-400">
+                <a @click="mobileMenuOpen = false" href="{{ route('catalog.montajes') }}" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between font-bold text-amber-700 dark:text-amber-400">
                     <span class="flex items-center gap-2">
                         <span>Montajes & Puesta en Escena</span>
                         <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded">Nuevo</span>
@@ -338,7 +338,7 @@
                         <span>Ver Vitrina en Carrusel</span>
                         <svg class="w-4 h-4 text-amber-400 dark:text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </a>
-                    <a href="#montajes" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700 font-medium text-xs sm:text-sm px-5 py-3 rounded-full shadow-sm transition-all duration-300">
+                    <a href="{{ route('catalog.montajes') }}" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700 font-medium text-xs sm:text-sm px-5 py-3 rounded-full shadow-sm transition-all duration-300">
                         <span>Montajes Realizados</span>
                         <span class="text-[10px] font-mono bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded font-bold">2023-2026</span>
                     </a>
@@ -625,76 +625,85 @@
                     </p>
                 </div>
 
-                <!-- Montaje Destacado T E N O   2 0 2 3 (Fiel a la Composición Fotográfica del Cliente) -->
-                <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-10 mb-12 shadow-sm">
-                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800 mb-8">
-                        <div>
-                            <h3 class="font-serif text-2xl sm:text-4xl font-light tracking-[0.35em] text-zinc-900 dark:text-white uppercase mb-4">
-                                T E N O &nbsp; 2 0 2 3
-                            </h3>
-                            <dl class="space-y-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-                                <div>
-                                    <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Tipo de proyecto</dt>
-                                    <dd class="text-zinc-500 dark:text-zinc-400">Evento Empresa</dd>
-                                </div>
-                                <div>
-                                    <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Fecha</dt>
-                                    <dd class="text-zinc-500 dark:text-zinc-400">2023</dd>
-                                </div>
-                                <div>
-                                    <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Ubicación</dt>
-                                    <dd class="text-zinc-500 dark:text-zinc-400">Teno, Curicó</dd>
-                                </div>
-                            </dl>
-                        </div>
-                        <div class="max-w-md text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 md:text-right font-light leading-relaxed">
-                            <p class="font-medium text-zinc-900 dark:text-white mb-1">Evento para Agrozzi en Teno, realizado el 2023.</p>
-                            <p>Montaje completo para 250 personas con mesas vestidas, centro floral, vajilla de 5 tiempos y sillería Chiavari blanca.</p>
-                            <div class="mt-4 flex md:justify-end gap-2">
-                                <a href="{{ route('catalog.montajes') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline">
-                                    <span>Ver especificaciones de este montaje</span>
-                                    <span>&rarr;</span>
-                                </a>
+                @php
+                    $teno = collect($montajes)->firstWhere('slug', 'teno-2023') ?? ($montajes[0] ?? null);
+                    $tenoCover = $teno['cover_image'] ?? asset('images/montajes/teno-mesa-principal.jpg');
+                    $tenoGallery = $teno['gallery'] ?? [];
+                    $tenoPhoto1 = $tenoGallery[1] ?? ($tenoGallery[0] ?? $tenoCover);
+                    $tenoPhoto2 = $tenoGallery[2] ?? ($tenoGallery[0] ?? $tenoCover);
+                @endphp
+                @if($teno)
+                    <!-- Montaje Destacado Spotlight (Gestionable 100% desde el Panel de Administración) -->
+                    <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-10 mb-12 shadow-sm">
+                        <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800 mb-8">
+                            <div>
+                                <h3 class="font-serif text-2xl sm:text-4xl font-light tracking-[0.35em] text-zinc-900 dark:text-white uppercase mb-4">
+                                    {{ $teno['title'] }}
+                                </h3>
+                                <dl class="space-y-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                                    <div>
+                                        <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Tipo de proyecto</dt>
+                                        <dd class="text-zinc-500 dark:text-zinc-400">{{ $teno['type'] }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Fecha</dt>
+                                        <dd class="text-zinc-500 dark:text-zinc-400">{{ $teno['year'] }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Ubicación</dt>
+                                        <dd class="text-zinc-500 dark:text-zinc-400">{{ $teno['location'] }}</dd>
+                                    </div>
+                                </dl>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Composición Fotográfica Teno 2023 -->
-                    <div class="space-y-4 sm:space-y-6">
-                        <!-- Foto 1: Mesa Principal Gran Angular -->
-                        <div class="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-200/80 dark:border-zinc-700/80 group">
-                            <img src="{{ asset('images/montajes/teno-mesa-principal.jpg') }}" 
-                                 alt="Montaje Banquete Teno 2023 - Mesa Principal" 
-                                 class="w-full h-72 sm:h-96 md:h-[480px] object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4 sm:p-6">
-                                <div class="text-white">
-                                    <span class="text-[10px] font-mono tracking-widest uppercase bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded border border-white/20">Mesa Principal de Banquete</span>
-                                    <p class="text-xs sm:text-sm mt-1 text-zinc-200">Caminos de arpillera natural, copas de cristal templado y plato base esmaltado.</p>
+                            <div class="max-w-md text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 md:text-right font-light leading-relaxed">
+                                <p class="font-medium text-zinc-900 dark:text-white mb-1">{{ $teno['summary'] }}</p>
+                                <p>{{ Str::limit($teno['description'], 160) }}</p>
+                                <div class="mt-4 flex md:justify-end gap-2">
+                                    <a href="{{ route('catalog.montajes') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline">
+                                        <span>Ver especificaciones de este montaje</span>
+                                        <span>&rarr;</span>
+                                    </a>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 2 Fotos Inferiores en Perspectiva -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                            <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
-                                <img src="{{ asset('images/montajes/teno-salon-250p.jpg') }}" 
-                                     alt="Montaje de salón para 250 personas" 
-                                     class="w-full h-60 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
-                                    <span class="text-white text-xs font-medium">Distribución radial para 250 comensales</span>
+                        <!-- Composición Fotográfica Dinámica -->
+                        <div class="space-y-4 sm:space-y-6">
+                            <!-- Foto 1: Mesa Principal Gran Angular -->
+                            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-200/80 dark:border-zinc-700/80 group">
+                                <img src="{{ $tenoCover }}" 
+                                     alt="{{ $teno['title'] }}" 
+                                     class="w-full h-72 sm:h-96 md:h-[480px] object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4 sm:p-6">
+                                    <div class="text-white">
+                                        <span class="text-[10px] font-mono tracking-widest uppercase bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded border border-white/20">{{ $teno['capacity'] ?: 'Montaje Premium' }}</span>
+                                        <p class="text-xs sm:text-sm mt-1 text-zinc-200">{{ $teno['summary'] }}</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
-                                <img src="{{ asset('images/montajes/teno-salon-250p.jpg') }}" 
-                                     alt="Perspectiva de montaje de sillas y vajilla" 
-                                     class="w-full h-60 sm:h-72 object-cover scale-x-[-1] group-hover:scale-105 transition-transform duration-500 ease-out">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
-                                    <span class="text-white text-xs font-medium">Alineación simétrica de sillería y mantelería</span>
+
+                            <!-- 2 Fotos Inferiores en Perspectiva -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
+                                    <img src="{{ $tenoPhoto1 }}" 
+                                         alt="{{ $teno['title'] }} perspectiva 1" 
+                                         class="w-full h-60 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
+                                        <span class="text-white text-xs font-medium">{{ $teno['location'] }} &bull; {{ $teno['year'] }}</span>
+                                    </div>
+                                </div>
+                                <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
+                                    <img src="{{ $tenoPhoto2 }}" 
+                                         alt="{{ $teno['title'] }} perspectiva 2" 
+                                         class="w-full h-60 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
+                                        <span class="text-white text-xs font-medium">{{ $teno['type'] }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @endif
 
                 <!-- Grilla de Otros Montajes Realizados -->
                 <div>
@@ -880,153 +889,62 @@
                 </div>
             </form>
 
-            @if(request('buscar') || request('categoria'))
-                <div class="flex items-center gap-2 self-start sm:self-center">
-                    <a href="{{ route('catalog.index') }}#catalogo" class="group inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 px-3.5 py-2 rounded-full transition-all duration-200">
-                        <span>Limpiar filtros</span>
-                        <svg class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </a>
-                </div>
-            @endif
+            <div x-show="activeCategory || (searchQuery && searchQuery.trim().length > 0)" 
+                 class="flex items-center gap-2 self-start sm:self-center" 
+                 style="{{ (!request('buscar') && !request('categoria')) ? 'display: none;' : '' }}">
+                <button type="button" 
+                        @click.prevent="searchQuery = ''; clearLiveSearch(); filterCategory('', '{{ route('catalog.index') }}#catalogo')" 
+                        class="group inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 px-3.5 py-2 rounded-full transition-all duration-200 cursor-pointer shadow-sm">
+                    <span>Limpiar filtros</span>
+                    <svg class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
         </div>
 
-        <!-- Carrusel Horizontal de Categorías con Conteo Activo -->
+        <!-- Carrusel Horizontal de Categorías con Conteo Activo (Navegación Instantánea con 0ms Latencia) -->
         <nav class="flex gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar items-center">
             <a href="{{ route('catalog.index', array_filter(['buscar' => request('buscar')])) }}#catalogo" 
-               class="px-5 py-2.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 {{ !request('categoria') ? 'bg-zinc-900 dark:bg-amber-500 text-white dark:text-zinc-950 shadow-md' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200/90 dark:border-zinc-700' }}">
+               @click.prevent="filterCategory('', '{{ route('catalog.index', array_filter(['buscar' => request('buscar')])) }}#catalogo')"
+               :class="activeCategory === '' ? 'bg-zinc-900 dark:bg-amber-500 text-white dark:text-zinc-950 shadow-md ring-2 ring-amber-500/20' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200/90 dark:border-zinc-700'"
+               class="px-5 py-2.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer shadow-sm">
                 Todos los productos
             </a>
             @foreach ($categories as $cat)
                 <a href="{{ route('catalog.index', array_filter(['categoria' => $cat->slug, 'buscar' => request('buscar')])) }}#catalogo" 
-                   class="px-5 py-2.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 {{ request('categoria') === $cat->slug ? 'bg-zinc-900 dark:bg-amber-500 text-white dark:text-zinc-950 shadow-md' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200/90 dark:border-zinc-700' }}">
+                   @click.prevent="filterCategory('{{ $cat->slug }}', '{{ route('catalog.index', array_filter(['categoria' => $cat->slug, 'buscar' => request('buscar')])) }}#catalogo')"
+                   :class="activeCategory === '{{ $cat->slug }}' ? 'bg-zinc-900 dark:bg-amber-500 text-white dark:text-zinc-950 shadow-md ring-2 ring-amber-500/20' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200/90 dark:border-zinc-700'"
+                   class="px-5 py-2.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer shadow-sm">
                     {{ $cat->name }}
                     <span class="ml-1 opacity-75 font-normal">({{ $cat->products_count }})</span>
                 </a>
             @endforeach
         </nav>
 
-        <!-- Grid de Cards de Producto -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-            @forelse ($products as $prod)
-                @php
-                    $cardImg = $getProductImage($prod);
-                @endphp
-                <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
-                    <div>
-                        <!-- Contenedor Fotográfico con Cero Cajas Grises -->
-                        <div @click="openDetail({
-                                id: {{ $prod->id }},
-                                name: '{{ addslashes($prod->name) }}',
-                                code: {{ $prod->code }},
-                                price: {{ $prod->rental_price }},
-                                stock: {{ $prod->stock }},
-                                category: '{{ addslashes($prod->category->name ?? 'Catálogo') }}',
-                                description: '{{ addslashes($prod->description ?? 'Artículo de alta gama para ambientación de bodas y eventos.') }}',
-                                is_sale: {{ $prod->is_sale ? 'true' : 'false' }},
-                                image: '{{ $cardImg }}'
-                             })"
-                             class="cursor-pointer relative h-48 sm:h-56 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                            <img src="{{ $cardImg }}" 
-                                 alt="{{ $prod->name }}" 
-                                 loading="lazy"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                            
-                            <!-- Badges Flotantes con Efecto Cristal -->
-                            <span class="absolute top-2.5 left-2.5 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-zinc-900 dark:text-zinc-100 text-[10px] font-mono font-medium px-2.5 py-0.5 rounded shadow-sm border border-white/50 dark:border-zinc-700">
-                                Cód: {{ $prod->code }}
-                            </span>
-
-                            @if($prod->is_sale)
-                                <span class="absolute top-2.5 right-2.5 bg-amber-400 text-zinc-950 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded shadow-sm">
-                                    Venta
-                                </span>
-                            @endif
-                        </div>
-
-                        <!-- Detalles del Producto -->
-                        <div class="p-4 sm:p-5">
-                            <span class="text-[10px] font-mono tracking-widest uppercase text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200/60 dark:border-amber-800/60 inline-block font-semibold">
-                                {{ $prod->category->name ?? 'Catálogo' }}
-                            </span>
-
-                            <h3 @click="openDetail({
-                                    id: {{ $prod->id }},
-                                    name: '{{ addslashes($prod->name) }}',
-                                    code: {{ $prod->code }},
-                                    price: {{ $prod->rental_price }},
-                                    stock: {{ $prod->stock }},
-                                    category: '{{ addslashes($prod->category->name ?? 'Catálogo') }}',
-                                    description: '{{ addslashes($prod->description ?? 'Artículo de alta gama para ambientación de bodas y banquetes.') }}',
-                                    is_sale: {{ $prod->is_sale ? 'true' : 'false' }},
-                                    image: '{{ $cardImg }}'
-                                 })"
-                                class="cursor-pointer font-serif font-bold text-zinc-900 dark:text-white text-base sm:text-lg mt-2 leading-snug line-clamp-1 group-hover:text-amber-800 dark:group-hover:text-amber-400 transition-colors" title="{{ $prod->name }}">
-                                {{ $prod->name }}
-                            </h3>
-
-                            <div class="mt-3 pt-2.5 border-t border-zinc-100 dark:border-zinc-800 flex items-baseline justify-between">
-                                <div>
-                                    <span class="text-[10px] text-zinc-500 dark:text-zinc-400 block uppercase tracking-wider">Valor arriendo:</span>
-                                    <p class="text-base sm:text-lg font-bold font-mono text-zinc-900 dark:text-white mt-0.5">
-                                        ${{ number_format($prod->rental_price, 0, ',', '.') }}
-                                        <span class="text-xs font-normal text-zinc-500 dark:text-zinc-400">/ un.</span>
-                                    </p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-[10px] font-mono font-semibold {{ $prod->stock > 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-zinc-400 dark:text-zinc-500' }}">
-                                        {{ $prod->stock > 0 ? $prod->stock . ' un.' : 'Agotado' }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Botón "+ Agregar al Arriendo" con Feedback Táctil de 1 Segundo -->
-                    <div class="p-4 sm:p-5 pt-0" x-data="{ added: false }">
-                        @if($prod->stock > 0)
-                            <button @click="addItem({{ $prod->id }}, '{{ addslashes($prod->name) }}', {{ $prod->rental_price }}, {{ $prod->stock }}, {{ $prod->code }}); added = true; setTimeout(() => added = false, 1000)"
-                                    :class="added ? 'bg-emerald-600 text-white shadow-md' : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white shadow-sm'"
-                                    class="w-full py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-98">
-                                <template x-if="!added">
-                                    <span class="flex items-center gap-1.5">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                        <span>+ Agregar al Arriendo</span>
-                                    </span>
-                                </template>
-                                <template x-if="added">
-                                    <span class="flex items-center gap-1.5 font-bold">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                        <span>✓ Agregado</span>
-                                    </span>
-                                </template>
-                            </button>
-                        @else
-                            <button disabled class="w-full py-2.5 px-3 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-700 cursor-not-allowed">
-                                Sin stock disponible
-                            </button>
-                        @endif
-                    </div>
+        <!-- Contenedor Reactivo de Grilla de Productos -->
+        <div id="products-grid-container" class="relative min-h-[360px]">
+            <!-- Skeleton/Cargador sutil de transición de categorías -->
+            <div x-show="isFiltering" 
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="absolute inset-0 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-3xl"
+                 style="display: none;">
+                <div class="flex items-center gap-3 bg-zinc-900 dark:bg-zinc-800 text-white px-5 py-2.5 rounded-full shadow-2xl border border-zinc-700">
+                    <svg class="animate-spin h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span class="text-xs font-semibold tracking-wide">Cargando categoría...</span>
                 </div>
-            @empty
-                <div class="col-span-full py-20 text-center bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-8 shadow-sm">
-                    <div class="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto text-zinc-400 dark:text-zinc-500 mb-4">
-                        <svg class="w-8 h-8 text-zinc-500 dark:text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <h3 class="font-serif text-2xl font-bold text-zinc-900 dark:text-white">No encontramos productos coincidentes</h3>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-2 max-w-sm mx-auto">Intenta con términos más generales o limpia los filtros activos.</p>
-                    <a href="{{ route('catalog.index') }}#catalogo" class="inline-block mt-5 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 text-xs font-semibold px-6 py-2.5 rounded-full transition shadow-sm">
-                        Ver todo el catálogo
-                    </a>
-                </div>
-            @endforelse
-        </div>
-
-        <!-- Paginación -->
-        @if($products->hasPages())
-            <div class="mt-10 flex justify-center">
-                {{ $products->links() }}
             </div>
-        @endif
+
+            <div id="products-grid-inner">
+                @include('catalog.partials.product_grid', ['products' => $products, 'getProductImage' => $getProductImage])
+            </div>
+        </div>
     </main>
 
     <!-- SECCIÓN CÓMO COTIZAR (GUÍA COMPLETA, CAJONES ELEGANTES Y MODO OSCURO) -->
@@ -2253,6 +2171,86 @@
                 maxDate: '{{ now()->addYears(2)->format('Y-m-d') }}',
                 toast: { show: false, message: '', timeout: null },
                 isDark: document.documentElement.classList.contains('dark'),
+
+                // Filtro Reactivo de Categorías y Carga Asíncrona (0ms de latencia con caché)
+                activeCategory: '{{ addslashes(request('categoria', '')) }}',
+                isFiltering: false,
+                categoryCache: {},
+
+                init() {
+                    // Interceptar clics en la paginación dentro del contenedor del catálogo
+                    document.addEventListener('click', (e) => {
+                        const pageLink = e.target.closest('#products-grid-container .custom-pagination a, #products-grid-container nav a');
+                        if (pageLink && pageLink.href) {
+                            e.preventDefault();
+                            this.fetchGrid(pageLink.href);
+                        }
+                    });
+
+                    // Sincronizar con botones de navegación del explorador (Atrás / Adelante)
+                    window.addEventListener('popstate', () => {
+                        const params = new URLSearchParams(window.location.search);
+                        this.activeCategory = params.get('categoria') || '';
+                        this.fetchGrid(window.location.href, false);
+                    });
+                },
+
+                async filterCategory(slug, targetUrl) {
+                    if (this.activeCategory === slug && !targetUrl.includes('buscar=')) {
+                        return;
+                    }
+                    this.activeCategory = slug;
+                    await this.fetchGrid(targetUrl, true);
+                },
+
+                async fetchGrid(url, pushState = true) {
+                    const cacheKey = url;
+                    if (this.categoryCache[cacheKey]) {
+                        const container = document.getElementById('products-grid-inner');
+                        if (container) {
+                            container.innerHTML = this.categoryCache[cacheKey];
+                        }
+                        if (pushState) {
+                            window.history.pushState({ url }, '', url);
+                        }
+                        return;
+                    }
+
+                    this.isFiltering = true;
+                    try {
+                        const fetchUrl = new URL(url, window.location.origin);
+                        fetchUrl.searchParams.set('ajax', '1');
+
+                        const res = await fetch(fetchUrl.toString(), {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'X-Catalog-Filter': '1',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data && data.html) {
+                                this.categoryCache[cacheKey] = data.html;
+                                const container = document.getElementById('products-grid-inner');
+                                if (container) {
+                                    container.innerHTML = data.html;
+                                }
+                                if (pushState) {
+                                    window.history.pushState({ url }, '', url);
+                                }
+                            }
+                        } else {
+                            window.location.href = url;
+                        }
+                    } catch (err) {
+                        console.error('Error al filtrar catálogo:', err);
+                        window.location.href = url;
+                    } finally {
+                        this.isFiltering = false;
+                    }
+                },
 
                 toggleTheme() {
                     this.isDark = !this.isDark;

@@ -176,4 +176,20 @@ class ProductTelemetryAndDashboardTest extends TestCase
         $response->assertSeeLivewire(ProductInterestRankingWidget::class);
         $response->assertSeeLivewire(LatestQuotesWidget::class);
     }
+
+    /**
+     * 6. Comprueba que el panel administrativo permita a los administradores gestionar los montajes y galerías.
+     */
+    public function test_admin_can_access_montajes_resource(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin);
+
+        $response = $this->get('/admin/montajes');
+        $response->assertOk();
+    }
 }

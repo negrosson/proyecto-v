@@ -8,6 +8,7 @@ use App\Actions\Catalog\FilterProductsAction;
 use App\Actions\Catalog\TrackProductClickAction;
 use App\Models\Category;
 use App\Models\Faq;
+use App\Models\Montaje;
 use App\Models\Product;
 use App\Models\SiteSetting;
 use Illuminate\Contracts\View\View;
@@ -19,8 +20,43 @@ class CatalogController extends Controller
     /**
      * Muestra la vista principal del catálogo con filtros, configuración CMS y FAQs.
      */
-    public function index(Request $request, FilterProductsAction $filterProducts): View
+    public function index(Request $request, FilterProductsAction $filterProducts): View|JsonResponse
     {
+        $search = $request->query('buscar');
+        $categoria = $request->query('categoria');
+
+        $products = $filterProducts->execute(
+            search: is_string($search) ? $search : null,
+            categorySlug: is_string($categoria) ? $categoria : null,
+        );
+
+        $categoryPlaceholders = [
+            'vajilla' => 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80',
+            'manteleria' => 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+            'mobiliario' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80',
+            'equipamiento-cocina' => 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80',
+            'bar-decoracion' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80',
+        ];
+        $defaultPlaceholder = 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80';
+
+        $getProductImage = static function (Product $product) use ($categoryPlaceholders, $defaultPlaceholder): string {
+            if (! empty($product->image_url)) {
+                return (string) $product->image_url;
+            }
+            $slug = $product->category?->slug ?? '';
+
+            return $categoryPlaceholders[$slug] ?? $defaultPlaceholder;
+        };
+
+        if ($request->ajax() || $request->header('X-Catalog-Filter') !== null || $request->boolean('ajax')) {
+            return response()->json([
+                'html' => view('catalog.partials.product_grid', compact('products', 'categoria', 'search', 'getProductImage'))->render(),
+                'total' => $products->total(),
+                'categoria' => $categoria,
+                'search' => $search,
+            ]);
+        }
+
         $settings = SiteSetting::current();
 
         $faqs = Faq::query()
@@ -32,14 +68,6 @@ class CatalogController extends Controller
             ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
             ->orderBy('name')
             ->get();
-
-        $search = $request->query('buscar');
-        $categoria = $request->query('categoria');
-
-        $products = $filterProducts->execute(
-            search: is_string($search) ? $search : null,
-            categorySlug: is_string($categoria) ? $categoria : null,
-        );
 
         $featuredProducts = Product::query()
             ->where('is_active', true)
@@ -123,6 +151,34 @@ class CatalogController extends Controller
      */
     public function getMontajesData(): array
     {
+        $dbMontajes = Montaje::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
+        if ($dbMontajes->isNotEmpty()) {
+            return $dbMontajes->map(static function (Montaje $m): array {
+                return [
+                    'id' => $m->slug,
+                    'slug' => $m->slug,
+                    'title' => $m->title,
+                    'client' => $m->client ?? '',
+                    'type' => $m->type,
+                    'year' => $m->year,
+                    'location' => $m->location ?? '',
+                    'capacity' => $m->capacity ?? '',
+                    'summary' => $m->summary ?? '',
+                    'description' => $m->description ?? '',
+                    'cover_image' => $m->cover_image_url,
+                    'image' => $m->cover_image_url,
+                    'gallery' => $m->gallery_urls,
+                    'items_used' => $m->items_used ?? [],
+                    'is_featured' => $m->is_featured,
+                ];
+            })->values()->all();
+        }
+
         return [
             [
                 'id' => 'teno-2023',
