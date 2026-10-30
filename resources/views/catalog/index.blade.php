@@ -136,11 +136,11 @@
                         {{ mb_substr($settings->site_name ?? 'A', 0, 1) }}
                     </div>
                 @endif
-                <div>
-                    <span class="text-base sm:text-lg font-serif font-bold tracking-wider text-zinc-900 dark:text-zinc-100 uppercase block leading-tight">
+                <div class="min-w-0 flex-1 sm:flex-initial">
+                    <span class="text-sm sm:text-base md:text-lg font-serif font-bold tracking-wider text-zinc-900 dark:text-zinc-100 uppercase block leading-tight truncate max-w-[135px] sm:max-w-none">
                         {{ $settings->site_name ?? 'Arriendos & Eventos' }}
                     </span>
-                    <span class="text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-500 dark:text-zinc-400 uppercase font-mono block">
+                    <span class="hidden sm:block text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-500 dark:text-zinc-400 uppercase font-mono truncate">
                         {{ $settings->site_tagline ?? 'Boutique de Banquetería & Menaje' }}
                     </span>
                 </div>
@@ -184,12 +184,12 @@
                      x-init="$watch('countItems()', () => { bump = true; setTimeout(() => bump = false, 350) })">
                     <button @click="cartOpen = true" 
                             id="open-quote-drawer-btn"
-                            class="relative inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 group">
+                            class="relative inline-flex items-center gap-1.5 sm:gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 group">
                         <svg class="w-4 h-4 text-amber-300 dark:text-zinc-950 group-hover:rotate-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
-                        <span class="text-xs font-semibold tracking-wide">Cotización</span>
-                        <span class="transition-transform duration-300 font-mono font-bold text-xs px-2 py-0.5 rounded-full" 
+                        <span class="hidden sm:inline text-xs font-semibold tracking-wide">Cotización</span>
+                        <span class="transition-transform duration-300 font-mono font-bold text-xs px-1.5 sm:px-2 py-0.5 rounded-full" 
                               :class="{ 'scale-125 bg-amber-400 dark:bg-zinc-900 text-zinc-950 dark:text-amber-400 shadow-md': bump, 'scale-100 bg-white/20 dark:bg-black/20 text-white dark:text-zinc-950': !bump }" 
                               x-text="countItems()"></span>
                     </button>
@@ -726,14 +726,14 @@
                         @foreach ($montajes as $montaje)
                             <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
                                 <div>
-                                    <div class="relative h-52 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                    <div class="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                                         <img src="{{ $montaje['image'] }}" 
                                              alt="{{ $montaje['title'] }}" 
-                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                                        <span class="absolute top-2.5 left-2.5 bg-black/70 backdrop-blur-md text-white text-[10px] font-mono uppercase px-2 py-0.5 rounded border border-white/20">
+                                             class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out">
+                                        <span class="absolute top-2.5 left-2.5 bg-black/75 backdrop-blur-md text-white text-[10px] font-mono uppercase px-2.5 py-1 rounded-full border border-white/20 shadow-sm">
                                             {{ $montaje['year'] }}
                                         </span>
-                                        <span class="absolute top-2.5 right-2.5 bg-amber-400 text-zinc-950 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                                        <span class="absolute top-2.5 right-2.5 max-w-[65%] truncate bg-amber-400 text-zinc-950 text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
                                             {{ $montaje['capacity'] }}
                                         </span>
                                     </div>

@@ -107,11 +107,11 @@
                         {{ mb_substr($settings->site_name ?? 'A', 0, 1) }}
                     </div>
                 @endif
-                <div class="flex flex-col">
-                    <span class="font-serif text-lg sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-white leading-tight">
+                <div class="flex flex-col min-w-0 flex-1 sm:flex-initial">
+                    <span class="font-serif text-sm sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-white leading-tight truncate max-w-[135px] sm:max-w-none">
                         {{ $settings->site_name ?? 'Arriendos & Eventos' }}
                     </span>
-                    <span class="text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-mono tracking-wider uppercase">
+                    <span class="hidden sm:block text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-mono tracking-wider uppercase truncate">
                         {{ $settings->site_tagline ?? 'Banquetería & Mobiliario' }}
                     </span>
                 </div>
@@ -337,11 +337,11 @@
                     <div class="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
                         <div>
                             <div @click="openProject({{ json_encode($m) }})"
-                                 class="cursor-pointer relative h-64 sm:h-72 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                 class="cursor-pointer relative aspect-[4/3] sm:aspect-[16/10] sm:h-72 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                                 <img src="{{ $m['cover_image'] }}" 
                                      alt="{{ $m['title'] }}" 
                                      loading="lazy"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                                     class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out">
                                 
                                 <span class="absolute top-3 left-3 backdrop-blur-md bg-black/60 text-white text-[10px] font-mono font-medium px-2.5 py-1 rounded-full border border-white/20">
                                     {{ $m['type'] }}

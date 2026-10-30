@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MontajeResource extends Resource
@@ -123,23 +124,45 @@ class MontajeResource extends Resource
                             ->schema([
                                 Forms\Components\FileUpload::make('cover_image')
                                     ->label('Foto de Portada Principal')
+                                    ->disk('public')
+                                    ->directory('montajes')
+                                    ->visibility('public')
                                     ->image()
                                     ->maxSize(4096)
-                                    ->directory('montajes')
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'montajes'))
-                                    ->helperText('Foto representativa principal. Máx 4 MB. Formato JPG, PNG o WebP.')
+                                    ->deleteUploadedFileUsing(function (?string $file): void {
+                                        if ($file && Storage::disk('public')->exists($file)) {
+                                            Storage::disk('public')->delete($file);
+                                        }
+                                    })
+                                    ->deletable(true)
+                                    ->openable()
+                                    ->downloadable()
+                                    ->nullable()
+                                    ->helperText('Foto representativa principal. Máx 4 MB. Formato JPG, PNG o WebP. Puedes quitar la foto actual con el botón de papelera o subir una nueva.')
                                     ->columnSpanFull(),
                                 Forms\Components\FileUpload::make('gallery')
                                     ->label('Galería Fotográfica del Evento (Múltiples Fotos)')
+                                    ->disk('public')
+                                    ->directory('montajes/galeria')
+                                    ->visibility('public')
                                     ->multiple()
                                     ->reorderable()
+                                    ->deletable(true)
+                                    ->openable()
+                                    ->downloadable()
+                                    ->nullable()
                                     ->image()
                                     ->maxSize(4096)
-                                    ->directory('montajes/galeria')
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'montajes/galeria'))
-                                    ->helperText('Sube múltiples fotos para mostrar todos los ángulos del montaje, detalles de mesa y panorámica. Tamaño máx: 4 MB por foto.')
+                                    ->deleteUploadedFileUsing(function (?string $file): void {
+                                        if ($file && Storage::disk('public')->exists($file)) {
+                                            Storage::disk('public')->delete($file);
+                                        }
+                                    })
+                                    ->helperText('Sube múltiples fotos para mostrar todos los ángulos del montaje. Puedes quitar cualquiera individualmente con el botón de papelera o reorganizarlas.')
                                     ->columnSpanFull(),
                             ]),
 

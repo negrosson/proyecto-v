@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -151,12 +152,24 @@ class ProductResource extends Resource
 
                         Forms\Components\FileUpload::make('image')
                             ->label('Fotografía de Producto')
+                            ->disk('public')
+                            ->directory('products')
+                            ->visibility('public')
                             ->image()
                             ->maxSize(4096)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 4 MB. El sistema optimiza y sanitiza automáticamente a WebP de alta fidelidad.')
+                            ->deletable(true)
+                            ->openable()
+                            ->downloadable()
+                            ->nullable()
+                            ->helperText('Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 4 MB. Puedes quitar la foto con el botón de papelera o subir una nueva.')
                             ->saveUploadedFileUsing(function (UploadedFile $file): string {
                                 return SafeImageSanitizer::sanitize($file, 'public', 'products');
+                            })
+                            ->deleteUploadedFileUsing(function (?string $file): void {
+                                if ($file && Storage::disk('public')->exists($file)) {
+                                    Storage::disk('public')->delete($file);
+                                }
                             })
                             ->columnSpanFull(),
 

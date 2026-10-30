@@ -74,11 +74,11 @@
                         {{ mb_substr($settings->site_name ?? 'F', 0, 1) }}
                     </div>
                 @endif
-                <div>
-                    <span class="text-base sm:text-lg font-serif font-bold tracking-wider text-zinc-900 dark:text-zinc-100 uppercase block leading-tight">
+                <div class="min-w-0 flex-1 sm:flex-initial">
+                    <span class="text-sm sm:text-base md:text-lg font-serif font-bold tracking-wider text-zinc-900 dark:text-zinc-100 uppercase block leading-tight truncate max-w-[135px] sm:max-w-none">
                         {{ $settings->site_name ?? 'Fiesta Rent' }}
                     </span>
-                    <span class="text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-500 dark:text-zinc-400 uppercase font-mono block">
+                    <span class="hidden sm:block text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-500 dark:text-zinc-400 uppercase font-mono truncate">
                         {{ $settings->site_tagline ?? 'Tu Evento, Nuestro Mobiliario' }}
                     </span>
                 </div>
@@ -119,12 +119,12 @@
             <div class="flex items-center gap-2 sm:gap-2.5">
                 <!-- Botón Cotización -->
                 <button @click="cartOpen = true" 
-                        class="relative inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-md transition-all active:scale-95 group">
+                        class="relative inline-flex items-center gap-1.5 sm:gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-md transition-all active:scale-95 group">
                     <svg class="w-4 h-4 text-amber-300 dark:text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
-                    <span class="text-xs font-semibold tracking-wide">Cotización</span>
-                    <span class="font-mono font-bold text-xs px-2 py-0.5 rounded-full bg-amber-400 dark:bg-zinc-900 text-zinc-950 dark:text-amber-400" 
+                    <span class="hidden sm:inline text-xs font-semibold tracking-wide">Cotización</span>
+                    <span class="font-mono font-bold text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-400 dark:bg-zinc-900 text-zinc-950 dark:text-amber-400" 
                           x-text="countItems()"></span>
                 </button>
 
