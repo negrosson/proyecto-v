@@ -33,7 +33,7 @@ class ProductResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::where('is_active', true)->count();
+        return (string) cache()->remember('filament_badge_products_count', 60, static fn () => (string) static::getModel()::where('is_active', true)->count());
     }
 
     public static function getEloquentQuery(): Builder
@@ -211,7 +211,7 @@ class ProductResource extends Resource
                 Tables\Columns\ImageColumn::make('image')
                     ->label('Foto')
                     ->circular()
-                    ->defaultImageUrl('https://placehold.co/80x80/FAF8F5/1C1814?text=Item'),
+                    ->defaultImageUrl('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="%2371717a"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2v10h14V7H5zm2 8l3-4 2.5 3 2-2.5 3.5 4.5H7z"/></svg>'),
 
                 Tables\Columns\TextColumn::make('code')
                     ->label('Cód.')

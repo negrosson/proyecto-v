@@ -27,7 +27,7 @@ class ContactMessageResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $unread = (int) static::getModel()::where('is_read', false)->count();
+        $unread = cache()->remember('filament_badge_contact_unread_count', 30, static fn () => (int) static::getModel()::where('is_read', false)->count());
 
         return $unread > 0 ? (string) $unread : null;
     }

@@ -29,7 +29,7 @@ class QuoteLogResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $pending = (int) static::getModel()::where('status', 'pendiente')->count();
+        $pending = cache()->remember('filament_badge_quotes_pending_count', 30, static fn () => (int) static::getModel()::where('status', 'pendiente')->count());
 
         return $pending > 0 ? (string) $pending : null;
     }

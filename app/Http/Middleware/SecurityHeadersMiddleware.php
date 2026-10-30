@@ -6,6 +6,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeadersMiddleware
@@ -17,6 +19,19 @@ class SecurityHeadersMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // 0. Sincronización Dinámica de Host y Esquema (Ngrok / Proxy Reverso / HTTPS)
+        if ($request->header('x-forwarded-proto') === 'https' || $request->isSecure()) {
+            URL::forceScheme('https');
+        }
+
+        $schemeAndHost = $request->getSchemeAndHttpHost();
+        if ($schemeAndHost && ! str_contains($schemeAndHost, '127.0.0.1:0')) {
+            URL::forceRootUrl($schemeAndHost);
+            config(['filesystems.disks.public.url' => $schemeAndHost.'/storage']);
+            // Reiniciar la instancia del disco public si ya fue resuelta previamente
+            Storage::forgetDisk('public');
+        }
+
         $response = $next($request);
 
         // Anti-Clickjacking: DENY estricto en rutas administrativas y SAMEORIGIN en catálogo público

@@ -30,7 +30,7 @@ class CategoryResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::count();
+        return (string) cache()->remember('filament_badge_categories_count', 60, static fn () => (string) static::getModel()::count());
     }
 
     public static function getEloquentQuery(): Builder
