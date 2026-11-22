@@ -26,16 +26,27 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // 0. Detección Dinámica de Host y Esquema para Proxies Reversos / Túneles (Ngrok / HTTPS)
+        // 0. Esquema HTTPS y protección contra Host Header Injection en producción
         if (! $this->app->runningInConsole()) {
-            if (request()->header('x-forwarded-proto') === 'https' || request()->isSecure()) {
-                URL::forceScheme('https');
-            }
+            if ($this->app->isProduction()) {
+                $appUrl = (string) config('app.url', '');
+                if ($appUrl !== '') {
+                    URL::forceRootUrl($appUrl);
+                    config(['filesystems.disks.public.url' => rtrim($appUrl, '/').'/storage']);
+                }
+                if (str_starts_with($appUrl, 'https://') || request()->isSecure()) {
+                    URL::forceScheme('https');
+                }
+            } else {
+                if (request()->isSecure()) {
+                    URL::forceScheme('https');
+                }
 
-            $currentHost = request()->getSchemeAndHttpHost();
-            if ($currentHost && ! str_contains($currentHost, '127.0.0.1:0')) {
-                URL::forceRootUrl($currentHost);
-                config(['filesystems.disks.public.url' => $currentHost.'/storage']);
+                $currentHost = request()->getSchemeAndHttpHost();
+                if ($currentHost && ! str_contains($currentHost, '127.0.0.1:0')) {
+                    URL::forceRootUrl($currentHost);
+                    config(['filesystems.disks.public.url' => $currentHost.'/storage']);
+                }
             }
         }
         // 1. Rate Limiters contra DoS y Spam (OWASP A04)

@@ -60,7 +60,6 @@ class QuoteLogResource extends Resource
                             ->label('Fecha del Evento')
                             ->native(false)
                             ->displayFormat('d/m/Y')
-                            ->minDate(now()->subMonths(6))
                             ->maxDate(now()->addYears(2)),
 
                         Forms\Components\Select::make('status')

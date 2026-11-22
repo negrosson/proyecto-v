@@ -68,6 +68,45 @@ final readonly class TotpService
     }
 
     /**
+     * Verifica un código TOTP de 6 dígitos contra una semilla Base32 en memoria (flujo de activación).
+     * Retorna el bloque temporal (slice) coincidente o null si es inválido.
+     */
+    public function verifyCodeForSecret(string $secret, string $code, int $window = 1): ?int
+    {
+        $cleanCode = preg_replace('/\s+/', '', trim($code)) ?? '';
+        if (strlen($cleanCode) !== 6 || ! ctype_digit($cleanCode)) {
+            return null;
+        }
+
+        $secretBytes = $this->base32Decode($secret);
+        if ($secretBytes === '') {
+            return null;
+        }
+
+        $currentSlice = (int) floor(time() / 30);
+
+        for ($i = -$window; $i <= $window; $i++) {
+            $slice = $currentSlice + $i;
+            $timeBytes = pack('N*', 0).pack('N*', $slice);
+            $hash = hash_hmac('sha1', $timeBytes, $secretBytes, true);
+
+            $offset = ord($hash[19]) & 0x0F;
+            $binary = ((ord($hash[$offset]) & 0x7F) << 24)
+                | ((ord($hash[$offset + 1]) & 0xFF) << 16)
+                | ((ord($hash[$offset + 2]) & 0xFF) << 8)
+                | (ord($hash[$offset + 3]) & 0xFF);
+
+            $calculatedCode = str_pad((string) ($binary % 1000000), 6, '0', STR_PAD_LEFT);
+
+            if (hash_equals($calculatedCode, $cleanCode)) {
+                return $slice;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Valida y consume un código TOTP de 6 dígitos con protección Anti-Replay y Anti-Race Condition.
      *
      * Bloquea la fila del usuario en la base de datos (SELECT ... FOR UPDATE) y almacena el
@@ -222,51 +261,12 @@ final readonly class TotpService
     }
 
     /**
-     * Genera la URI de aprovisionamiento TOTP con parámetros RFC 6238 y Data URI SVG.
+     * Genera un código QR ISO/IEC 18004 real en SVG (Data URI) para escaneo directo en apps 2FA.
      */
     public function generateQrSvgDataUri(string $issuer, string $email, string $secret): string
     {
         $otpauth = $this->getOtpAuthUri($issuer, $email, $secret);
 
-        // Genera un SVG vectorizado limpio y autónomo que contiene el código de configuración
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">'
-            .'<rect width="240" height="240" fill="#ffffff" rx="16"/>'
-            .'<rect x="16" y="16" width="60" height="60" fill="#18181b" rx="8"/>'
-            .'<rect x="24" y="24" width="44" height="44" fill="#ffffff" rx="4"/>'
-            .'<rect x="32" y="32" width="28" height="28" fill="#18181b" rx="2"/>'
-            .'<rect x="164" y="16" width="60" height="60" fill="#18181b" rx="8"/>'
-            .'<rect x="172" y="24" width="44" height="44" fill="#ffffff" rx="4"/>'
-            .'<rect x="180" y="32" width="28" height="28" fill="#18181b" rx="2"/>'
-            .'<rect x="16" y="164" width="60" height="60" fill="#18181b" rx="8"/>'
-            .'<rect x="24" y="172" width="44" height="44" fill="#ffffff" rx="4"/>'
-            .'<rect x="32" y="180" width="28" height="28" fill="#18181b" rx="2"/>'
-            .'<g fill="#27272a">'
-            .'<rect x="88" y="20" width="12" height="12"/>'
-            .'<rect x="112" y="20" width="12" height="12"/>'
-            .'<rect x="136" y="20" width="12" height="12"/>'
-            .'<rect x="88" y="44" width="12" height="12"/>'
-            .'<rect x="124" y="44" width="12" height="12"/>'
-            .'<rect x="88" y="68" width="12" height="12"/>'
-            .'<rect x="112" y="68" width="12" height="12"/>'
-            .'<rect x="140" y="68" width="12" height="12"/>'
-            .'<rect x="20" y="88" width="12" height="12"/>'
-            .'<rect x="44" y="88" width="12" height="12"/>'
-            .'<rect x="68" y="88" width="12" height="12"/>'
-            .'<rect x="92" y="92" width="56" height="56" fill="#f59e0b" rx="8"/>'
-            .'<path d="M110 110 h20 v20 h-20 z" fill="#ffffff"/>'
-            .'<rect x="164" y="88" width="12" height="12"/>'
-            .'<rect x="188" y="88" width="12" height="12"/>'
-            .'<rect x="212" y="88" width="12" height="12"/>'
-            .'<rect x="88" y="164" width="12" height="12"/>'
-            .'<rect x="112" y="164" width="12" height="12"/>'
-            .'<rect x="140" y="164" width="12" height="12"/>'
-            .'<rect x="164" y="164" width="12" height="12"/>'
-            .'<rect x="188" y="188" width="12" height="12"/>'
-            .'<rect x="212" y="212" width="12" height="12"/>'
-            .'</g>'
-            .'<!-- '.htmlspecialchars($otpauth, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8').' -->'
-            .'</svg>';
-
-        return 'data:image/svg+xml;utf8,'.rawurlencode($svg);
+        return QrCodeSvgGenerator::generateDataUri($otpauth);
     }
 }

@@ -30,23 +30,7 @@ class CatalogController extends Controller
             categorySlug: is_string($categoria) ? $categoria : null,
         );
 
-        $categoryPlaceholders = [
-            'vajilla' => 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80',
-            'manteleria' => 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-            'mobiliario' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80',
-            'equipamiento-cocina' => 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80',
-            'bar-decoracion' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80',
-        ];
-        $defaultPlaceholder = 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80';
-
-        $getProductImage = static function (Product $product) use ($categoryPlaceholders, $defaultPlaceholder): string {
-            if (! empty($product->image_url)) {
-                return (string) $product->image_url;
-            }
-            $slug = $product->category?->slug ?? '';
-
-            return $categoryPlaceholders[$slug] ?? $defaultPlaceholder;
-        };
+        $getProductImage = static fn (Product $product): string => $product->display_image_url;
 
         if ($request->ajax() || $request->header('X-Catalog-Filter') !== null || $request->boolean('ajax')) {
             return response()->json([
@@ -139,7 +123,7 @@ class CatalogController extends Controller
     public function comoCotizar(): View
     {
         $settings = SiteSetting::current();
-        $categories = Category::query()->where('is_active', true)->orderBy('sort_order')->get();
+        $categories = Category::query()->orderBy('name')->get();
 
         return view('catalog.como-cotizar', compact('settings', 'categories'));
     }
@@ -310,7 +294,7 @@ class CatalogController extends Controller
             'stock' => $product->stock,
             'category_name' => $product->category?->name ?? 'Catálogo',
             'category_slug' => $product->category?->slug ?? '',
-            'image' => $product->image_url,
+            'image' => $product->display_image_url,
         ])->values();
 
         return response()->json([
@@ -324,6 +308,8 @@ class CatalogController extends Controller
      */
     public function trackClick(Request $request, Product $product, TrackProductClickAction $action): JsonResponse
     {
+        abort_unless($product->is_active, 404);
+
         $action->execute($product->id);
 
         return response()->json([

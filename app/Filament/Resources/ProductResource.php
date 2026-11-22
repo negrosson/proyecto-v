@@ -4,16 +4,22 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Actions\Admin\MoveProductsToCategoryAction;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Category;
 use App\Models\Product;
 use App\Services\Security\SafeImageSanitizer;
+use App\Support\Filament\PreviewImageResolver;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -55,6 +61,7 @@ class ProductResource extends Resource
                             ->relationship('category', 'name')
                             ->preload()
                             ->searchable()
+                            ->live()
                             ->required()
                             ->exists('categories', 'id')
                             ->createOptionForm([
@@ -115,6 +122,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('name')
                             ->label('Nombre del Producto')
                             ->required()
+                            ->live(onBlur: true)
                             ->string()
                             ->minLength(2)
                             ->maxLength(120)
@@ -136,6 +144,7 @@ class ProductResource extends Resource
                             ->label('Precio Arriendo (CLP)')
                             ->prefix('$')
                             ->required()
+                            ->live(onBlur: true)
                             ->numeric()
                             ->integer()
                             ->minValue(0)
@@ -144,6 +153,7 @@ class ProductResource extends Resource
                         Forms\Components\TextInput::make('stock')
                             ->label('Stock Disponible (Unidades)')
                             ->required()
+                            ->live(onBlur: true)
                             ->numeric()
                             ->integer()
                             ->minValue(0)
@@ -156,20 +166,49 @@ class ProductResource extends Resource
                             ->directory('products')
                             ->visibility('public')
                             ->image()
+                            ->live()
                             ->maxSize(4096)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->deletable(true)
                             ->openable()
                             ->downloadable()
                             ->nullable()
-                            ->helperText('Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 4 MB. Puedes quitar la foto con el botón de papelera o subir una nueva.')
+                            ->helperText('Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 4 MB. Al subirla verás abajo cómo queda la tarjeta en el catálogo.')
                             ->saveUploadedFileUsing(function (UploadedFile $file): string {
                                 return SafeImageSanitizer::sanitize($file, 'public', 'products');
                             })
                             ->deleteUploadedFileUsing(function (?string $file): void {
-                                if ($file && Storage::disk('public')->exists($file)) {
+                                if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
                                     Storage::disk('public')->delete($file);
                                 }
+                            })
+                            ->columnSpanFull(),
+
+                        Forms\Components\Placeholder::make('product_live_preview')
+                            ->label('Vista Previa en Tiempo Real (Tarjeta del Catálogo)')
+                            ->content(function (Get $get): View {
+                                $uploadedUrl = PreviewImageResolver::resolveSingle($get('image'));
+                                $category = $get('category_id')
+                                    ? Category::query()->select(['id', 'name', 'slug'])->find($get('category_id'))
+                                    : null;
+
+                                $previewProduct = new Product([
+                                    'name' => (string) ($get('name') ?? ''),
+                                ]);
+                                if ($category !== null) {
+                                    $previewProduct->setRelation('category', $category);
+                                }
+
+                                return view('filament.previews.product-card-preview', [
+                                    'name' => (string) ($get('name') ?? ''),
+                                    'code' => $get('code'),
+                                    'rentalPrice' => (int) ($get('rental_price') ?? 0),
+                                    'stock' => (int) ($get('stock') ?? 0),
+                                    'isSale' => (bool) ($get('is_sale') ?? false),
+                                    'categoryName' => $category?->name ?? 'Catálogo',
+                                    'imageUrl' => $uploadedUrl ?? $previewProduct->resolveFallbackImageUrl(),
+                                    'isFallback' => $uploadedUrl === null,
+                                ]);
                             })
                             ->columnSpanFull(),
 
@@ -221,10 +260,10 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
+                Tables\Columns\ImageColumn::make('image_url')
                     ->label('Foto')
                     ->circular()
-                    ->defaultImageUrl('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="%2371717a"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2v10h14V7H5zm2 8l3-4 2.5 3 2-2.5 3.5 4.5H7z"/></svg>'),
+                    ->defaultImageUrl(fn (Product $record): string => $record->resolveFallbackImageUrl()),
 
                 Tables\Columns\TextColumn::make('code')
                     ->label('Cód.')
@@ -322,6 +361,39 @@ class ProductResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('moveToCategory')
+                        ->label('Mover a otra categoría')
+                        ->icon('heroicon-o-arrows-right-left')
+                        ->color('amber')
+                        ->form([
+                            Forms\Components\Select::make('target_category_id')
+                                ->label('Categoría de Destino')
+                                ->options(fn (): array => Category::query()->orderBy('name')->pluck('name', 'id')->all())
+                                ->searchable()
+                                ->preload()
+                                ->required()
+                                ->exists('categories', 'id'),
+                        ])
+                        ->modalHeading('Mover productos seleccionados de categoría')
+                        ->modalDescription('Todos los productos que marcaste en la tabla serán reasignados a la categoría de destino.')
+                        ->modalSubmitActionLabel('Mover Productos')
+                        ->action(function (Collection $records, array $data, MoveProductsToCategoryAction $moveAction): void {
+                            $targetCategoryId = (int) $data['target_category_id'];
+                            $movedCount = $moveAction->execute(
+                                targetCategoryId: $targetCategoryId,
+                                productIds: $records->pluck('id')->all(),
+                                mode: 'manual',
+                            );
+
+                            $targetName = Category::query()->whereKey($targetCategoryId)->value('name') ?? 'Destino';
+
+                            Notification::make()
+                                ->title("{$movedCount} producto(s) movidos a «{$targetName}»")
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

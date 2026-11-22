@@ -4,43 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Guía Completa: Cómo Cotizar Mobiliario para tu Evento | {{ $settings->site_name ?? 'Fiesta Rent' }}</title>
-    <meta name="description" content="Aprende cómo cotizar mobiliario para tu evento en Fiesta Rent. Proceso simple en 5 pasos: cotiza, abona, recibe, devuelve y garantía. Nosotros lavamos por ti.">
+    <title>Guía Completa: Cómo Cotizar Mobiliario para tu Evento | {{ $settings->site_name ?? 'Arriendos & Eventos' }}</title>
+    <meta name="description" content="Aprende cómo cotizar mobiliario para tu evento en {{ $settings->site_name ?? 'Arriendos & Eventos' }}. Proceso simple en 5 pasos: cotiza, abona, recibe, devuelve y garantía. Nosotros lavamos por ti.">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Cómo Cotizar Mobiliario | {{ $settings->site_name ?? 'Arriendos & Eventos' }}">
+    <meta property="og:description" content="Proceso simple en 5 pasos para reservar vajilla, mantelería y mobiliario de gala.">
+    <meta property="og:image" content="{{ asset('images/montajes/teno-mesa-principal.jpg') }}">
 
     <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS y Alpine.js -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Cormorant Garamond"', 'serif'],
-                    },
-                    colors: {
-                        amber: {
-                            50: '#FFFDF9',
-                            100: '#FEF8EE',
-                            200: '#FDF1DD',
-                            300: '#FBE3BC',
-                            400: '#F6D090',
-                            500: '#EAB759',
-                            600: '#C89333',
-                            700: '#9E6D1C',
-                            800: '#785018',
-                            900: '#543612',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS Compilado con Vite y Alpine.js -->
+    @vite(['resources/css/app.css'])
     <script>
         (function() {
             var theme = localStorage.getItem('theme');
@@ -51,7 +30,7 @@
             }
         })();
     </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('vendor/alpinejs/alpine.min.js') }}"></script>
 
     <style>
         [x-cloak] { display: none !important; }
@@ -65,27 +44,13 @@
     <!-- HEADER / NAVEGACIÓN PRINCIPAL -->
     <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            <!-- Brand Logo -->
-            <a href="{{ route('catalog.index') }}" class="flex items-center gap-3 group focus:outline-none">
-                @if(!empty($settings?->logo_path))
-                    <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="{{ $settings->site_name ?? 'Logo' }}" class="w-10 h-10 rounded-xl object-cover shadow-md border border-zinc-200 dark:border-zinc-700">
-                @else
-                    <div class="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-800 text-zinc-100 flex items-center justify-center font-serif text-2xl font-bold shadow-md shadow-zinc-900/10 group-hover:scale-105 transition-transform duration-300 border border-zinc-800 dark:border-zinc-700">
-                        {{ mb_substr($settings->site_name ?? 'F', 0, 1) }}
-                    </div>
-                @endif
-                <div class="min-w-0 flex-1 sm:flex-initial">
-                    <span class="text-sm sm:text-base md:text-lg font-serif font-bold tracking-wider text-zinc-900 dark:text-zinc-100 uppercase block leading-tight truncate max-w-[135px] sm:max-w-none">
-                        {{ $settings->site_name ?? 'Fiesta Rent' }}
-                    </span>
-                    <span class="hidden sm:block text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-500 dark:text-zinc-400 uppercase font-mono truncate">
-                        {{ $settings->site_tagline ?? 'Tu Evento, Nuestro Mobiliario' }}
-                    </span>
-                </div>
+            <!-- Brand Logo Oficial VYS -->
+            <a href="{{ route('catalog.index') }}" class="flex items-center shrink-0 group focus:outline-none">
+                <x-brand-logo variant="header" :settings="$settings" />
             </a>
 
             <!-- Navegación Desktop -->
-            <nav class="hidden md:flex items-center gap-6 text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400">
+            <nav class="hidden lg:flex items-center gap-4 xl:gap-6 text-[11px] xl:text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
                 <a href="{{ route('catalog.index') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Inicio
                 </a>
@@ -109,6 +74,7 @@
                 </a>
                 <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, quisiera consultar cómo cotizar mobiliario.') }}" 
                    target="_blank" 
+                   rel="noopener noreferrer"
                    class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors py-1 flex items-center gap-1.5 font-bold">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     WhatsApp
@@ -116,22 +82,23 @@
             </nav>
 
             <!-- Acciones Header -->
-            <div class="flex items-center gap-2 sm:gap-2.5">
-                <!-- Botón Cotización -->
-                <button @click="cartOpen = true" 
-                        class="relative inline-flex items-center gap-1.5 sm:gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-md transition-all active:scale-95 group">
+            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                <!-- Enlace Directo al Carrito de Cotización en el Catálogo -->
+                <a href="{{ route('catalog.index') }}?abrir_cotizacion=1#catalogo"
+                   class="relative inline-flex items-center gap-1.5 sm:gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-md transition-all active:scale-95 group">
                     <svg class="w-4 h-4 text-amber-300 dark:text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                     </svg>
                     <span class="hidden sm:inline text-xs font-semibold tracking-wide">Cotización</span>
                     <span class="font-mono font-bold text-xs px-1.5 sm:px-2 py-0.5 rounded-full bg-amber-400 dark:bg-zinc-900 text-zinc-950 dark:text-amber-400" 
                           x-text="countItems()"></span>
-                </button>
+                </a>
 
                 <!-- Botón Modo Oscuro / Claro -->
                 <button @click="toggleTheme()" 
                         type="button" 
                         title="Alternar Modo Claro / Oscuro"
+                        aria-label="Cambiar tema claro/oscuro"
                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-amber-400 transition flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
                     <svg x-show="isDark" class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -141,9 +108,21 @@
                     </svg>
                 </button>
 
-                <!-- Toggle Móvil -->
+                <!-- Botón Login Panel -->
+                <a href="{{ route('filament.admin.auth.login') }}"
+                   title="Acceso Administración"
+                   class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white transition flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </a>
+
+                <!-- Toggle Móvil / Tablet -->
                 <button @click="mobileMenuOpen = !mobileMenuOpen" 
-                        class="md:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition">
+                        type="button"
+                        aria-label="Abrir menú de navegación"
+                        :aria-expanded="mobileMenuOpen"
+                        class="lg:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition">
                     <svg x-show="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
                     </svg>
@@ -154,7 +133,7 @@
             </div>
         </div>
 
-        <!-- Menú Móvil Desplegable -->
+        <!-- Menú Móvil / Tablet Desplegable -->
         <div x-show="mobileMenuOpen" 
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-2"
@@ -163,7 +142,7 @@
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-2"
              @click.outside="mobileMenuOpen = false"
-             class="md:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 px-5 py-4 space-y-3"
+             class="lg:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 px-5 py-4 space-y-3"
              style="display: none;">
             <nav class="flex flex-col space-y-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
                 <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
@@ -196,18 +175,41 @@
                 </a>
                 <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" 
                    target="_blank" 
+                   rel="noopener noreferrer"
                    class="px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold transition flex items-center justify-between">
                     <span>Atención por WhatsApp</span>
                     <svg class="w-4 h-4 fill-current text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.529 1.831.812 2.791.812 3.179 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.768-5.768-5.768zm9.969 5.768c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.819-1.242l-5.181 1.356 1.381-5.048c-.902-1.492-1.381-3.21-1.381-5.066 0-5.518 4.482-10 10-10s10 4.482 10 10z"/></svg>
+                </a>
+                <a href="{{ route('filament.admin.auth.login') }}" 
+                   class="px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 font-medium transition flex items-center justify-between border border-zinc-200 dark:border-zinc-700">
+                    <span>Acceso Administración</span>
+                    <span class="text-xs text-zinc-500 font-mono">Panel &rarr;</span>
                 </a>
             </nav>
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL: CÓMO COTIZAR -->
-    <main class="flex-1">
+    <!-- CONTENIDO PRINCIPAL: CÓMO COTIZAR CON LUZ SPOTLIGHT INTERACTIVA -->
+    <main class="flex-1"
+          x-data="{
+              mouseX: 50,
+              mouseY: 30,
+              spotlightActive: false,
+              handleMouseMove(e) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  this.mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+                  this.mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+                  this.spotlightActive = true;
+              }
+          }"
+          @mousemove="handleMouseMove($event)"
+          @mouseleave="spotlightActive = false">
         <!-- Hero Editorial: Celebra con Estilo -->
         <section class="relative bg-zinc-50/60 dark:bg-zinc-950 border-b border-zinc-200/80 dark:border-zinc-800 py-16 sm:py-24 overflow-hidden">
+            <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
+                 :class="spotlightActive ? 'opacity-100' : 'opacity-60'"
+                 :style="`background: radial-gradient(600px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.16), rgba(16, 185, 129, 0.05) 45%, transparent 75%);`">
+            </div>
             <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(#18181B 1px, transparent 1px); background-size: 24px 24px;"></div>
 
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -223,7 +225,7 @@
                 </h1>
 
                 <p class="text-sm sm:text-base md:text-lg text-zinc-600 dark:text-zinc-300 mt-6 max-w-3xl mx-auto font-light leading-relaxed">
-                    ¿Buscas la manera de cómo cotizar mobiliario para tu próximo evento? En <span class="font-semibold text-zinc-900 dark:text-white">{{ $settings->site_name ?? 'Fiesta Rent' }}</span> te ayudamos a hacerlo fácil y rápido. Nuestro servicio incluye una amplia variedad de mobiliario para eventos, perfecto para cualquier ocasión. Ya sea que necesites sillas, mesas, o decoración, nuestro equipo está listo para asistirte. Consulta cómo cotizar mobiliario con nosotros y haz de tu celebración una experiencia inolvidable.
+                    ¿Buscas la manera de cómo cotizar mobiliario para tu próximo evento? En <span class="font-semibold text-zinc-900 dark:text-white">{{ $settings->site_name ?? 'Arriendos & Eventos' }}</span> te ayudamos a hacerlo fácil y rápido. Nuestro servicio incluye una amplia variedad de mobiliario para eventos, perfecto para cualquier ocasión. Ya sea que necesites sillas, mesas, o decoración, nuestro equipo está listo para asistirte. Consulta cómo cotizar mobiliario con nosotros y haz de tu celebración una experiencia inolvidable.
                 </p>
 
                 <!-- Acciones Rápidas -->
@@ -242,8 +244,13 @@
             </div>
         </section>
 
-        <!-- SECCIÓN DE LOS 5 PASOS: CAJONES BONITOS & ORDENADOS -->
-        <section class="py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- SECCIÓN DE LOS 5 PASOS: CAJONES BONITOS & ORDENADOS CON LUZ SPOTLIGHT -->
+        <section class="relative overflow-hidden py-16 sm:py-24">
+            <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
+                 :class="spotlightActive ? 'opacity-100' : 'opacity-50'"
+                 :style="`background: radial-gradient(640px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.15), rgba(16, 185, 129, 0.05) 45%, transparent 75%);`">
+            </div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-2xl mx-auto mb-14">
                 <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 py-1 rounded-full inline-block mb-3 font-semibold">
                     Paso a Paso Transparente
@@ -515,6 +522,7 @@
                     </div>
                 </div>
             </div>
+            </div>
         </section>
     </main>
 
@@ -523,9 +531,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
                 <div>
-                    <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white mb-2">
-                        {{ $settings->site_name ?? 'Fiesta Rent' }}
-                    </h5>
+                    <a href="{{ route('catalog.index') }}" class="inline-block group mb-3">
+                        <x-brand-logo variant="footer" :settings="$settings" />
+                    </a>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 font-light leading-relaxed">
                         Arriendo de mobiliario, vajilla y mantelería fina para bodas, galas y eventos en Santiago y regiones.
                     </p>
@@ -554,7 +562,7 @@
                 </div>
             </div>
             <div class="pt-6 border-t border-zinc-200 dark:border-zinc-800 text-center text-xs text-zinc-400 font-mono">
-                &copy; {{ date('Y') }} {{ $settings->site_name ?? 'Fiesta Rent' }}. Todos los derechos reservados.
+                &copy; {{ date('Y') }} {{ $settings->site_name ?? 'Arriendos & Eventos' }}. Todos los derechos reservados.
             </div>
         </div>
     </footer>

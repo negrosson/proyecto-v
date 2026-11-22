@@ -18,24 +18,37 @@ class BusinessStatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalClicks = (int) Product::sum('clicks_count');
+        $productStats = Product::query()
+            ->selectRaw('
+                COALESCE(SUM(clicks_count), 0) as total_clicks,
+                SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_products_count,
+                COALESCE(SUM(CASE WHEN is_active = 1 THEN stock ELSE 0 END), 0) as total_stock,
+                SUM(CASE WHEN is_active = 1 AND clicks_count >= 5 THEN 1 ELSE 0 END) as high_demand_count
+            ')
+            ->first();
+
+        $totalClicks = (int) ($productStats->total_clicks ?? 0);
+        $activeProductsCount = (int) ($productStats->active_products_count ?? 0);
+        $totalStock = (int) ($productStats->total_stock ?? 0);
+        $highDemandCount = (int) ($productStats->high_demand_count ?? 0);
+
         $topClickedProduct = Product::query()
             ->where('is_active', true)
             ->where('clicks_count', '>', 0)
             ->orderByDesc('clicks_count')
             ->first();
 
-        $totalQuotes = QuoteLog::count();
-        $totalQuotedAmount = (int) QuoteLog::sum('total_amount');
+        $quoteStats = QuoteLog::query()
+            ->selectRaw('COUNT(*) as total_quotes, COALESCE(SUM(total_amount), 0) as total_quoted_amount')
+            ->first();
+
+        $totalQuotes = (int) ($quoteStats->total_quotes ?? 0);
+        $totalQuotedAmount = (int) ($quoteStats->total_quoted_amount ?? 0);
         $unreadMessages = ContactMessage::where('is_read', false)->count();
 
         $conversionRate = $totalClicks > 0
             ? round(($totalQuotes / $totalClicks) * 100, 1)
             : 0;
-
-        $activeProductsCount = Product::where('is_active', true)->count();
-        $totalStock = (int) Product::where('is_active', true)->sum('stock');
-        $highDemandCount = Product::where('is_active', true)->where('clicks_count', '>=', 5)->count();
 
         $formattedQuotedAmount = '$ '.number_format($totalQuotedAmount, 0, ',', '.');
         $formattedStock = number_format($totalStock, 0, ',', '.');

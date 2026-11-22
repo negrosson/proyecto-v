@@ -51,6 +51,11 @@ class SubmitQuoteRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // Protección Honeypot anti-bots: debe permanecer vacío
+            'website_hp' => [
+                'nullable',
+                'max:0',
+            ],
             'customer_name' => [
                 'required',
                 'string',
@@ -99,6 +104,7 @@ class SubmitQuoteRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'website_hp.max' => 'Petición rechazada por detección de bot.',
             'customer_name.required' => 'El nombre del cliente es obligatorio.',
             'customer_name.min' => 'El nombre debe contener al menos 3 caracteres.',
             'customer_name.max' => 'El nombre no puede superar los 80 caracteres.',

@@ -1,20 +1,5 @@
 @php
-    $categoryPlaceholders = [
-        'vajilla' => 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80',
-        'manteleria' => 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-        'mobiliario' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80',
-        'equipamiento-cocina' => 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80',
-        'bar-decoracion' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80',
-    ];
-    $defaultPlaceholder = 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80';
-
-    $getProductImage = $getProductImage ?? function ($item) use ($categoryPlaceholders, $defaultPlaceholder) {
-        if (!empty($item->image_url)) {
-            return $item->image_url;
-        }
-        $slug = $item->category?->slug ?? '';
-        return $categoryPlaceholders[$slug] ?? $defaultPlaceholder;
-    };
+    $getProductImage = $getProductImage ?? static fn ($item): string => $item->display_image_url;
 @endphp
 
 <!-- Grid de Cards de Producto -->
@@ -22,10 +7,11 @@
     @forelse ($products as $prod)
         @php
             $cardImg = $getProductImage($prod);
+            $isStudioPackshot = $prod->usesFallbackImage();
         @endphp
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/50 dark:hover:border-amber-400/50 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div>
-                <!-- Contenedor Fotográfico con Cero Cajas Grises -->
+                <!-- Contenedor Fotográfico con Brillo Diagonal y Fondo Limpio -->
                 <div @click="openDetail({
                         id: {{ $prod->id }},
                         name: '{{ addslashes($prod->name) }}',
@@ -37,11 +23,11 @@
                         is_sale: {{ $prod->is_sale ? 'true' : 'false' }},
                         image: '{{ $cardImg }}'
                      })"
-                     class="cursor-pointer relative h-48 sm:h-56 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                     class="card-gloss-shine cursor-pointer relative h-48 sm:h-56 overflow-hidden {{ $isStudioPackshot ? 'bg-white' : 'bg-zinc-100 dark:bg-zinc-800' }}">
                     <img src="{{ $cardImg }}" 
                          alt="{{ $prod->name }}" 
                          loading="lazy"
-                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                         class="w-full h-full {{ $isStudioPackshot ? 'object-contain p-3' : 'object-cover' }} group-hover:scale-105 transition-transform duration-500 ease-out">
                     
                     <!-- Badges Flotantes con Efecto Cristal -->
                     <span class="absolute top-2.5 left-2.5 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-zinc-900 dark:text-zinc-100 text-[10px] font-mono font-medium px-2.5 py-0.5 rounded shadow-sm border border-white/50 dark:border-zinc-700">
@@ -93,22 +79,22 @@
                 </div>
             </div>
 
-            <!-- Botón "+ Agregar al Arriendo" con Feedback Táctil de 1 Segundo -->
+            <!-- Botón "+ Agregar al Arriendo" con Vuelo al Carrito y Feedback Táctil -->
             <div class="p-4 sm:p-5 pt-0" x-data="{ added: false }">
                 @if($prod->stock > 0)
-                    <button @click="addItem({{ $prod->id }}, '{{ addslashes($prod->name) }}', {{ $prod->rental_price }}, {{ $prod->stock }}, {{ $prod->code }}); added = true; setTimeout(() => added = false, 1000)"
+                    <button @click="addItem({{ $prod->id }}, '{{ addslashes($prod->name) }}', {{ $prod->rental_price }}, {{ $prod->stock }}, {{ $prod->code }}, $event, '{{ $cardImg }}'); added = true; setTimeout(() => added = false, 1000)"
                             :class="added ? 'bg-emerald-600 text-white shadow-md' : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white shadow-sm'"
                             class="w-full py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-98">
                         <template x-if="!added">
                             <span class="flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                <span>+ Agregar al Arriendo</span>
+                                <span>Agregar al Arriendo</span>
                             </span>
                         </template>
                         <template x-if="added">
                             <span class="flex items-center gap-1.5 font-bold">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                <span>✓ Agregado</span>
+                                <span>Agregado</span>
                             </span>
                         </template>
                     </button>

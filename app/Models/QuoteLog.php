@@ -6,10 +6,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class QuoteLog extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::saved(static function (): void {
+            Cache::forget('filament_badge_quotes_pending_count');
+        });
+
+        static::deleted(static function (): void {
+            Cache::forget('filament_badge_quotes_pending_count');
+        });
+    }
 
     protected $fillable = [
         'customer_name',

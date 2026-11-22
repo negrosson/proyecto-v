@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 155" fill="none">
+  <defs>
+    <linearGradient id="vysGoldSvg" x1="15" y1="10" x2="430" y2="145" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#B68228"/>
+      <stop offset="50%" stop-color="#E5BC61"/>
+      <stop offset="100%" stop-color="#B07B22"/>
+    </linearGradient>
+  </defs>
+  <!-- Carpa / Pabellón Dorado -->
+  <path d="M98 12 C89 35 64 50 30 57 C58 54 83 41 98 22 C113 41 138 54 166 57 C132 50 107 35 98 12 Z" fill="url(#vysGoldSvg)"/>
+  <path d="M98 25 C86 42 65 56 36 64 C65 60 87 47 98 31 C109 47 131 60 160 64 C131 56 110 42 98 25 Z" fill="url(#vysGoldSvg)" opacity="0.88"/>
+  <path d="M38 63 L38 103 M44 63 L44 101 M158 63 L158 103 M152 63 L152 101" stroke="url(#vysGoldSvg)" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M20 116 C61 98 135 98 176 116 C135 103 61 103 20 116 Z" fill="url(#vysGoldSvg)"/>
+  <!-- Mesa, Mantel, Flores, Copas y Sillas -->
+  <path d="M74 79 L122 79 L120 101 L107 101 L103 90 L93 90 L89 101 L76 101 Z" fill="#18181B"/>
+  <rect x="71" y="76" width="54" height="4.5" rx="1.5" fill="#18181B"/>
+  <circle cx="98" cy="67" r="5" fill="#18181B"/>
+  <circle cx="92.5" cy="69" r="3.2" fill="#18181B"/>
+  <circle cx="103.5" cy="69" r="3.2" fill="#18181B"/>
+  <path d="M96 71 L100 71 L99 76 L97 76 Z" fill="#18181B"/>
+  <path d="M81 69 C81 72 83 73 83 76 M81.5 76 L84.5 76" stroke="#18181B" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M115 69 C115 72 113 73 113 76 M111.5 76 L114.5 76" stroke="#18181B" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M53 67 L57.5 67 L60.5 89 L71 89 L71 101 L68 101 L68 92 L59.5 92 L58.5 101 L55 101 Z" fill="#18181B"/>
+  <path d="M143 67 L138.5 67 L135.5 89 L125 89 L125 101 L128 101 L128 92 L136.5 92 L137.5 101 L141 101 Z" fill="#18181B"/>
+  <!-- Tipografía Oficial (corregida: PRODUCTORA DE EVENTOS) -->
+  <text x="200" y="34" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="700" font-size="16" letter-spacing="2.2" fill="#18181B">PRODUCTORA DE EVENTOS</text>
+  <text x="202" y="53" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="500" font-size="12.5" letter-spacing="3" fill="#52525B">SERVICIOS INTEGRALES</text>
+  <text x="196" y="116" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="76" letter-spacing="4">
+    <tspan fill="#18181B">V</tspan><tspan fill="url(#vysGoldSvg)">Y</tspan><tspan fill="#18181B">S</tspan>
+  </text>
+  <!-- Franja inferior de servicios -->
+  <text x="230" y="142" text-anchor="middle" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-weight="600" font-size="11.5" letter-spacing="2.1" fill="#3F3F46">• CATERING • MOBILIARIO • MESAS • SILLAS • CARPAS • TOLDOS •</text>
+</svg>

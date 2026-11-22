@@ -6,41 +6,20 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Montaje de Eventos en Santiago & Regiones | {{ $settings->site_name ?? 'Arriendos & Eventos' }}</title>
     <meta name="description" content="Montaje integral de eventos, mobiliario, vajilla, mantelería y ambientación para bodas, galas y eventos corporativos en Santiago y regiones.">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="Montajes & Galerías | {{ $settings->site_name ?? 'Arriendos & Eventos' }}">
+    <meta property="og:description" content="Portafolio fotográfico real de montajes de eventos, bodas y cenas corporativas.">
+    <meta property="og:image" content="{{ asset('images/montajes/teno-mesa-principal.jpg') }}">
 
     <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS y Alpine.js -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Cormorant Garamond"', 'serif'],
-                    },
-                    colors: {
-                        amber: {
-                            50: '#FFFDF9',
-                            100: '#FEF8EE',
-                            200: '#FDF1DD',
-                            300: '#FBE3BC',
-                            400: '#F6D090',
-                            500: '#EAB759',
-                            600: '#C89333',
-                            700: '#9E6D1C',
-                            800: '#785018',
-                            900: '#543612',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS Compilado con Vite y Alpine.js -->
+    @vite(['resources/css/app.css'])
     <script>
         (function() {
             var theme = localStorage.getItem('theme');
@@ -51,7 +30,7 @@
             }
         })();
     </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('vendor/alpinejs/alpine.min.js') }}"></script>
 
     <style>
         [x-cloak] { display: none !important; }
@@ -96,29 +75,13 @@
     <!-- HEADER / NAVEGACIÓN PRINCIPAL -->
     <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            <!-- Brand Logo -->
-            <a href="{{ route('catalog.index') }}" class="flex items-center gap-3 group focus:outline-none">
-                @if(!empty($settings?->logo_path))
-                    <img src="{{ asset('storage/' . $settings->logo_path) }}" 
-                         alt="{{ $settings->site_name ?? 'Arriendos & Eventos' }}" 
-                         class="h-10 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105">
-                @else
-                    <div class="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-amber-500 text-amber-400 dark:text-zinc-950 flex items-center justify-center font-serif font-black text-xl shadow-inner">
-                        {{ mb_substr($settings->site_name ?? 'A', 0, 1) }}
-                    </div>
-                @endif
-                <div class="flex flex-col min-w-0 flex-1 sm:flex-initial">
-                    <span class="font-serif text-sm sm:text-xl font-bold tracking-tight text-zinc-900 dark:text-white leading-tight truncate max-w-[135px] sm:max-w-none">
-                        {{ $settings->site_name ?? 'Arriendos & Eventos' }}
-                    </span>
-                    <span class="hidden sm:block text-[10px] sm:text-xs text-zinc-500 dark:text-zinc-400 font-mono tracking-wider uppercase truncate">
-                        {{ $settings->site_tagline ?? 'Banquetería & Mobiliario' }}
-                    </span>
-                </div>
+            <!-- Brand Logo Oficial VYS -->
+            <a href="{{ route('catalog.index') }}" class="flex items-center shrink-0 group focus:outline-none">
+                <x-brand-logo variant="header" :settings="$settings" />
             </a>
 
             <!-- Menú Desktop -->
-            <nav class="hidden md:flex items-center gap-6 text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400">
+            <nav class="hidden lg:flex items-center gap-4 xl:gap-6 text-[11px] xl:text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
                 <a href="{{ route('catalog.index') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Inicio
                 </a>
@@ -143,6 +106,7 @@
                 </a>
                 <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico para consultar por un servicio de montaje.') }}" 
                    target="_blank" 
+                   rel="noopener noreferrer"
                    class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors py-1 flex items-center gap-1.5 font-bold">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     WhatsApp
@@ -150,10 +114,11 @@
             </nav>
 
             <!-- Acciones -->
-            <div class="flex items-center gap-2 sm:gap-2.5">
+            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
                 <!-- Botón Toggle Sol / Luna -->
                 <button @click="toggleTheme()" 
                         type="button" 
+                        aria-label="Cambiar tema claro/oscuro"
                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-amber-400 flex items-center justify-center border border-zinc-200/80 dark:border-zinc-700 shadow-sm hover:scale-105 active:scale-95 transition">
                     <svg x-show="isDark" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -165,14 +130,19 @@
 
                 <!-- Botón Login Panel -->
                 <a href="{{ route('filament.admin.auth.login') }}" 
+                   title="Acceso Administración"
                    class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white transition flex items-center justify-center border border-zinc-200/80 dark:border-zinc-700 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                 </a>
 
-                <!-- Botón Móvil -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200">
+                <!-- Botón Móvil / Tablet -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
+                        type="button"
+                        aria-label="Abrir menú de navegación"
+                        :aria-expanded="mobileMenuOpen"
+                        class="lg:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200">
                     <svg x-show="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
                     </svg>
@@ -183,19 +153,21 @@
             </div>
         </div>
 
-        <!-- Menú Móvil -->
+        <!-- Menú Móvil / Tablet -->
         <div x-show="mobileMenuOpen" 
              x-transition 
              @click.outside="mobileMenuOpen = false" 
-             class="md:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 px-5 py-4 space-y-2"
+             class="lg:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 px-5 py-4 space-y-2"
              style="display: none;">
-            <a href="{{ route('catalog.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium">Inicio</a>
-            <a href="{{ route('catalog.index') }}#destacados" class="block px-3 py-2 rounded-lg text-sm font-medium">Destacados</a>
-            <a href="{{ route('catalog.index') }}#catalogo" class="block px-3 py-2 rounded-lg text-sm font-medium">Catálogo</a>
-            <a href="{{ route('catalog.montajes') }}" class="block px-3 py-2 rounded-lg text-sm font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-950 dark:text-white">Montajes & Puesta en Escena</a>
-            <a href="{{ route('catalog.como-cotizar') }}" class="block px-3 py-2 rounded-lg text-sm font-medium">Cómo Cotizar</a>
-            <a href="{{ route('catalog.index') }}#envios" class="block px-3 py-2 rounded-lg text-sm font-medium">Envíos</a>
-            <a href="{{ route('catalog.index') }}#contacto" class="block px-3 py-2 rounded-lg text-sm font-medium">Contacto</a>
+            <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Inicio</a>
+            <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#destacados" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Destacados</a>
+            <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#catalogo" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Catálogo</a>
+            <a @click="mobileMenuOpen = false" href="{{ route('catalog.montajes') }}" class="block px-3 py-2 rounded-lg text-sm font-bold bg-zinc-100 dark:bg-zinc-800 text-amber-700 dark:text-amber-400">Montajes & Puesta en Escena</a>
+            <a @click="mobileMenuOpen = false" href="{{ route('catalog.como-cotizar') }}" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Cómo Cotizar</a>
+            <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#envios" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Envíos</a>
+            <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#contacto" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Contacto</a>
+            <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico para consultar por un servicio de montaje.') }}" target="_blank" rel="noopener noreferrer" class="block px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Atención por WhatsApp</a>
+            <a href="{{ route('filament.admin.auth.login') }}" class="block px-3 py-2 rounded-lg text-sm font-medium bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">Acceso Administración</a>
         </div>
     </header>
 
@@ -227,9 +199,15 @@
         </div>
     </section>
 
-    <!-- PROYECTO PRINCIPAL SPOTLIGHT: T E N O   2 0 2 3 (Inspirado en imagen 1) -->
+    <!-- PROYECTO PRINCIPAL SPOTLIGHT (Gestionable desde el Panel Admin) -->
     @php
-        $teno = collect($montajes)->firstWhere('slug', 'teno-2023') ?? ($montajes[0] ?? null);
+        $teno = collect($montajes)->firstWhere('is_featured', true) ?? ($montajes[0] ?? null);
+        $tenoSubPhotos = collect($teno['gallery'] ?? [])
+            ->filter(static fn ($url): bool => is_string($url) && $url !== '' && $url !== ($teno['cover_image'] ?? ''))
+            ->unique()
+            ->values()
+            ->take(4)
+            ->all();
     @endphp
     @if($teno)
     <section id="proyecto-destacado" class="py-14 sm:py-20 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
@@ -289,27 +267,35 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div @click="openProject({{ json_encode($teno) }})" 
-                             class="cursor-pointer relative rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 group h-64 sm:h-80 shadow-sm">
-                            <img src="{{ $teno['gallery'][1] ?? $teno['cover_image'] }}" 
-                                 alt="{{ $teno['title'] }} Vista Amplia" 
-                                 class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 ease-out">
-                            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-3 py-1 rounded-full border border-white/20">
-                                Vista Panorámica Salón (250 personas)
-                            </div>
+                    @if(count($tenoSubPhotos) > 0)
+                        @php
+                            $subGridCols = match (count($tenoSubPhotos)) {
+                                1 => 'grid-cols-1',
+                                2 => 'grid-cols-1 sm:grid-cols-2',
+                                3 => 'grid-cols-1 sm:grid-cols-3',
+                                default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+                            };
+                            $subCaptions = [
+                                trim(($teno['location'] ?? '') . ' • ' . ($teno['year'] ?? ''), ' •'),
+                                $teno['type'] ?? 'Detalle del Montaje',
+                                $teno['capacity'] ?: 'Perspectiva Adicional',
+                                $teno['client'] ?: 'Galería del Evento',
+                            ];
+                        @endphp
+                        <div class="grid {{ $subGridCols }} gap-4">
+                            @foreach($tenoSubPhotos as $subIndex => $subUrl)
+                                <div @click="openProject({{ json_encode($teno) }}); currentPhotoIndex = {{ $subIndex + 1 }}"
+                                     class="cursor-pointer relative rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 group h-64 sm:h-80 shadow-sm">
+                                    <img src="{{ $subUrl }}"
+                                         alt="{{ $teno['title'] }} perspectiva {{ $subIndex + 1 }}"
+                                         class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 ease-out">
+                                    <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-3 py-1 rounded-full border border-white/20">
+                                        {{ $subCaptions[$subIndex] ?? ($teno['type'] ?? 'Detalle') }}
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-
-                        <div @click="openProject({{ json_encode($teno) }})" 
-                             class="cursor-pointer relative rounded-2xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 group h-64 sm:h-80 shadow-sm">
-                            <img src="{{ $teno['gallery'][2] ?? $teno['cover_image'] }}" 
-                                 alt="{{ $teno['title'] }} Composición Completa" 
-                                 class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-700 ease-out">
-                            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-3 py-1 rounded-full border border-white/20">
-                                Disposición de Sillas Tiffany & Iluminación
-                            </div>
-                        </div>
-                    </div>
+                    @endif
                 </div>
 
             </div>
@@ -498,12 +484,14 @@
 
     <!-- FOOTER -->
     <footer class="bg-zinc-900 text-white border-t border-zinc-800 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-zinc-400">
-            <div>
-                <p>&copy; {{ date('Y') }} {{ $settings->site_name ?? 'Arriendos & Eventos' }}. Todos los derechos reservados.</p>
-                <p class="mt-1 font-mono text-[11px]">{{ $settings->site_tagline ?? 'Banquetería, Mobiliario & Vajilla Premium' }}</p>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-8 text-xs text-zinc-400">
+            <div class="dark">
+                <a href="{{ route('catalog.index') }}" class="inline-block group mb-3">
+                    <x-brand-logo variant="footer" :settings="$settings" />
+                </a>
+                <p>&copy; {{ date('Y') }} {{ $settings->site_name ?? 'VYS Productora de Eventos' }}. Todos los derechos reservados.</p>
             </div>
-            <div class="flex items-center gap-6 font-medium">
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2.5 font-medium">
                 <a href="{{ route('catalog.index') }}" class="hover:text-white transition">Inicio</a>
                 <a href="{{ route('catalog.index') }}#catalogo" class="hover:text-white transition">Catálogo</a>
                 <a href="{{ route('catalog.montajes') }}" class="hover:text-white transition font-bold text-amber-400">Montajes</a>

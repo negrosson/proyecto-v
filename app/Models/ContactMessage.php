@@ -6,10 +6,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class ContactMessage extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::saved(static function (): void {
+            Cache::forget('filament_badge_contact_unread_count');
+        });
+
+        static::deleted(static function (): void {
+            Cache::forget('filament_badge_contact_unread_count');
+        });
+    }
 
     protected $fillable = [
         'name',

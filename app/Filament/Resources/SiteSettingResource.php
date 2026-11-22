@@ -7,12 +7,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SiteSettingResource\Pages;
 use App\Models\SiteSetting;
 use App\Services\Security\SafeImageSanitizer;
+use App\Support\Filament\PreviewImageResolver;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class SiteSettingResource extends Resource
 {
@@ -41,38 +45,83 @@ class SiteSettingResource extends Resource
                                 Forms\Components\TextInput::make('site_name')
                                     ->label('Nombre del Sitio / Marca')
                                     ->required()
+                                    ->live(onBlur: true)
                                     ->maxLength(100),
                                 Forms\Components\TextInput::make('site_tagline')
                                     ->label('Lema / Tagline')
                                     ->required()
+                                    ->live(onBlur: true)
                                     ->maxLength(150),
                                 Forms\Components\FileUpload::make('logo_path')
                                     ->label('Logo Oficial (Opcional)')
+                                    ->disk('public')
+                                    ->directory('site')
+                                    ->visibility('public')
                                     ->image()
+                                    ->live()
                                     ->maxSize(4096)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                    ->helperText('Formato PNG, WebP o JPG. Tamaño máx: 4 MB.')
-                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site')),
+                                    ->deletable(true)
+                                    ->openable()
+                                    ->downloadable()
+                                    ->nullable()
+                                    ->helperText('Formato PNG, WebP o JPG. Tamaño máx: 4 MB. Si lo dejas vacío se muestra el logo vectorial oficial VYS.')
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site'))
+                                    ->deleteUploadedFileUsing(function (?string $file): void {
+                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
+                                            Storage::disk('public')->delete($file);
+                                        }
+                                    }),
                                 Forms\Components\TextInput::make('hero_badge')
                                     ->label('Badge Superior del Hero')
                                     ->required()
+                                    ->live(onBlur: true)
                                     ->maxLength(100),
                                 Forms\Components\TextInput::make('hero_title')
                                     ->label('Título Principal del Hero')
                                     ->required()
+                                    ->live(onBlur: true)
                                     ->maxLength(150),
                                 Forms\Components\Textarea::make('hero_subtitle')
                                     ->label('Subtítulo y Propuesta de Valor')
                                     ->required()
+                                    ->live(onBlur: true)
                                     ->rows(3)
                                     ->columnSpanFull(),
                                 Forms\Components\FileUpload::make('hero_bg_image')
                                     ->label('Imagen de Fondo del Hero (Opcional)')
+                                    ->disk('public')
+                                    ->directory('site')
+                                    ->visibility('public')
                                     ->image()
+                                    ->live()
                                     ->maxSize(4096)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                    ->helperText('Fotografía de fondo (JPG, PNG, WebP). Tamaño máx: 4 MB.')
-                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site')),
+                                    ->deletable(true)
+                                    ->openable()
+                                    ->downloadable()
+                                    ->nullable()
+                                    ->helperText('Fotografía de fondo (JPG, PNG, WebP). Tamaño máx: 4 MB. Al subirla verás abajo cómo queda aplicada.')
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site'))
+                                    ->deleteUploadedFileUsing(function (?string $file): void {
+                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
+                                            Storage::disk('public')->delete($file);
+                                        }
+                                    })
+                                    ->columnSpanFull(),
+
+                                Forms\Components\Placeholder::make('hero_live_preview')
+                                    ->label('Vista Previa en Tiempo Real (Header & Hero)')
+                                    ->content(fn (Get $get): View => view('filament.previews.site-hero-preview', [
+                                        'siteName' => (string) ($get('site_name') ?? ''),
+                                        'siteTagline' => (string) ($get('site_tagline') ?? ''),
+                                        'logoUrl' => PreviewImageResolver::resolveSingle($get('logo_path')),
+                                        'heroBadge' => (string) ($get('hero_badge') ?? ''),
+                                        'heroTitle' => (string) ($get('hero_title') ?? ''),
+                                        'heroSubtitle' => (string) ($get('hero_subtitle') ?? ''),
+                                        'heroBgUrl' => PreviewImageResolver::resolveSingle($get('hero_bg_image')),
+                                    ]))
+                                    ->columnSpanFull(),
                             ])->columns(['default' => 1, 'md' => 2]),
 
                         // Pestaña 2: Empresa, Mapa & Redes

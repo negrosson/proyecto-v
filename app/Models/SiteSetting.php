@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Services\Media\PublicMediaCleaner;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -56,12 +57,24 @@ class SiteSetting extends Model
             Cache::forget('site_settings.current');
         });
 
-        static::updated(static function (): void {
+        static::updated(static function (self $setting): void {
             Cache::forget('site_settings.current');
+
+            if ($setting->wasChanged('logo_path')) {
+                $oldLogo = $setting->getOriginal('logo_path');
+                PublicMediaCleaner::deleteIfUnreferenced(is_string($oldLogo) ? $oldLogo : null);
+            }
+
+            if ($setting->wasChanged('hero_bg_image')) {
+                $oldHero = $setting->getOriginal('hero_bg_image');
+                PublicMediaCleaner::deleteIfUnreferenced(is_string($oldHero) ? $oldHero : null);
+            }
         });
 
-        static::deleted(static function (): void {
+        static::deleted(static function (self $setting): void {
             Cache::forget('site_settings.current');
+            PublicMediaCleaner::deleteIfUnreferenced($setting->logo_path);
+            PublicMediaCleaner::deleteIfUnreferenced($setting->hero_bg_image);
         });
     }
 
@@ -89,6 +102,9 @@ class SiteSetting extends Model
 
     /**
      * Obtiene la configuración activa del sitio mediante singleton en caché permanente.
+     *
+     * Almacena los atributos primitivos (array) en caché para ser 100% compatible con
+     * `cache.serializable_classes = false` en Laravel 13 (evitando __PHP_Incomplete_Class).
      */
     public static function current(): self
     {
@@ -98,11 +114,17 @@ class SiteSetting extends Model
             return $cached;
         }
 
+        if (is_array($cached) && isset($cached['id'])) {
+            return (new static)->newFromBuilder($cached);
+        }
+
         Cache::forget('site_settings.current');
 
-        return Cache::rememberForever('site_settings.current', static function (): self {
-            return static::query()->first() ?? static::createDefault();
-        });
+        $setting = static::query()->first() ?? static::createDefault();
+
+        Cache::forever('site_settings.current', $setting->getAttributes());
+
+        return $setting;
     }
 
     /**

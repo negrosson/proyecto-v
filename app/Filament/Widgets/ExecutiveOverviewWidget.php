@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Pages\TwoFactorSecurityPage;
 use App\Filament\Resources\CategoryResource;
-use App\Filament\Resources\ContactMessageResource;
+use App\Filament\Resources\GalleryImageResource;
+use App\Filament\Resources\MontajeResource;
 use App\Filament\Resources\ProductResource;
-use App\Filament\Resources\QuoteLogResource;
 use App\Filament\Resources\SiteSettingResource;
-use App\Filament\Resources\UserResource;
 use App\Models\Category;
-use App\Models\ContactMessage;
-use App\Models\Faq;
-use App\Models\Product;
-use App\Models\QuoteLog;
+use App\Models\GalleryImage;
+use App\Models\Montaje;
+use App\Models\SiteSetting;
+use App\Models\User;
 use Filament\Widgets\Widget;
 
 class ExecutiveOverviewWidget extends Widget
@@ -30,28 +30,28 @@ class ExecutiveOverviewWidget extends Widget
      */
     public function getViewData(): array
     {
+        /** @var User|null $user */
         $user = auth()->user();
         $rawName = $user?->name;
         $userName = ($rawName === 'admin' || empty($rawName))
             ? 'Administrador General'
             : $rawName;
 
+        $settings = SiteSetting::current();
+
         return [
-            'totalProducts' => Product::where('is_active', true)->count(),
-            'totalStock' => (int) Product::where('is_active', true)->sum('stock'),
-            'totalCategories' => Category::count(),
-            'totalFaqs' => Faq::where('is_active', true)->count(),
-            'totalQuotes' => QuoteLog::count(),
-            'pendingQuotes' => QuoteLog::where('status', 'pendiente')->count(),
-            'unreadMessages' => ContactMessage::where('is_read', false)->count(),
+            'siteName' => $settings->site_name ?: 'VYS · Productora de Eventos',
             'userName' => $userName,
+            'hasTwoFactor' => (bool) $user?->hasEnabledTwoFactor(),
+            'totalGalleryPhotos' => GalleryImage::query()->count(),
+            'totalMontajes' => Montaje::query()->where('is_active', true)->count(),
+            'totalCategories' => Category::query()->count(),
             'createProductUrl' => ProductResource::getUrl('create'),
-            'productsUrl' => ProductResource::getUrl('index'),
+            'galleryUrl' => GalleryImageResource::getUrl('index'),
+            'montajesUrl' => MontajeResource::getUrl('index'),
             'categoriesUrl' => CategoryResource::getUrl('index'),
             'siteSettingsUrl' => SiteSettingResource::getUrl('index'),
-            'quotesUrl' => QuoteLogResource::getUrl('index'),
-            'messagesUrl' => ContactMessageResource::getUrl('index'),
-            'usersUrl' => UserResource::getUrl('index'),
+            'twoFactorUrl' => TwoFactorSecurityPage::getUrl(),
             'catalogUrl' => url('/'),
         ];
     }

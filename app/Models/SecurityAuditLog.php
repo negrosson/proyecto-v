@@ -8,6 +8,7 @@ use DomainException;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Registro de Auditoría Forense con Inmutabilidad Criptográfica (Hash Chaining & HMAC-SHA256).
@@ -68,34 +69,36 @@ class SecurityAuditLog extends Model
         $now = now();
         $createdAtIso = $now->toIso8601String();
 
-        // Obtener el hash del último registro insertado para mantener la cadena inmutable (Blockchain-like)
-        /** @var self|null $lastRecord */
-        $lastRecord = static::query()->latest('id')->first();
-        $previousHash = $lastRecord?->signature_hmac ?? str_repeat('0', 64);
+        return DB::transaction(static function () use ($userId, $eventType, $severity, $ipAddress, $userAgent, $context, $now, $createdAtIso): self {
+            // Bloqueo pesimista sobre el último eslabón para evitar bifurcaciones concurrentes en la cadena HMAC
+            /** @var self|null $lastRecord */
+            $lastRecord = static::query()->latest('id')->lockForUpdate()->first();
+            $previousHash = $lastRecord?->signature_hmac ?? str_repeat('0', 64);
 
-        $signature = static::computeSignature(
-            userId: $userId,
-            eventType: $eventType,
-            severity: $severity,
-            ipAddress: $ipAddress,
-            context: $context,
-            previousHash: $previousHash,
-            createdAt: $createdAtIso,
-        );
+            $signature = static::computeSignature(
+                userId: $userId,
+                eventType: $eventType,
+                severity: $severity,
+                ipAddress: $ipAddress,
+                context: $context,
+                previousHash: $previousHash,
+                createdAt: $createdAtIso,
+            );
 
-        $log = new static;
-        $log->user_id = $userId;
-        $log->event_type = $eventType;
-        $log->severity = $severity;
-        $log->ip_address = $ipAddress;
-        $log->user_agent = $userAgent;
-        $log->context = $context;
-        $log->previous_hash = $previousHash;
-        $log->signature_hmac = $signature;
-        $log->created_at = $now;
-        $log->saveQuietly();
+            $log = new static;
+            $log->user_id = $userId;
+            $log->event_type = $eventType;
+            $log->severity = $severity;
+            $log->ip_address = $ipAddress;
+            $log->user_agent = $userAgent;
+            $log->context = $context;
+            $log->previous_hash = $previousHash;
+            $log->signature_hmac = $signature;
+            $log->created_at = $now;
+            $log->saveQuietly();
 
-        return $log;
+            return $log;
+        });
     }
 
     /**

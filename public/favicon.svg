@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="goldFav" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C8932E"/>
+      <stop offset="50%" stop-color="#F2CE74"/>
+      <stop offset="100%" stop-color="#B07B22"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#09090B"/>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="11.5" stroke="url(#goldFav)" stroke-width="1.5" stroke-opacity="0.75"/>
+  <!-- Carpa dorada superior -->
+  <path d="M32 9 C28 19 20 25 10 28 C19 26.5 27 21.5 32 14 C37 21.5 45 26.5 54 28 C44 25 36 19 32 9 Z" fill="url(#goldFav)"/>
+  <!-- Monograma VYS -->
+  <text x="32" y="48" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="20" letter-spacing="1.5">
+    <tspan fill="#FAFAFA">V</tspan><tspan fill="url(#goldFav)">Y</tspan><tspan fill="#FAFAFA">S</tspan>
+  </text>
+  <!-- Arco dorado base -->
+  <path d="M12 54 C24 49.5 40 49.5 52 54 C40 51.5 24 51.5 12 54 Z" fill="url(#goldFav)"/>
+</svg>

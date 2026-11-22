@@ -17,7 +17,7 @@ class CreateUser extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         $isAdmin = (bool) ($data['is_admin'] ?? false);
-        unset($data['is_admin']);
+        unset($data['is_admin'], $data['password_confirmation'], $data['sudo_password']);
 
         /** @var User $user */
         $user = static::getModel()::make($data);

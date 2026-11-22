@@ -11,6 +11,7 @@ use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Locked;
 
 /**
@@ -55,8 +56,10 @@ class TwoFactorChallengePage extends Page
             return;
         }
 
-        // Si ya está verificado en la sesión actual, no requerir re-autenticación
-        if (session('mfa_verified_for_user_id') === $user->id && session('mfa_verified_ip') === request()->ip()) {
+        // Si ya está verificado en la sesión y navegador actual, no requerir re-autenticación
+        $currentUaHash = hash('sha256', (string) request()->userAgent());
+        $verifiedUaHash = session('mfa_verified_ua');
+        if (session('mfa_verified_for_user_id') === $user->id && is_string($verifiedUaHash) && hash_equals($verifiedUaHash, $currentUaHash)) {
             redirect()->to(Filament::getUrl());
 
             return;
@@ -98,7 +101,10 @@ class TwoFactorChallengePage extends Page
             $valid = $totp->verifyAndConsume($user, $this->code);
         }
 
+        $mfaAttemptKey = 'mfa-challenge:user:'.$user->id;
+
         if ($valid) {
+            RateLimiter::clear($mfaAttemptKey);
             session()->forget('mfa_failed_attempts');
 
             // Mitigación estricta de Session Fixation
@@ -108,7 +114,7 @@ class TwoFactorChallengePage extends Page
 
             session([
                 'mfa_verified_for_user_id' => $user->id,
-                'mfa_verified_ip' => request()->ip(),
+                'mfa_verified_ua' => hash('sha256', (string) request()->userAgent()),
             ]);
 
             SecurityAuditLog::record(
@@ -128,15 +134,17 @@ class TwoFactorChallengePage extends Page
             return redirect()->to(Filament::getUrl());
         }
 
-        // Incremento de intentos fallidos
-        $attempts = (int) session('mfa_failed_attempts', 0) + 1;
-        session(['mfa_failed_attempts' => $attempts]);
+        // Contador persistente ligado al user_id (independiente de la sesión para evitar evasión reiniciando cookies)
+        RateLimiter::hit($mfaAttemptKey, 900);
+        $attempts = RateLimiter::attempts($mfaAttemptKey);
 
-        // Disparo de Circuit Breaker tras 5 intentos
+        // Disparo de Circuit Breaker tras 5 intentos fallidos acumulados
         if ($attempts >= 5) {
             $user->forceFill([
                 'mfa_locked_until' => now()->addMinutes(15),
             ])->save();
+
+            RateLimiter::clear($mfaAttemptKey);
 
             SecurityAuditLog::record(
                 eventType: 'mfa.circuit_breaker_triggered',
@@ -168,7 +176,7 @@ class TwoFactorChallengePage extends Page
         );
 
         $errorField = $this->useRecoveryCode ? 'recovery_code' : 'code';
-        $this->addError($errorField, 'El código ingresado es incorrecto o ha expirado. Intentos restantes: '.(5 - $attempts));
+        $this->addError($errorField, 'El código ingresado es incorrecto o ha expirado. Intentos restantes: '.max(0, 5 - $attempts));
 
         return null;
     }

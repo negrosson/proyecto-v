@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Modelo de Usuario protegido contra escalada de privilegios y ataques de asignación masiva (OWASP A01 / A04).
@@ -24,6 +25,17 @@ class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected static function booted(): void
+    {
+        static::saved(static function (): void {
+            Cache::forget('filament_badge_users_count');
+        });
+
+        static::deleted(static function (): void {
+            Cache::forget('filament_badge_users_count');
+        });
+    }
 
     /**
      * Get the attributes that should be cast.

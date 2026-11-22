@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use App\Models\SecurityAuditLog;
 use App\Models\User;
+use App\Rules\ThrottledCurrentPassword;
 use App\Services\Security\TotpService;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -76,8 +77,8 @@ class TwoFactorSecurityPage extends Page
 
         $secret = $totp->generateSecret();
         $this->setupSecret = $secret;
-        $this->setupQrUri = $totp->generateQrSvgDataUri('Arriendos & Eventos', $user->email, $secret);
-        $this->otpauthUri = $totp->getOtpAuthUri('Arriendos & Eventos', $user->email, $secret);
+        $this->setupQrUri = $totp->generateQrSvgDataUri('VYS Eventos', $user->email, $secret);
+        $this->otpauthUri = $totp->getOtpAuthUri('VYS Eventos', $user->email, $secret);
         $this->isConfiguring = true;
         $this->confirmationCode = '';
         $this->currentPassword = '';
@@ -102,7 +103,7 @@ class TwoFactorSecurityPage extends Page
     public function confirmConfiguration(TotpService $totp): void
     {
         $this->validate([
-            'currentPassword' => ['required', 'current_password:web'],
+            'currentPassword' => ['required', new ThrottledCurrentPassword],
             'confirmationCode' => ['required', 'string', 'size:6'],
         ]);
 
@@ -115,11 +116,11 @@ class TwoFactorSecurityPage extends Page
             return;
         }
 
-        // Asignar temporalmente el secreto para validar el código contra el método oficial
-        $user->two_factor_secret = $this->setupSecret;
+        // Validar el código contra la semilla temporal en memoria (aún no persistida en BD)
+        $matchedSlice = $totp->verifyCodeForSecret($this->setupSecret, $this->confirmationCode);
 
-        if (! $totp->verifyAndConsume($user, $this->confirmationCode)) {
-            $this->addError('confirmationCode', 'El código de 6 dígitos no coincide o ha expirado. Verifica la hora en tu dispositivo.');
+        if ($matchedSlice === null) {
+            $this->addError('confirmationCode', 'El código de 6 dígitos no coincide o ha expirado. Verifica que la fecha y hora de tu PC y teléfono estén sincronizadas.');
 
             return;
         }
@@ -130,11 +131,12 @@ class TwoFactorSecurityPage extends Page
             'two_factor_secret' => $this->setupSecret,
             'two_factor_recovery_codes' => $recoveryCodes,
             'two_factor_confirmed_at' => now(),
+            'last_totp_slice' => $matchedSlice,
         ])->save();
 
         session([
             'mfa_verified_for_user_id' => $user->id,
-            'mfa_verified_ip' => request()->ip(),
+            'mfa_verified_ua' => hash('sha256', (string) request()->userAgent()),
         ]);
 
         $this->recoveryCodes = $recoveryCodes;
@@ -165,7 +167,7 @@ class TwoFactorSecurityPage extends Page
     public function regenerateRecoveryCodes(TotpService $totp): void
     {
         $this->validate([
-            'regeneratePassword' => ['required', 'current_password:web'],
+            'regeneratePassword' => ['required', new ThrottledCurrentPassword],
         ]);
 
         /** @var User $user */
@@ -201,7 +203,7 @@ class TwoFactorSecurityPage extends Page
     public function disableTwoFactor(): void
     {
         $this->validate([
-            'disablePassword' => ['required', 'current_password:web'],
+            'disablePassword' => ['required', new ThrottledCurrentPassword],
         ]);
 
         /** @var User $user */
@@ -214,7 +216,7 @@ class TwoFactorSecurityPage extends Page
             'last_totp_slice' => null,
         ])->save();
 
-        session()->forget(['mfa_verified_for_user_id', 'mfa_verified_ip']);
+        session()->forget(['mfa_verified_for_user_id', 'mfa_verified_ua', 'mfa_verified_ip']);
 
         $this->isEnabled = false;
         $this->disablePassword = '';

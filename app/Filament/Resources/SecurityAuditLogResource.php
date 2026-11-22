@@ -206,11 +206,14 @@ class SecurityAuditLogResource extends Resource
                     ->options([
                         'mfa.enabled' => 'MFA Activado',
                         'mfa.disabled' => 'MFA Desactivado',
+                        'mfa.recovery_codes_regenerated' => 'Códigos MFA Regenerados',
                         'mfa.challenge_success' => 'Desafío MFA Exitoso',
                         'mfa.challenge_failed' => 'Desafío MFA Fallido',
                         'mfa.circuit_breaker_triggered' => 'Bloqueo Temporal (Circuit Breaker)',
                         'user.created' => 'Usuario Creado',
                         'user.privilege_changed' => 'Privilegio Modificado',
+                        'user.password_reset' => 'Contraseña Restablecida',
+                        'user.status_toggled' => 'Estado de Cuenta Modificado',
                         'user.deleted' => 'Usuario Eliminado',
                     ]),
             ])

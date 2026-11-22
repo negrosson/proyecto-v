@@ -30,10 +30,28 @@ class QuoteController extends Controller
         $validated = $request->validated();
         $itemsData = $validated['items'];
 
-        $productIds = array_column($itemsData, 'product_id');
+        // Consolidar cantidades cuando llega el mismo product_id repetido para impedir evasión del tope de stock
+        $aggregatedItems = [];
+        foreach ($itemsData as $index => $item) {
+            $productId = (int) $item['product_id'];
+            $quantity = (int) $item['quantity'];
 
-        // Consultar productos oficiales de la base de datos para evitar alteración de precios o códigos
+            if (! isset($aggregatedItems[$productId])) {
+                $aggregatedItems[$productId] = [
+                    'product_id' => $productId,
+                    'quantity' => $quantity,
+                    'first_index' => $index,
+                ];
+            } else {
+                $aggregatedItems[$productId]['quantity'] += $quantity;
+            }
+        }
+
+        $productIds = array_keys($aggregatedItems);
+
+        // Consultar únicamente productos activos oficiales para evitar cotizar ítems ocultos o alterar precios
         $products = Product::query()
+            ->where('is_active', true)
             ->whereIn('id', $productIds)
             ->get()
             ->keyBy('id');
@@ -43,19 +61,20 @@ class QuoteController extends Controller
         $totalPieces = 0;
         $itemsPayload = [];
 
-        foreach ($itemsData as $index => $item) {
+        foreach ($aggregatedItems as $productId => $item) {
             /** @var Product|null $product */
-            $product = $products->get($item['product_id']);
+            $product = $products->get($productId);
+            $firstIndex = $item['first_index'];
 
             if ($product === null) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.product_id" => ['El producto solicitado no fue encontrado.'],
+                    "items.{$firstIndex}.product_id" => ['El producto solicitado no se encuentra disponible en el catálogo.'],
                 ]);
             }
 
             if ($item['quantity'] > $product->stock) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.quantity" => [
+                    "items.{$firstIndex}.quantity" => [
                         "La cantidad solicitada para '{$product->name}' supera el stock disponible ({$product->stock} un.).",
                     ],
                 ]);
@@ -65,7 +84,7 @@ class QuoteController extends Controller
                 code: $product->code,
                 name: $product->name,
                 unitPrice: $product->rental_price,
-                quantity: (int) $item['quantity'],
+                quantity: $item['quantity'],
             );
 
             $cartItems[] = $cartItem;
@@ -78,12 +97,12 @@ class QuoteController extends Controller
                 'code' => $product->code,
                 'name' => $product->name,
                 'unit_price' => $product->rental_price,
-                'quantity' => (int) $item['quantity'],
+                'quantity' => $item['quantity'],
                 'subtotal' => $subtotal,
             ];
         }
 
-        DB::transaction(function () use ($validated, $totalAmount, $totalPieces, $itemsPayload, $request, $itemsData): void {
+        DB::transaction(function () use ($validated, $totalAmount, $totalPieces, $itemsPayload, $request, $aggregatedItems): void {
             QuoteLog::create([
                 'customer_name' => (string) $validated['customer_name'],
                 'event_date' => isset($validated['event_date']) && is_string($validated['event_date'])
@@ -97,9 +116,9 @@ class QuoteController extends Controller
                 'ip_address' => $request->ip(),
             ]);
 
-            foreach ($itemsData as $item) {
+            foreach ($aggregatedItems as $item) {
                 Product::where('id', $item['product_id'])->increment('quoted_count');
-                Product::where('id', $item['product_id'])->increment('units_quoted_count', (int) $item['quantity']);
+                Product::where('id', $item['product_id'])->increment('units_quoted_count', $item['quantity']);
             }
         });
 

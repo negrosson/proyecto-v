@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\AdminLogin;
 use App\Filament\Pages\Dashboard;
 use App\Http\Middleware\EnforceAdminMfaMiddleware;
 use Filament\Http\Middleware\Authenticate;
@@ -28,14 +31,18 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(AdminLogin::class)
             ->spa()
             ->unsavedChangesAlerts()
-            ->brandName('Arriendos & Eventos')
+            ->brandName('VYS · Productora de Eventos')
+            ->brandLogo(fn () => view('filament.brand-logo'))
+            ->brandLogoHeight('2.75rem')
+            ->favicon(asset('favicon.svg'))
             ->darkMode(true)
             ->colors([
                 'primary' => Color::Amber,
                 'gray' => Color::Zinc,
+                'amber' => Color::Amber,
             ])
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,

@@ -44,15 +44,12 @@ final class FilterProductsAction
             } else {
                 $escapedSearch = addcslashes($trimmedSearch, '%_\\');
 
-                $query->where(function (Builder $q) use ($escapedSearch): void {
-                    if ($q->getConnection()->getDriverName() === 'sqlite') {
-                        $q->whereRaw('name like ? escape \'\\\'', ['%'.$escapedSearch.'%'])
-                            ->orWhereRaw('code like ? escape \'\\\'', ['%'.$escapedSearch.'%']);
-                    } else {
-                        $q->where('name', 'like', '%'.$escapedSearch.'%')
-                            ->orWhere('code', 'like', '%'.$escapedSearch.'%');
-                    }
-                });
+                // Búsqueda textual: evitar castear la columna entera `code` a string fila por fila
+                if ($query->getConnection()->getDriverName() === 'sqlite') {
+                    $query->whereRaw('name like ? escape \'\\\'', ['%'.$escapedSearch.'%']);
+                } else {
+                    $query->where('name', 'like', '%'.$escapedSearch.'%');
+                }
             }
         }
 

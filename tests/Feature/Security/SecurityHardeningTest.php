@@ -30,9 +30,18 @@ class SecurityHardeningTest extends TestCase
 
         $csp = (string) $response->headers->get('Content-Security-Policy');
         $this->assertStringContainsString("default-src 'self'", $csp);
-        $this->assertStringContainsString('https://cdn.tailwindcss.com', $csp);
-        $this->assertStringContainsString('https://cdn.jsdelivr.net', $csp);
+        $this->assertStringNotContainsString('https://cdn.tailwindcss.com', $csp);
+        $this->assertStringNotContainsString('https://cdn.jsdelivr.net', $csp);
         $this->assertStringContainsString('https://images.unsplash.com', $csp);
+
+        // Panel administrativo: CSP base + anti-clickjacking DENY
+        $adminLoginResponse = $this->get('/admin/login');
+        $adminLoginResponse->assertOk();
+        $adminLoginResponse->assertHeader('X-Frame-Options', 'DENY');
+        $adminCsp = (string) $adminLoginResponse->headers->get('Content-Security-Policy');
+        $this->assertStringContainsString("frame-ancestors 'none'", $adminCsp);
+        $this->assertStringContainsString("object-src 'none'", $adminCsp);
+        $this->assertStringContainsString("base-uri 'self'", $adminCsp);
     }
 
     /**

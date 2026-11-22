@@ -118,4 +118,31 @@ class ProductTest extends TestCase
         $this->assertNotEmpty($product->name);
         $this->assertNotNull($product->category_id);
     }
+
+    /**
+     * Verifica que las miniaturas comerciales de estudio se asignen según el tipo de artículo y categoría.
+     */
+    public function test_product_resolves_clean_hotel_fallback_thumbnails_by_item_type(): void
+    {
+        $vajilla = Category::factory()->create(['name' => 'Vajilla', 'slug' => 'vajilla']);
+        $manteleria = Category::factory()->create(['name' => 'Mantelería', 'slug' => 'manteleria']);
+
+        $plato = Product::factory()->create(['category_id' => $vajilla->id, 'name' => 'PLATO FONDO ECONOMICO', 'image' => null]);
+        $platoBase = Product::factory()->create(['category_id' => $vajilla->id, 'name' => 'PLATO BASE RECTANGULAR O REDONDO', 'image' => null]);
+        $cubiertoPlata = Product::factory()->create(['category_id' => $vajilla->id, 'name' => 'TENEDOR PRINCIPAL', 'image' => null]);
+        $cubiertoDorado = Product::factory()->create(['category_id' => $vajilla->id, 'name' => 'TENEDOR PRINCIPAL DORADO', 'image' => null]);
+        $copa = Product::factory()->create(['category_id' => $vajilla->id, 'name' => 'COPA VINO BLANCO', 'image' => null]);
+        $vaso = Product::factory()->create(['category_id' => $vajilla->id, 'name' => 'VASO WISKY', 'image' => null]);
+        $mantel = Product::factory()->create(['category_id' => $manteleria->id, 'name' => 'MANTEL REDONDO BLANCO', 'image' => null]);
+
+        $this->assertNull($plato->image_url);
+        $this->assertTrue($plato->usesFallbackImage());
+        $this->assertStringEndsWith('/images/products/default-platos.webp', $plato->display_image_url);
+        $this->assertStringEndsWith('/images/products/default-plato-base.webp', $platoBase->display_image_url);
+        $this->assertStringEndsWith('/images/products/default-cubiertos.webp', $cubiertoPlata->display_image_url);
+        $this->assertStringEndsWith('/images/products/default-cubiertos-dorados.webp', $cubiertoDorado->display_image_url);
+        $this->assertStringEndsWith('/images/products/default-copas.webp', $copa->display_image_url);
+        $this->assertStringEndsWith('/images/products/default-vasos.webp', $vaso->display_image_url);
+        $this->assertStringEndsWith('/images/products/default-manteleria.webp', $mantel->display_image_url);
+    }
 }

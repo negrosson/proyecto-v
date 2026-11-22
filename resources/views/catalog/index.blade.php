@@ -1,20 +1,5 @@
 @php
-    $categoryPlaceholders = [
-        'vajilla' => 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80',
-        'manteleria' => 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-        'mobiliario' => 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80',
-        'equipamiento-cocina' => 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80',
-        'bar-decoracion' => 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80',
-    ];
-    $defaultPlaceholder = 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80';
-
-    $getProductImage = function ($item) use ($categoryPlaceholders, $defaultPlaceholder) {
-        if (!empty($item->image_url)) {
-            return $item->image_url;
-        }
-        $slug = $item->category?->slug ?? '';
-        return $categoryPlaceholders[$slug] ?? $defaultPlaceholder;
-    };
+    $getProductImage = static fn ($item): string => $item->display_image_url;
 @endphp
 <!DOCTYPE html>
 <html lang="es" class="scroll-smooth">
@@ -23,41 +8,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $settings->site_name ?? 'Arriendos & Eventos' }} | {{ $settings->site_tagline ?? 'Banquetería, Mobiliario & Vajilla Premium' }}</title>
+    <meta name="description" content="{{ $settings->hero_subtitle ?? 'Arriendo de mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y eventos corporativos en Santiago.' }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+
+    <!-- OpenGraph & WhatsApp Preview -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $settings->site_name ?? 'Arriendos & Eventos' }} | {{ $settings->site_tagline ?? 'Banquetería, Mobiliario & Vajilla Premium' }}">
+    <meta property="og:description" content="{{ $settings->hero_subtitle ?? 'Mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y celebraciones corporativas.' }}">
+    <meta property="og:image" content="{{ !empty($settings?->hero_bg_image) ? asset('storage/' . $settings->hero_bg_image) : asset('images/montajes/teno-mesa-principal.jpg') }}">
+    <meta name="twitter:card" content="summary_large_image">
 
     <!-- Google Fonts: Cormorant Garamond (Editorial Luxury) & Plus Jakarta Sans (UI Clean) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS y Alpine.js -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                        serif: ['"Cormorant Garamond"', 'serif'],
-                    },
-                    colors: {
-                        amber: {
-                            50: '#FFFDF9',
-                            100: '#FEF8EE',
-                            200: '#FDF1DD',
-                            300: '#FBE3BC',
-                            400: '#F6D090',
-                            500: '#EAB759',
-                            600: '#C89333',
-                            700: '#9E6D1C',
-                            800: '#785018',
-                            900: '#543612',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS Compilado con Vite (Producción) y Alpine.js -->
+    @vite(['resources/css/app.css'])
     <script>
         (function() {
             var theme = localStorage.getItem('theme');
@@ -68,7 +36,7 @@
             }
         })();
     </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('vendor/alpinejs/alpine.min.js') }}"></script>
 
     <style>
         [x-cloak] { display: none !important; }
@@ -117,6 +85,175 @@
             font-weight: 700 !important;
             border-color: #F4F4F5 !important;
         }
+
+        /* === EFECTOS MODERNOS SECCIÓN INICIO (HERO INTERACTIVO) === */
+        @keyframes heroFloatSlow {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+            33% { transform: translate3d(28px, -22px, 0) scale(1.06); }
+            66% { transform: translate3d(-20px, 18px, 0) scale(0.96); }
+        }
+        @keyframes heroRevealUp {
+            0% { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.985); filter: blur(4px); }
+            100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+        }
+        @keyframes heroShimmerSweep {
+            0% { transform: translateX(-120%) skewX(-18deg); }
+            100% { transform: translateX(220%) skewX(-18deg); }
+        }
+        @keyframes heroPulseLine {
+            0% { left: -15%; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+        @keyframes heroTextGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-orb-1 { animation: heroFloatSlow 11s ease-in-out infinite; }
+        .hero-orb-2 { animation: heroFloatSlow 14s ease-in-out infinite reverse; }
+        .hero-reveal-1 { animation: heroRevealUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+        .hero-reveal-2 { animation: heroRevealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+        .hero-reveal-3 { animation: heroRevealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both; }
+        .hero-reveal-4 { animation: heroRevealUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+        .hero-reveal-5 { animation: heroRevealUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both; }
+
+        .hero-grid-mask {
+            background-image:
+                linear-gradient(to right, rgba(200, 147, 51, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(200, 147, 51, 0.08) 1px, transparent 1px);
+            background-size: 44px 44px;
+            -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, #000 35%, transparent 85%);
+            mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, #000 35%, transparent 85%);
+        }
+        .dark .hero-grid-mask {
+            background-image:
+                linear-gradient(to right, rgba(234, 183, 89, 0.09) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(234, 183, 59, 0.09) 1px, transparent 1px);
+        }
+
+        .hero-btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-btn-shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+            transform: translateX(-120%) skewX(-18deg);
+            animation: heroShimmerSweep 4.2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .hero-step-beam {
+            position: absolute;
+            top: 0;
+            width: 18%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #EAB759, #10B981, transparent);
+            animation: heroPulseLine 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* === EFECTOS GLOBALES DEL RESTO DEL INICIO (SCROLL REVEAL, MARQUEE & CARD SHINE) === */
+        @keyframes marqueeScroll {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        .luxury-marquee-track {
+            display: flex;
+            width: max-content;
+            animation: marqueeScroll 34s linear infinite;
+        }
+        .luxury-marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        /* Efecto de reflejo diagonal (Cristal) al pasar el mouse sobre fotos de productos/montajes */
+        .card-gloss-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .card-gloss-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 40%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.32) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(25deg);
+            transition: transform 0.75s cubic-bezier(0.19, 1, 0.22, 1);
+            pointer-events: none;
+        }
+        .group:hover .card-gloss-shine::after {
+            transform: translateX(380%) rotate(25deg);
+        }
+
+        /* Scroll Reveal con IntersectionObserver */
+        [data-reveal] {
+            opacity: 0;
+            transform: translate3d(0, 28px, 0) scale(0.985);
+            transition:
+                opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        [data-reveal].is-revealed {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+        }
+
+        /* === OPCIÓN C: VUELO AL CARRITO (FLY-TO-CART) & SHOCKWAVE === */
+        @keyframes cartShockwave {
+            0% { box-shadow: 0 0 0 0 rgba(234, 183, 89, 0.75); transform: scale(1); }
+            50% { box-shadow: 0 0 0 14px rgba(234, 183, 89, 0); transform: scale(1.09); }
+            100% { box-shadow: 0 0 0 0 rgba(234, 183, 89, 0); transform: scale(1); }
+        }
+        .cart-hit-shockwave {
+            animation: cartShockwave 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* === FOOTER EDITORIAL: SUBRAYADO MAGNÉTICO & MARCA DE AGUA === */
+        .footer-link-magnetic {
+            position: relative;
+            display: inline-block;
+        }
+        .footer-link-magnetic::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 100%;
+            height: 1.5px;
+            background: linear-gradient(90deg, #EAB759, #10B981);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .footer-link-magnetic:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-orb-1, .hero-orb-2, .hero-reveal-1, .hero-reveal-2, .hero-reveal-3, .hero-reveal-4, .hero-reveal-5, .hero-btn-shimmer::after, .hero-step-beam, .luxury-marquee-track {
+                animation: none !important;
+            }
+            [data-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-white relative overflow-x-hidden transition-colors duration-200" 
@@ -127,31 +264,17 @@
     <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
             
-            <!-- Brand Monograma Boutique -->
-            <a href="{{ route('catalog.index') }}" class="group flex items-center gap-3">
-                @if(!empty($settings?->logo_path))
-                    <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="{{ $settings->site_name ?? 'Logo' }}" class="w-10 h-10 rounded-xl object-cover shadow-md border border-zinc-200 dark:border-zinc-700">
-                @else
-                    <div class="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-800 text-zinc-100 flex items-center justify-center font-serif text-2xl font-bold shadow-md shadow-zinc-900/10 group-hover:scale-105 transition-transform duration-300 border border-zinc-800 dark:border-zinc-700">
-                        {{ mb_substr($settings->site_name ?? 'A', 0, 1) }}
-                    </div>
-                @endif
-                <div class="min-w-0 flex-1 sm:flex-initial">
-                    <span class="text-sm sm:text-base md:text-lg font-serif font-bold tracking-wider text-zinc-900 dark:text-zinc-100 uppercase block leading-tight truncate max-w-[135px] sm:max-w-none">
-                        {{ $settings->site_name ?? 'Arriendos & Eventos' }}
-                    </span>
-                    <span class="hidden sm:block text-[9px] sm:text-[10px] tracking-[0.22em] text-zinc-500 dark:text-zinc-400 uppercase font-mono truncate">
-                        {{ $settings->site_tagline ?? 'Boutique de Banquetería & Menaje' }}
-                    </span>
-                </div>
+            <!-- Brand Logo Oficial VYS -->
+            <a href="{{ route('catalog.index') }}" class="group flex items-center shrink-0 focus:outline-none">
+                <x-brand-logo variant="header" :settings="$settings" />
             </a>
 
-            <!-- Enlaces de Navegación Desktop (Menú limpio: Inicio, Destacados, Catálogo, Montajes, Envíos, Contacto, WhatsApp) -->
-            <nav class="hidden md:flex items-center gap-6 text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400">
+            <!-- Enlaces de Navegación Desktop (Responsivo desde lg:1024px sin saturar tablets) -->
+            <nav class="hidden lg:flex items-center gap-3.5 xl:gap-6 text-[11px] xl:text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
                 <a href="{{ route('catalog.index') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1 relative {{ !request('categoria') && !request('buscar') ? 'text-zinc-950 dark:text-white font-bold border-b-2 border-zinc-900 dark:border-amber-400' : '' }}">
                     Inicio
                 </a>
-                <a href="#destacados" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
+                <a href="{{ (request('categoria') || request('buscar')) ? route('catalog.index') . '#destacados' : '#destacados' }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Destacados
                 </a>
                 <a href="#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
@@ -170,8 +293,9 @@
                 <a href="#contacto" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Contacto
                 </a>
-                <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico desde el catálogo de ' . ($settings->site_name ?? 'Arriendos & Eventos') . '.') }}" 
+                <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico desde el catálogo de ' . ($settings->site_name ?? 'VYS Productora de Eventos') . '.') }}" 
                    target="_blank" 
+                   rel="noopener noreferrer"
                    class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors py-1 flex items-center gap-1.5 font-bold">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     WhatsApp
@@ -222,7 +346,10 @@
                 </a>
 
                 <button @click="mobileMenuOpen = !mobileMenuOpen" 
-                        class="md:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition">
+                        type="button"
+                        aria-label="Abrir menú de navegación"
+                        :aria-expanded="mobileMenuOpen"
+                        class="lg:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition">
                     <svg x-show="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
                     </svg>
@@ -233,7 +360,7 @@
             </div>
         </div>
 
-        <!-- Menú Móvil Desplegable -->
+        <!-- Menú Móvil / Tablet Desplegable -->
         <div x-show="mobileMenuOpen" 
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-2"
@@ -242,14 +369,14 @@
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 -translate-y-2"
              @click.outside="mobileMenuOpen = false"
-             class="md:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 px-5 py-4 space-y-3"
+             class="lg:hidden bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 px-5 py-4 space-y-3"
              style="display: none;">
             <nav class="flex flex-col space-y-2 text-sm font-medium text-zinc-800 dark:text-zinc-200">
                 <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Inicio</span>
                     <span class="text-xs text-zinc-400 font-mono">01</span>
                 </a>
-                <a @click="mobileMenuOpen = false" href="#destacados" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
+                <a @click="mobileMenuOpen = false" href="{{ (request('categoria') || request('buscar')) ? route('catalog.index') . '#destacados' : '#destacados' }}" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Colección en Carrusel</span>
                     <span class="text-xs text-zinc-400 font-mono">02</span>
                 </a>
@@ -292,102 +419,202 @@
                 </a>
             </nav>
         </div>
+
+        <!-- Barra Dinámica de Progreso de Lectura (Scroll Progress) -->
+        <div class="h-[2px] w-full bg-transparent overflow-hidden pointer-events-none">
+            <div id="scroll-progress-bar" class="h-full bg-gradient-to-r from-amber-500 via-amber-400 to-emerald-500 transition-[width] duration-75 ease-out" style="width: 0%;"></div>
+        </div>
     </header>
 
     @if(!request('categoria') && !request('buscar'))
-        <!-- Hero Banner Editorial (Blanco Puro en Claro + Modo Oscuro Obsidian) -->
-        <section class="relative bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 py-10 sm:py-16 overflow-hidden"
-                 @if(!empty($settings?->hero_bg_image)) style="background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.98)), url('{{ asset('storage/' . $settings->hero_bg_image) }}'); background-size: cover; background-position: center;" @endif>
-            <!-- Patrón de fondo geométrico sutil -->
-            <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(#18181B 1px, transparent 1px); background-size: 24px 24px;"></div>
-            
+        <!-- Hero Banner Editorial Interactivo (Spotlight Reactivo + Orbes Aurora + Contadores Animados) -->
+        <section id="inicio"
+                 x-data="{
+                     mouseX: 50,
+                     mouseY: 40,
+                     spotlightActive: false,
+                     activeTagIndex: 0,
+                     eventTags: [
+                         'Matrimonios & Bodas de Gala',
+                         'Eventos Corporativos & Lanzamientos',
+                         'Banquetes & Cenas de Fin de Año',
+                         'Cócteles & Celebraciones Privadas'
+                     ],
+                     itemsCounter: 0,
+                     sanitizedCounter: 0,
+                     initHero() {
+                         setInterval(() => {
+                             this.activeTagIndex = (this.activeTagIndex + 1) % this.eventTags.length;
+                         }, 3200);
+
+                         const duration = 1400;
+                         const start = performance.now();
+                         const step = (now) => {
+                             const progress = Math.min((now - start) / duration, 1);
+                             const eased = 1 - Math.pow(1 - progress, 3);
+                             this.itemsCounter = Math.round(eased * 190);
+                             this.sanitizedCounter = Math.round(eased * 100);
+                             if (progress < 1) requestAnimationFrame(step);
+                         };
+                         requestAnimationFrame(step);
+                     },
+                     handleMouseMove(e) {
+                         const rect = e.currentTarget.getBoundingClientRect();
+                         this.mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+                         this.mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+                         this.spotlightActive = true;
+                     }
+                 }"
+                 x-init="initHero()"
+                 @mousemove="handleMouseMove($event)"
+                 @mouseleave="spotlightActive = false"
+                 class="relative bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 py-12 sm:py-20 overflow-hidden select-none"
+                 @if(!empty($settings?->hero_bg_image)) style="background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.97)), url('{{ asset('storage/' . $settings->hero_bg_image) }}'); background-size: cover; background-position: center;" @endif>
+
+            <!-- 1. Luz Spotlight Interactiva que sigue el cursor -->
+            <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
+                 :class="spotlightActive ? 'opacity-100' : 'opacity-60'"
+                 :style="`background: radial-gradient(560px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.16), rgba(16, 185, 129, 0.05) 45%, transparent 75%);`">
+            </div>
+
+            <!-- 2. Orbes Flotantes de Luz Ambiental (Aurora Luxury) -->
+            <div class="hero-orb-1 pointer-events-none absolute -top-24 left-1/4 w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full bg-amber-400/15 dark:bg-amber-500/10 blur-3xl"></div>
+            <div class="hero-orb-2 pointer-events-none absolute -bottom-28 right-1/4 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-emerald-400/10 dark:bg-amber-300/10 blur-3xl"></div>
+
+            <!-- 3. Retícula Arquitectónica con Máscara Radial -->
+            <div class="hero-grid-mask absolute inset-0 pointer-events-none"></div>
+
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                <div class="inline-flex items-center gap-2 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 py-1.5 rounded-full mb-4 sm:mb-6 shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                    <span class="text-[10px] sm:text-xs font-mono font-medium tracking-widest uppercase text-zinc-700 dark:text-zinc-300">
-                        {{ $settings->hero_badge ?? 'Catálogo Oficial • Temporada 2026' }}
-                    </span>
+                <!-- Badge Superior con Pulso Vivo + Rotador Dinámico de Especialidades -->
+                <div class="hero-reveal-1 flex flex-col sm:flex-row items-center justify-center gap-2.5 mb-5 sm:mb-7">
+                    <div class="inline-flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 px-4 py-1.5 rounded-full shadow-sm">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                        </span>
+                        <span class="text-[10px] sm:text-xs font-mono font-semibold tracking-widest uppercase text-zinc-700 dark:text-zinc-300">
+                            {{ $settings->hero_badge ?? 'Catálogo Oficial • Temporada 2026' }}
+                        </span>
+                    </div>
+
+                    <!-- Píldora Dinámica Cambiante (Rotador en vivo) -->
+                    <div class="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-medium text-amber-800 dark:text-amber-300 shadow-sm overflow-hidden h-7 sm:h-8">
+                        <svg class="w-3.5 h-3.5 text-amber-500 shrink-0 animate-spin" style="animation-duration: 9s;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                        </svg>
+                        <div class="relative flex items-center justify-center min-w-[215px] sm:min-w-[240px]">
+                            <template x-for="(tag, idx) in eventTags" :key="idx">
+                                <span x-show="activeTagIndex === idx"
+                                      x-transition:enter="transition ease-out duration-500"
+                                      x-transition:enter-start="opacity-0 translate-y-3"
+                                      x-transition:enter-end="opacity-100 translate-y-0"
+                                      x-transition:leave="transition ease-in duration-300 absolute"
+                                      x-transition:leave-start="opacity-100 translate-y-0"
+                                      x-transition:leave-end="opacity-0 -translate-y-3"
+                                      class="font-semibold tracking-wide truncate"
+                                      x-text="tag"></span>
+                            </template>
+                        </div>
+                    </div>
                 </div>
 
-                <h1 class="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-zinc-900 dark:text-white max-w-4xl mx-auto leading-[1.12]">
+                <!-- Título Principal Editorial con Efecto de Entrada y Brillo Sutil -->
+                <h1 class="hero-reveal-2 font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-zinc-900 dark:text-white max-w-4xl mx-auto leading-[1.1] drop-shadow-sm">
                     {{ $settings->hero_title ?? 'Equipamiento y ambientación para ocasiones extraordinarias' }}
                 </h1>
 
-                <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 sm:mt-5 max-w-2xl mx-auto font-light leading-relaxed">
+                <!-- Subtítulo Editorial -->
+                <p class="hero-reveal-3 text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 sm:mt-6 max-w-2xl mx-auto font-light leading-relaxed">
                     {{ $settings->hero_subtitle ?? 'Mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y celebraciones corporativas. Celebra con distinción y logística puntual garantizada.' }}
                 </p>
 
-                <!-- Mini-Stats de Confianza Boutique -->
-                <div class="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-2xl mx-auto">
-                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 rounded-2xl shadow-sm text-center">
-                        <span class="block font-serif text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">+190</span>
-                        <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Ítems de colección</span>
-                    </div>
-                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 rounded-2xl shadow-sm text-center">
-                        <span class="block font-serif text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">100%</span>
-                        <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Sanitización certificada</span>
-                    </div>
-                    <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800 p-3.5 sm:p-4 rounded-2xl shadow-sm text-center">
-                        <span class="block font-serif text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">Puntual</span>
-                        <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium">Entrega y retiro coordinado</span>
-                    </div>
+                <!-- Mini-Stats Interactivas con Conteo Animado y Elevación 3D Glassmorphism -->
+                <div class="hero-reveal-4 mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5 max-w-3xl mx-auto">
+                    <!-- Tarjeta 1 -->
+                    <a href="#catalogo" class="group relative bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/60 dark:hover:border-amber-400/60 p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1.5 transition-all duration-300 text-center overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span class="block font-serif text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white group-hover:scale-105 transition-transform duration-300"
+                              x-text="'+' + (itemsCounter || 190)">+190</span>
+                        <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5 block">Ítems de colección</span>
+                    </a>
+
+                    <!-- Tarjeta 2 -->
+                    <a href="#como-cotizar" class="group relative bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 hover:border-emerald-500/60 dark:hover:border-emerald-400/60 p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1.5 transition-all duration-300 text-center overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span class="block font-serif text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform duration-300"
+                              x-text="(sanitizedCounter || 100) + '%'">100%</span>
+                        <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5 block">Sanitización certificada</span>
+                    </a>
+
+                    <!-- Tarjeta 3 -->
+                    <a href="#envios" class="group relative bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/60 dark:hover:border-amber-400/60 p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1.5 transition-all duration-300 text-center overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span class="block font-serif text-2xl sm:text-3xl font-bold text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform duration-300">Puntual</span>
+                        <span class="text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5 block">Entrega y retiro coordinado</span>
+                    </a>
                 </div>
 
-                <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
-                    <a href="#destacados" class="inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 font-medium text-xs sm:text-sm px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300">
+                <!-- Botones CTA con Barrido de Luz (Shimmer) y Micro-interacción -->
+                <div class="hero-reveal-5 mt-8 sm:mt-9 flex flex-wrap items-center justify-center gap-3.5">
+                    <a href="#destacados" class="hero-btn-shimmer group inline-flex items-center gap-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 font-semibold text-xs sm:text-sm px-7 py-3.5 rounded-full shadow-lg hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
                         <span>Ver Vitrina en Carrusel</span>
-                        <svg class="w-4 h-4 text-amber-400 dark:text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        <svg class="w-4 h-4 text-amber-400 dark:text-zinc-950 group-hover:translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </a>
-                    <a href="{{ route('catalog.montajes') }}" class="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700 font-medium text-xs sm:text-sm px-5 py-3 rounded-full shadow-sm transition-all duration-300">
+                    <a href="{{ route('catalog.montajes') }}" class="group inline-flex items-center gap-2.5 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700 hover:border-amber-500/50 dark:hover:border-amber-400/50 font-medium text-xs sm:text-sm px-6 py-3.5 rounded-full shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
                         <span>Montajes Realizados</span>
-                        <span class="text-[10px] font-mono bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded font-bold">2023-2026</span>
+                        <span class="text-[10px] font-mono bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-bold group-hover:bg-amber-500 group-hover:text-zinc-950 transition-colors duration-300">2023-2026</span>
                     </a>
                 </div>
             </div>
         </section>
 
-        <!-- Barra de 3 Pasos de Reserva Visual -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-5 sm:-mt-6 relative z-20">
-            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-4 sm:p-6 shadow-xl shadow-zinc-900/5">
+        <!-- Barra de 3 Pasos de Reserva Visual con Pulso Luminoso Conector -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
+            <div class="relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-4 sm:p-6 shadow-xl shadow-zinc-900/5 overflow-hidden">
+                <!-- Haz de luz animado recorriendo el borde superior de los 3 pasos -->
+                <div class="absolute inset-x-0 top-0 h-[2px] bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
+                    <div class="hero-step-beam"></div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 relative">
                     <!-- Paso 1 -->
-                    <div class="flex items-start gap-3.5 p-3 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-900 dark:bg-zinc-700 text-amber-300 font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm">
+                    <a href="#catalogo" class="group flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-amber-500/40 dark:hover:border-amber-400/40 hover:shadow-md transition-all duration-300">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-900 dark:bg-zinc-700 group-hover:bg-amber-500 text-amber-300 group-hover:text-zinc-950 font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-all duration-300">
                             1
                         </div>
                         <div>
-                            <h4 class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm">Selecciona tu mobiliario</h4>
+                            <h4 class="font-semibold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors text-xs sm:text-sm">Selecciona tu mobiliario</h4>
                             <p class="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-relaxed">
                                 Agrega piezas y cantidades requeridas con stock en tiempo real.
                             </p>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Paso 2 -->
-                    <div class="flex items-start gap-3.5 p-3 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-900 dark:bg-zinc-700 text-amber-300 font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm">
+                    <button type="button" @click="cartOpen = true" class="group text-left flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-amber-500/40 dark:hover:border-amber-400/40 hover:shadow-md transition-all duration-300">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-900 dark:bg-zinc-700 group-hover:bg-amber-500 text-amber-300 group-hover:text-zinc-950 font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-all duration-300">
                             2
                         </div>
                         <div>
-                            <h4 class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm">Revisa tu cotización</h4>
+                            <h4 class="font-semibold text-zinc-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors text-xs sm:text-sm">Revisa tu cotización</h4>
                             <p class="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-relaxed">
                                 Ingresa tu nombre, fecha y comuna en el drawer lateral consolidado.
                             </p>
                         </div>
-                    </div>
+                    </button>
 
                     <!-- Paso 3 -->
-                    <div class="flex items-start gap-3.5 p-3 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 border border-zinc-200/60 dark:border-zinc-700/60">
-                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-700 text-white font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm">
+                    <a href="#como-cotizar" class="group flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-emerald-500/40 dark:hover:border-emerald-400/40 hover:shadow-md transition-all duration-300">
+                        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-emerald-700 group-hover:bg-emerald-500 text-white font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-all duration-300">
                             3
                         </div>
                         <div>
-                            <h4 class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm">Confirmación por WhatsApp</h4>
+                            <h4 class="font-semibold text-zinc-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-xs sm:text-sm">Confirmación por WhatsApp</h4>
                             <p class="text-[11px] sm:text-xs text-zinc-600 dark:text-zinc-400 mt-0.5 leading-relaxed">
                                 Confirmamos disponibilidad de fecha, flete y reserva inmediata.
                             </p>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </section>
@@ -476,11 +703,12 @@
                         @foreach ($carouselProducts as $item)
                             @php
                                 $imgSrc = $getProductImage($item);
+                                $isStudioPackshot = $item->usesFallbackImage();
                             @endphp
                             <div class="w-full sm:w-1/2 lg:w-1/4 shrink-0 p-2 sm:p-2.5">
                                 <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full group">
                                     <div>
-                                        <!-- Imagen con Zoom & Click para Ficha Completa -->
+                                        <!-- Imagen con Zoom, Brillo Diagonal & Click para Ficha Completa -->
                                         <div @click="openDetail({
                                                 id: {{ $item->id }},
                                                 name: '{{ addslashes($item->name) }}',
@@ -492,11 +720,11 @@
                                                 is_sale: {{ $item->is_sale ? 'true' : 'false' }},
                                                 image: '{{ $imgSrc }}'
                                              })"
-                                             class="cursor-pointer relative h-48 sm:h-52 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                             class="card-gloss-shine cursor-pointer relative h-48 sm:h-52 overflow-hidden {{ $isStudioPackshot ? 'bg-white' : 'bg-zinc-100 dark:bg-zinc-800' }}">
                                             <img src="{{ $imgSrc }}" 
                                                  alt="{{ $item->name }}" 
                                                  loading="lazy"
-                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                                                 class="w-full h-full {{ $isStudioPackshot ? 'object-contain p-3' : 'object-cover' }} group-hover:scale-105 transition-transform duration-500 ease-out">
 
                                             <span class="absolute top-2.5 left-2.5 backdrop-blur-md bg-white/85 dark:bg-zinc-900/85 text-zinc-900 dark:text-zinc-100 text-[10px] font-mono font-medium px-2 py-0.5 rounded shadow-sm border border-white/50 dark:border-zinc-700">
                                                 Cód: {{ $item->code }}
@@ -566,22 +794,22 @@
                                         </div>
                                     </div>
 
-                                    <!-- Botón Agregar al Arriendo -->
+                                    <!-- Botón Agregar al Arriendo con Vuelo al Carrito -->
                                     <div class="p-4 sm:p-5 pt-0" x-data="{ added: false }">
                                         @if($item->stock > 0)
-                                            <button @click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->rental_price }}, {{ $item->stock }}, {{ $item->code }}); added = true; setTimeout(() => added = false, 1000)"
+                                            <button @click="addItem({{ $item->id }}, '{{ addslashes($item->name) }}', {{ $item->rental_price }}, {{ $item->stock }}, {{ $item->code }}, $event, '{{ $imgSrc }}'); added = true; setTimeout(() => added = false, 1000)"
                                                     :class="added ? 'bg-emerald-600 text-white shadow-md' : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white shadow-sm'"
                                                     class="w-full py-2 px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-98">
                                                 <template x-if="!added">
-                                                    <span class="flex items-center gap-1">
+                                                    <span class="flex items-center gap-1.5">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                                        <span>+ Agregar</span>
+                                                        <span>Agregar</span>
                                                     </span>
                                                 </template>
                                                 <template x-if="added">
-                                                    <span class="flex items-center gap-1 font-bold">
+                                                    <span class="flex items-center gap-1.5 font-bold">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                        <span>✓ Agregado</span>
+                                                        <span>Agregado</span>
                                                     </span>
                                                 </template>
                                             </button>
@@ -609,56 +837,96 @@
             </div>
         </section>
 
-        <!-- SECCIÓN: MONTAJES & PUESTA EN ESCENA (Basado en Galería Real de Eventos del Cliente) -->
-        <section id="montajes" class="py-14 sm:py-20 border-b border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+        <!-- PUENTE EDITORIAL & VISUAL: CONEXIÓN DE PIEZAS DESTACADAS → MONTAJES EN ESCENA -->
+        <div class="relative bg-gradient-to-b from-zinc-50 via-amber-50/40 to-white dark:from-zinc-900/50 dark:via-amber-950/15 dark:to-zinc-950 py-8 sm:py-10 overflow-hidden">
+            <!-- Línea vertical dorada sutil que une ambas secciones -->
+            <div class="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-amber-500/0 via-amber-500/45 to-amber-500/0"></div>
+
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md rounded-2xl sm:rounded-full border border-amber-200/80 dark:border-amber-800/40 shadow-sm px-5 py-4 sm:px-7 sm:py-3.5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 text-center sm:text-left">
+                        <span class="hidden sm:inline-flex items-center justify-center w-9 h-9 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-200/80 dark:border-amber-800/60 text-amber-700 dark:text-amber-400 shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                        </span>
+                        <div>
+                            <span class="text-[10px] font-mono uppercase tracking-[0.22em] text-amber-700 dark:text-amber-400 font-semibold block">
+                                De la pieza individual al montaje real
+                            </span>
+                            <p class="text-xs sm:text-sm text-zinc-700 dark:text-zinc-300 font-medium">
+                                Mira cómo lucen estas piezas vestidas en escena y cotízalas directo desde la foto.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2.5 shrink-0">
+                        <a href="#montajes"
+                           class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition shadow-sm">
+                            <span>Ver en escena</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
+                        </a>
+                        <a href="#catalogo"
+                           class="inline-flex items-center gap-1 px-3.5 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition border border-zinc-200/80 dark:border-zinc-700">
+                            <span>Catálogo</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: MONTAJES & PUESTA EN ESCENA (Conectada con la Vitrina Destacada) -->
+        <section id="montajes" class="scroll-mt-20 pt-8 pb-16 sm:pt-10 sm:pb-20 border-b border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-950">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Encabezado Editorial Idéntico a la Referencia del Cliente -->
-                <div class="text-center max-w-4xl mx-auto mb-12 sm:mb-16">
-                    <span class="text-[10px] font-mono uppercase tracking-[0.3em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-4 py-1.5 rounded-full inline-block mb-4 font-semibold">
+                <!-- Encabezado Editorial Conciso y Elegante -->
+                <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+                    <span class="text-[10px] font-mono uppercase tracking-[0.28em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-4 py-1.5 rounded-full inline-block mb-3.5 font-semibold">
                         Puesta en Escena &bull; Experiencia Real
                     </span>
                     <h2 class="font-serif text-2xl sm:text-4xl md:text-5xl font-light text-zinc-900 dark:text-white tracking-wide">
                         Montaje de Eventos en Santiago &ndash; <span class="italic font-normal text-amber-700 dark:text-amber-500">Tu Solución Completa</span>
                     </h2>
-                    <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 font-light leading-relaxed max-w-3xl mx-auto">
-                        En Fiesta Rent, nos especializamos en el montaje de eventos en Santiago, proporcionando un servicio integral para tus celebraciones. Desde mesas hasta sillas y otros mobiliarios, nuestras soluciones están diseñadas para que disfrutes de cada momento sin preocupaciones. Ya sea que planifiques un evento corporativo, una boda o una reunión especial, contamos con opciones ideales para cada necesidad. Nuestro enfoque está en asegurar que el montaje de eventos en Santiago sea sencillo, confiable y con resultados excepcionales. Contáctanos y descubre cómo podemos hacer de tu evento un éxito inolvidable.
+                    <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-3.5 font-light leading-relaxed max-w-2xl mx-auto">
+                        En <span class="font-medium text-zinc-900 dark:text-white">{{ $settings->site_name ?? 'VYS · Productora de Eventos' }}</span> transformamos cada pieza de nuestro catálogo en celebraciones memorables: mesas, sillas, vajilla, mantelería y carpas montadas con precisión para matrimonios y eventos corporativos.
                     </p>
                 </div>
 
                 @php
-                    $teno = collect($montajes)->firstWhere('slug', 'teno-2023') ?? ($montajes[0] ?? null);
+                    $teno = collect($montajes)->firstWhere('is_featured', true) ?? ($montajes[0] ?? null);
                     $tenoCover = $teno['cover_image'] ?? asset('images/montajes/teno-mesa-principal.jpg');
-                    $tenoGallery = $teno['gallery'] ?? [];
-                    $tenoPhoto1 = $tenoGallery[1] ?? ($tenoGallery[0] ?? $tenoCover);
-                    $tenoPhoto2 = $tenoGallery[2] ?? ($tenoGallery[0] ?? $tenoCover);
+                    $tenoSubPhotos = collect($teno['gallery'] ?? [])
+                        ->filter(static fn ($url): bool => is_string($url) && $url !== '' && $url !== $tenoCover)
+                        ->unique()
+                        ->values()
+                        ->take(4)
+                        ->all();
                 @endphp
                 @if($teno)
                     <!-- Montaje Destacado Spotlight (Gestionable 100% desde el Panel de Administración) -->
-                    <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-10 mb-12 shadow-sm">
-                        <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800 mb-8">
-                            <div>
-                                <h3 class="font-serif text-2xl sm:text-4xl font-light tracking-[0.35em] text-zinc-900 dark:text-white uppercase mb-4">
+                    <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-5 sm:p-8 lg:p-10 mb-12 shadow-sm">
+                        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-zinc-200 dark:border-zinc-800 mb-6 sm:mb-8">
+                            <div class="space-y-4">
+                                <h3 class="font-serif text-2xl sm:text-3xl lg:text-4xl font-light tracking-[0.14em] sm:tracking-[0.2em] text-zinc-900 dark:text-white uppercase leading-snug">
                                     {{ $teno['title'] }}
                                 </h3>
-                                <dl class="space-y-2 text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
-                                    <div>
-                                        <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Tipo de proyecto</dt>
-                                        <dd class="text-zinc-500 dark:text-zinc-400">{{ $teno['type'] }}</dd>
-                                    </div>
-                                    <div>
-                                        <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Fecha</dt>
-                                        <dd class="text-zinc-500 dark:text-zinc-400">{{ $teno['year'] }}</dd>
-                                    </div>
-                                    <div>
-                                        <dt class="font-semibold text-zinc-900 dark:text-zinc-200">Ubicación</dt>
-                                        <dd class="text-zinc-500 dark:text-zinc-400">{{ $teno['location'] }}</dd>
-                                    </div>
-                                </dl>
+                                <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200">
+                                        <span class="text-zinc-400 font-mono text-[10px] uppercase">Tipo:</span>
+                                        <strong class="font-semibold">{{ $teno['type'] }}</strong>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200">
+                                        <span class="text-zinc-400 font-mono text-[10px] uppercase">Año:</span>
+                                        <strong class="font-semibold">{{ $teno['year'] }}</strong>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200">
+                                        <span class="text-zinc-400 font-mono text-[10px] uppercase">Lugar:</span>
+                                        <strong class="font-semibold">{{ $teno['location'] }}</strong>
+                                    </span>
+                                </div>
                             </div>
-                            <div class="max-w-md text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 md:text-right font-light leading-relaxed">
+                            <div class="max-w-md text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 lg:text-right font-light leading-relaxed">
                                 <p class="font-medium text-zinc-900 dark:text-white mb-1">{{ $teno['summary'] }}</p>
-                                <p>{{ Str::limit($teno['description'], 160) }}</p>
-                                <div class="mt-4 flex md:justify-end gap-2">
+                                <p>{{ Str::limit($teno['description'], 150) }}</p>
+                                <div class="mt-3 flex lg:justify-end gap-2">
                                     <a href="{{ route('catalog.montajes') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 hover:underline">
                                         <span>Ver especificaciones de este montaje</span>
                                         <span>&rarr;</span>
@@ -667,40 +935,215 @@
                             </div>
                         </div>
 
-                        <!-- Composición Fotográfica Dinámica -->
-                        <div class="space-y-4 sm:space-y-6">
-                            <!-- Foto 1: Mesa Principal Gran Angular -->
-                            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-200/80 dark:border-zinc-700/80 group">
-                                <img src="{{ $tenoCover }}" 
+                        @php
+                            $hotspotPool = $carouselProducts->values();
+                            $hotspotCoords = [
+                                ['x' => 26, 'y' => 64, 'tag' => 'Sillas & Asientos de Gala'],
+                                ['x' => 48, 'y' => 52, 'tag' => 'Mesa & Mantelería Imperial'],
+                                ['x' => 38, 'y' => 38, 'tag' => 'Cristalería Fina de Brindis'],
+                                ['x' => 68, 'y' => 46, 'tag' => 'Vajilla & Servicio de Mesa'],
+                            ];
+                            $montajeHotspots = [];
+                            foreach ($hotspotCoords as $idx => $coord) {
+                                $hpProd = $hotspotPool->get($idx);
+                                if ($hpProd) {
+                                    $montajeHotspots[] = [
+                                        'x' => $coord['x'],
+                                        'y' => $coord['y'],
+                                        'tag' => $coord['tag'],
+                                        'id' => $hpProd->id,
+                                        'name' => $hpProd->name,
+                                        'code' => $hpProd->code,
+                                        'price' => (int) $hpProd->rental_price,
+                                        'stock' => (int) $hpProd->stock,
+                                        'category' => $hpProd->category->name ?? 'Colección Gala',
+                                        'description' => $hpProd->description ?? 'Pieza de alta gama utilizada en nuestros montajes oficiales.',
+                                        'is_sale' => (bool) $hpProd->is_sale,
+                                        'image' => $getProductImage($hpProd),
+                                    ];
+                                }
+                            }
+                        @endphp
+
+                        <!-- Composición Fotográfica Dinámica e Interactiva (Lookbook Hotspots + Quick Photo Switcher) -->
+                        <div class="space-y-4 sm:space-y-6"
+                             x-data="{
+                                 mainPhoto: {{ Js::from($tenoCover) }},
+                                 subPhotos: {{ Js::from($tenoSubPhotos) }},
+                                 activeHotspot: null,
+                                 showHotspots: true,
+                                 hotspots: {{ Js::from($montajeHotspots) }},
+                                 swapPhoto(index) {
+                                     if (index < 0 || index >= this.subPhotos.length) return;
+                                     this.activeHotspot = null;
+                                     const currentMain = this.mainPhoto;
+                                     this.mainPhoto = this.subPhotos[index];
+                                     this.subPhotos[index] = currentMain;
+                                 }
+                             }">
+                            <!-- Foto 1: Mesa Principal Gran Angular con Hotspots Interactivos -->
+                            <div class="relative rounded-2xl overflow-hidden shadow-lg border border-zinc-200/80 dark:border-zinc-700/80 group"
+                                 @click.self="activeHotspot = null">
+                                <img :src="mainPhoto"
+                                     src="{{ $tenoCover }}" 
                                      alt="{{ $teno['title'] }}" 
-                                     class="w-full h-72 sm:h-96 md:h-[480px] object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out">
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-4 sm:p-6">
+                                     class="w-full h-80 sm:h-96 md:h-[500px] object-cover group-hover:scale-[1.015] transition-all duration-700 ease-out">
+
+                                <!-- Badge Superior Lookbook Interactivo -->
+                                <template x-if="hotspots.length > 0">
+                                    <div class="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-2 z-20 pointer-events-none">
+                                        <div class="inline-flex items-center gap-2 bg-zinc-950/75 backdrop-blur-md text-white text-[10px] sm:text-xs font-mono px-3 py-1.5 rounded-full border border-amber-400/40 shadow-lg pointer-events-auto">
+                                            <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                                            <span>Lookbook Interactivo: Toca los puntos <strong>(+)</strong> para cotizar las piezas</span>
+                                        </div>
+                                        <button type="button"
+                                                @click="showHotspots = !showHotspots; activeHotspot = null"
+                                                class="pointer-events-auto hidden sm:inline-flex items-center gap-1.5 bg-zinc-950/75 hover:bg-zinc-900 backdrop-blur-md text-zinc-200 text-[10px] font-mono px-3 py-1.5 rounded-full border border-white/20 transition">
+                                            <span x-text="showHotspots ? 'Ocultar Puntos' : 'Mostrar Puntos'"></span>
+                                        </button>
+                                    </div>
+                                </template>
+
+                                <!-- Puntos Pulsantes (Hotspots) sobre la Fotografía -->
+                                <template x-if="showHotspots && hotspots.length > 0">
+                                    <div class="absolute inset-0 z-20 pointer-events-none">
+                                        <template x-for="(spot, index) in hotspots" :key="index">
+                                            <div class="absolute pointer-events-auto"
+                                                 :style="`left: ${spot.x}%; top: ${spot.y}%; transform: translate(-50%, -50%);`">
+                                                <!-- Botón Pin Dorado Pulsante -->
+                                                <button type="button"
+                                                        @mouseenter="activeHotspot = index"
+                                                        @click.stop="activeHotspot = (activeHotspot === index ? null : index)"
+                                                        :aria-label="'Ver pieza: ' + spot.name"
+                                                        class="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-transform duration-300 focus:outline-none"
+                                                        :class="activeHotspot === index ? 'scale-125 bg-amber-400 text-zinc-950 ring-4 ring-white/80 shadow-2xl' : 'bg-zinc-950/85 hover:bg-amber-400 text-amber-400 hover:text-zinc-950 border-2 border-amber-400 shadow-xl hover:scale-110'">
+                                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-50"></span>
+                                                    <svg class="w-4 h-4 relative z-10 transition-transform duration-300"
+                                                         :class="activeHotspot === index ? 'rotate-45' : ''"
+                                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                                                    </svg>
+                                                </button>
+
+                                                <!-- Tarjeta Flotante Glassmorphism del Hotspot -->
+                                                <div x-show="activeHotspot === index"
+                                                     x-transition:enter="transition ease-out duration-200"
+                                                     x-transition:enter-start="opacity-0 scale-90 translate-y-2"
+                                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                                     x-transition:leave="transition ease-in duration-150"
+                                                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                                     x-transition:leave-end="opacity-0 scale-90 translate-y-2"
+                                                     @click.outside="if (activeHotspot === index) activeHotspot = null"
+                                                     :class="[spot.x > 46 ? 'right-0' : 'left-0', spot.y < 44 ? 'top-full mt-3' : 'bottom-full mb-3']"
+                                                     class="absolute w-56 sm:w-72 bg-zinc-950/95 backdrop-blur-xl text-white rounded-2xl p-3 sm:p-3.5 border border-amber-400/50 shadow-2xl z-30"
+                                                     style="display: none;">
+                                                    <div class="flex items-start gap-3">
+                                                        <img :src="spot.image"
+                                                             :alt="spot.name"
+                                                             :class="(spot.image || '').includes('default-') ? 'bg-white object-contain p-1' : 'object-cover'"
+                                                             class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl border border-white/15 shrink-0">
+                                                        <div class="min-w-0 flex-1">
+                                                            <span class="text-[9px] font-mono uppercase tracking-wider text-amber-400 block truncate" x-text="spot.tag"></span>
+                                                            <h5 class="font-serif font-bold text-sm text-white truncate mt-0.5" x-text="spot.name"></h5>
+                                                            <div class="flex items-baseline justify-between mt-1">
+                                                                <span class="font-mono font-bold text-xs text-amber-300" x-text="'$' + Number(spot.price).toLocaleString('es-CL') + ' / un.'"></span>
+                                                                <span class="text-[10px] font-mono text-zinc-400" x-text="'Cód: ' + spot.code"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-3 pt-2.5 border-t border-white/10 flex items-center gap-2">
+                                                        <button type="button"
+                                                                @click.stop="addItem(spot.id, spot.name, spot.price, spot.stock, spot.code, $event, spot.image)"
+                                                                class="flex-1 py-1.5 px-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-zinc-950 font-bold text-[11px] flex items-center justify-center gap-1 transition shadow">
+                                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                                            <span>Cotizar Pieza</span>
+                                                        </button>
+                                                        <button type="button"
+                                                                @click.stop="openDetail(spot); activeHotspot = null"
+                                                                class="py-1.5 px-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[11px] font-medium transition">
+                                                            Ficha
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+
+                                <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end justify-between p-4 sm:p-6 pointer-events-none">
                                     <div class="text-white">
                                         <span class="text-[10px] font-mono tracking-widest uppercase bg-black/40 backdrop-blur-sm px-2.5 py-1 rounded border border-white/20">{{ $teno['capacity'] ?: 'Montaje Premium' }}</span>
                                         <p class="text-xs sm:text-sm mt-1 text-zinc-200">{{ $teno['summary'] }}</p>
                                     </div>
+                                    @if(count($tenoSubPhotos) > 0)
+                                        <span class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-amber-300 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full border border-amber-400/30">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                                            {{ count($tenoSubPhotos) === 1 ? 'Haz clic en la foto inferior para alternar vista' : 'Haz clic en las fotos inferiores para alternar vista' }}
+                                        </span>
+                                    @endif
                                 </div>
                             </div>
 
-                            <!-- 2 Fotos Inferiores en Perspectiva -->
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
-                                    <img src="{{ $tenoPhoto1 }}" 
-                                         alt="{{ $teno['title'] }} perspectiva 1" 
-                                         class="w-full h-60 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
-                                        <span class="text-white text-xs font-medium">{{ $teno['location'] }} &bull; {{ $teno['year'] }}</span>
-                                    </div>
+                            <!-- Barra Sincronizada: Piezas del Catálogo presentes en el Lookbook (clic para resaltar punto (+) o cotizar) -->
+                            <template x-if="hotspots.length > 0">
+                                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                                    <template x-for="(spot, idx) in hotspots" :key="'chip-' + idx">
+                                        <div @mouseenter="showHotspots = true; activeHotspot = idx"
+                                             @click="showHotspots = true; activeHotspot = (activeHotspot === idx ? null : idx)"
+                                             :class="activeHotspot === idx ? 'border-amber-500 ring-2 ring-amber-500/20 bg-amber-50/50 dark:bg-amber-950/30' : 'border-zinc-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900/90 hover:border-amber-400/60'"
+                                             class="cursor-pointer rounded-xl border p-2.5 flex items-center gap-2.5 transition-all duration-200 shadow-xs">
+                                            <img :src="spot.image"
+                                                 :alt="spot.name"
+                                                 :class="(spot.image || '').includes('default-') ? 'bg-white object-contain p-1' : 'object-cover'"
+                                                 class="w-10 h-10 rounded-lg border border-zinc-200/80 dark:border-zinc-700 shrink-0">
+                                            <div class="min-w-0 flex-1">
+                                                <span class="text-[9px] font-mono uppercase tracking-wider text-amber-700 dark:text-amber-400 block truncate" x-text="'Punto ' + (idx + 1)"></span>
+                                                <p class="text-xs font-semibold text-zinc-900 dark:text-white truncate" x-text="spot.name"></p>
+                                                <span class="text-[11px] font-mono font-bold text-zinc-600 dark:text-zinc-300" x-text="'$' + Number(spot.price).toLocaleString('es-CL')"></span>
+                                            </div>
+                                            <button type="button"
+                                                    @click.stop="addItem(spot.id, spot.name, spot.price, spot.stock, spot.code, $event, spot.image)"
+                                                    title="Agregar a cotización"
+                                                    class="w-7 h-7 rounded-lg bg-zinc-900 hover:bg-amber-500 dark:bg-zinc-800 dark:hover:bg-amber-500 text-white hover:text-zinc-950 flex items-center justify-center shrink-0 transition">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                            </button>
+                                        </div>
+                                    </template>
                                 </div>
-                                <div class="relative rounded-2xl overflow-hidden shadow-md border border-zinc-200/80 dark:border-zinc-700/80 group">
-                                    <img src="{{ $tenoPhoto2 }}" 
-                                         alt="{{ $teno['title'] }} perspectiva 2" 
-                                         class="w-full h-60 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
-                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent flex items-end p-4">
-                                        <span class="text-white text-xs font-medium">{{ $teno['type'] }}</span>
-                                    </div>
+                            </template>
+
+                            <!-- Fotos Adicionales de la Galería (sin duplicados, adaptables a la cantidad real cargada) -->
+                            @if(count($tenoSubPhotos) > 0)
+                                @php
+                                    $subGridCols = match (count($tenoSubPhotos)) {
+                                        1 => 'grid-cols-1',
+                                        2 => 'grid-cols-1 sm:grid-cols-2',
+                                        3 => 'grid-cols-1 sm:grid-cols-3',
+                                        default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+                                    };
+                                    $subCaptions = [
+                                        trim(($teno['location'] ?? '') . ' • ' . ($teno['year'] ?? ''), ' •'),
+                                        $teno['type'] ?? 'Detalle del Montaje',
+                                        $teno['capacity'] ?: 'Perspectiva Adicional',
+                                        $teno['client'] ?: 'Galería del Evento',
+                                    ];
+                                @endphp
+                                <div class="grid {{ $subGridCols }} gap-4 sm:gap-6">
+                                    @foreach($tenoSubPhotos as $subIndex => $subUrl)
+                                        <div @click="swapPhoto({{ $subIndex }})"
+                                             class="card-gloss-shine cursor-pointer relative rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-zinc-200/80 dark:border-zinc-700/80 hover:border-amber-500/60 transition-all duration-300 group">
+                                            <img :src="subPhotos[{{ $subIndex }}]"
+                                                 src="{{ $subUrl }}"
+                                                 alt="{{ $teno['title'] }} perspectiva {{ $subIndex + 1 }}"
+                                                 class="w-full {{ count($tenoSubPhotos) === 1 ? 'h-64 sm:h-80' : 'h-60 sm:h-72' }} object-cover group-hover:scale-105 transition-transform duration-500 ease-out">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end justify-between p-4">
+                                                <span class="text-white text-xs font-medium">{{ $subCaptions[$subIndex] ?? ($teno['type'] ?? 'Detalle') }}</span>
+                                                <span class="text-[10px] font-mono text-amber-300 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded-full border border-white/15 opacity-80 group-hover:opacity-100 transition">Ampliar &uarr;</span>
+                                            </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 @endif
@@ -722,11 +1165,19 @@
                         </a>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @php
+                        $montajesGridCols = match (count($montajes)) {
+                            1 => 'grid-cols-1 max-w-xl mx-auto',
+                            2 => 'grid-cols-1 sm:grid-cols-2',
+                            3 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+                            default => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+                        };
+                    @endphp
+                    <div class="grid {{ $montajesGridCols }} gap-6">
                         @foreach ($montajes as $montaje)
-                            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                            <div data-reveal class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/50 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
                                 <div>
-                                    <div class="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                    <div class="card-gloss-shine relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                                         <img src="{{ $montaje['image'] }}" 
                                              alt="{{ $montaje['title'] }}" 
                                              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out">
@@ -750,7 +1201,7 @@
                                     </div>
                                 </div>
                                 <div class="p-4 sm:p-5 pt-0">
-                                    <a href="{{ route('catalog.montajes') }}" class="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition">
+                                    <a href="{{ route('catalog.montajes') }}" class="w-full py-2 px-3 rounded-xl text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 group-hover:bg-zinc-900 dark:group-hover:bg-amber-500 group-hover:text-white dark:group-hover:text-zinc-950 text-zinc-800 dark:text-zinc-200 flex items-center justify-center gap-1.5 transition-colors duration-300">
                                         <span>Ver Detalle del Montaje</span>
                                         <span>&rarr;</span>
                                     </a>
@@ -761,26 +1212,61 @@
                 </div>
             </div>
         </section>
+
+        <!-- PUENTE EDITORIAL & CINTA LUMINOSA: CONEXIÓN MONTAJES → CATÁLOGO OFICIAL -->
+        <div class="relative bg-gradient-to-b from-white via-amber-50/40 to-zinc-50 dark:from-zinc-950 dark:via-zinc-900/50 dark:to-zinc-950 pt-6 pb-8 sm:pt-8 sm:pb-10 overflow-hidden">
+            <!-- Cinta Editorial Sutil en Tonos Champagne / Neutro con Desvanecimiento Lateral -->
+            <div class="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm text-zinc-700 dark:text-zinc-300 border-y border-amber-200/70 dark:border-amber-800/30 py-3 overflow-hidden select-none"
+                 style="-webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent); mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);">
+                <div class="luxury-marquee-track items-center gap-8 text-[11px] sm:text-xs font-mono uppercase tracking-[0.2em]">
+                    @for ($m = 0; $m < 2; $m++)
+                        <div class="flex items-center gap-8 shrink-0 pr-8">
+                            <span class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Vajilla de Porcelana &amp; Gala</span>
+                            <span class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Cristalería Fina</span>
+                            <span class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Sillas Chiavari &amp; Mesas</span>
+                            <span class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Mantelería &amp; Servilletas</span>
+                            <span class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Carpas, Toldos &amp; Catering</span>
+                            <span class="flex items-center gap-2.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> ¡Nosotros Lavamos por Ti!</span>
+                        </div>
+                    @endfor
+                </div>
+            </div>
+        </div>
     @endif
 
     <!-- CONTENIDO PRINCIPAL: CATÁLOGO DE ARRIENDOS Y FILTROS -->
-    <main id="catalogo" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1 w-full">
+    <main id="catalogo" class="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 sm:pt-8 sm:pb-16 flex-1 w-full">
         
-        <div class="mb-8">
-            <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 py-1 rounded-full inline-block mb-2 font-semibold">
-                Inventario Oficial
-            </span>
-            <h2 class="font-serif text-2xl sm:text-4xl font-light text-zinc-900 dark:text-white tracking-wide">
-                Catálogo de <span class="italic font-normal text-amber-700 dark:text-amber-500">Arriendos</span>
-            </h2>
-            <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 font-light">
-                Filtra por categoría o busca por código o nombre para armar tu cotización con disponibilidad asegurada.
-            </p>
+        <div class="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 py-1 rounded-full inline-block mb-2 font-semibold">
+                    Inventario Oficial
+                </span>
+                <h2 class="font-serif text-2xl sm:text-4xl font-light text-zinc-900 dark:text-white tracking-wide">
+                    Catálogo de <span class="italic font-normal text-amber-700 dark:text-amber-500">Arriendos</span>
+                </h2>
+                <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 font-light">
+                    Elige las piezas exactas de nuestros montajes o filtra por categoría para armar tu cotización.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5">
+                <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 shadow-xs">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span><strong class="font-mono text-zinc-900 dark:text-white">{{ $categories->sum('products_count') }}</strong> artículos activos</span>
+                </span>
+                <button type="button"
+                        @click="cartOpen = true"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition shadow-xs">
+                    <span>Mi Cotización</span>
+                    <span class="font-mono font-bold px-1.5 py-0.5 rounded-full bg-white/20 dark:bg-black/15" x-text="countItems()"></span>
+                </button>
+            </div>
         </div>
 
-        <!-- Buscador Integrado con Bordes Redondeados Completos y Búsqueda en Vivo Reactiva -->
-        <div class="mb-8 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 p-3 sm:p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row justify-between items-center gap-3 relative">
-            <form method="GET" action="{{ route('catalog.index') }}#catalogo" class="flex gap-2 w-full sm:max-w-xl relative">
+        <!-- Buscador Integrado + Atajos Populares Balanceados -->
+        <div class="mb-7 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 p-3 sm:p-4 rounded-2xl shadow-sm flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-3 relative">
+            <form method="GET" action="{{ route('catalog.index') }}#catalogo" class="flex gap-2 w-full lg:flex-1 lg:max-w-2xl relative">
                 @if(request('categoria'))
                     <input type="hidden" name="categoria" value="{{ request('categoria') }}">
                 @endif
@@ -816,7 +1302,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
-                <button type="submit" class="bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 font-semibold px-6 py-2.5 rounded-full text-xs sm:text-sm transition duration-200 active:scale-95 shadow-sm shrink-0">
+                <button type="submit" class="bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 font-semibold px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm transition duration-200 active:scale-95 shadow-sm shrink-0">
                     Buscar
                 </button>
 
@@ -860,10 +1346,11 @@
                                      })">
                                     <img :src="getLiveImage(item)" 
                                          :alt="item.name" 
-                                         class="w-12 h-12 rounded-lg object-cover bg-zinc-100 dark:bg-zinc-800 shrink-0 border border-zinc-200 dark:border-zinc-700">
+                                         :class="getLiveImage(item).includes('default-') ? 'bg-white object-contain p-1' : 'object-cover bg-zinc-100 dark:bg-zinc-800'"
+                                         class="w-12 h-12 rounded-lg shrink-0 border border-zinc-200 dark:border-zinc-700">
                                     <div class="min-w-0">
                                         <p class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm truncate" x-text="item.name"></p>
-                                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono mt-0.5">
+                                        <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono mt-0.5 truncate">
                                             <span x-text="'Cód: ' + item.code"></span> &bull; 
                                             <span x-text="item.category_name"></span> &bull; 
                                             <span class="font-semibold text-zinc-800 dark:text-zinc-200" x-text="'$' + Number(item.rental_price).toLocaleString('es-CL')"></span>
@@ -874,7 +1361,7 @@
                                 <div class="flex items-center gap-2 shrink-0">
                                     <template x-if="item.stock > 0">
                                         <button type="button" 
-                                                @click="addItem(item.id, item.name, item.rental_price, item.stock, item.code)"
+                                                @click="addItem(item.id, item.name, item.rental_price, item.stock, item.code, $event, getLiveImage(item))"
                                                 class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-white text-xs font-semibold shadow-sm active:scale-95 transition">
                                             + Agregar
                                         </button>
@@ -889,15 +1376,29 @@
                 </div>
             </form>
 
-            <div x-show="activeCategory || (searchQuery && searchQuery.trim().length > 0)" 
-                 class="flex items-center gap-2 self-start sm:self-center" 
-                 style="{{ (!request('buscar') && !request('categoria')) ? 'display: none;' : '' }}">
-                <button type="button" 
-                        @click.prevent="searchQuery = ''; clearLiveSearch(); filterCategory('', '{{ route('catalog.index') }}#catalogo')" 
-                        class="group inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 px-3.5 py-2 rounded-full transition-all duration-200 cursor-pointer shadow-sm">
-                    <span>Limpiar filtros</span>
-                    <svg class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
+            <div class="flex flex-wrap items-center justify-between lg:justify-end gap-2">
+                <!-- Atajos rápidos de búsqueda popular -->
+                <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+                    <span class="text-zinc-400 dark:text-zinc-500 font-mono uppercase tracking-wider text-[10px] mr-0.5 hidden sm:inline">Populares:</span>
+                    @foreach(['Copa', 'Plato', 'Silla', 'Mantel'] as $quickTerm)
+                        <button type="button"
+                                @click="searchQuery = '{{ $quickTerm }}'; liveSearch()"
+                                class="px-2.5 py-1 rounded-full bg-zinc-100 hover:bg-amber-50 dark:bg-zinc-800 dark:hover:bg-amber-950/40 text-zinc-700 dark:text-zinc-300 hover:text-amber-800 dark:hover:text-amber-300 border border-zinc-200/80 dark:border-zinc-700 hover:border-amber-300 dark:hover:border-amber-700 transition font-medium">
+                            {{ $quickTerm }}
+                        </button>
+                    @endforeach
+                </div>
+
+                <div x-show="activeCategory || (searchQuery && searchQuery.trim().length > 0)" 
+                     class="flex items-center gap-2" 
+                     style="{{ (!request('buscar') && !request('categoria')) ? 'display: none;' : '' }}">
+                    <button type="button" 
+                            @click.prevent="searchQuery = ''; clearLiveSearch(); filterCategory('', '{{ route('catalog.index') }}#catalogo')" 
+                            class="group inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 px-3.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer shadow-sm">
+                        <span>Limpiar</span>
+                        <svg class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -947,10 +1448,34 @@
         </div>
     </main>
 
-    <!-- SECCIÓN CÓMO COTIZAR (GUÍA COMPLETA, CAJONES ELEGANTES Y MODO OSCURO) -->
-    <section id="como-cotizar" class="py-20 sm:py-24 bg-white dark:bg-zinc-950 border-t border-b border-zinc-200/80 dark:border-zinc-800 scroll-mt-16 relative overflow-hidden">
-        <!-- Decoración geométrica sutil -->
-        <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] pointer-events-none" style="background-image: radial-gradient(#18181B 1px, transparent 1px); background-size: 28px 28px;"></div>
+    <!-- SECCIÓN CÓMO COTIZAR (GUÍA COMPLETA, CAJONES ELEGANTES Y MODO OSCURO CON LUZ SPOTLIGHT INTERACTIVA) -->
+    <section id="como-cotizar"
+             x-data="{
+                 mouseX: 50,
+                 mouseY: 45,
+                 spotlightActive: false,
+                 handleMouseMove(e) {
+                     const rect = e.currentTarget.getBoundingClientRect();
+                     this.mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+                     this.mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+                     this.spotlightActive = true;
+                 }
+             }"
+             @mousemove="handleMouseMove($event)"
+             @mouseleave="spotlightActive = false"
+             class="py-20 sm:py-24 bg-white dark:bg-zinc-950 border-t border-b border-zinc-200/80 dark:border-zinc-800 scroll-mt-16 relative overflow-hidden">
+        <!-- 1. Luz Spotlight Interactiva que sigue el cursor -->
+        <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
+             :class="spotlightActive ? 'opacity-100' : 'opacity-50'"
+             :style="`background: radial-gradient(620px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.16), rgba(16, 185, 129, 0.05) 45%, transparent 75%);`">
+        </div>
+
+        <!-- 2. Orbes Flotantes de Luz Ambiental -->
+        <div class="hero-orb-1 pointer-events-none absolute -top-24 right-1/4 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-amber-400/12 dark:bg-amber-500/10 blur-3xl"></div>
+        <div class="hero-orb-2 pointer-events-none absolute -bottom-24 left-1/4 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-emerald-400/10 dark:bg-teal-500/10 blur-3xl"></div>
+
+        <!-- 3. Retícula Arquitectónica con Máscara Radial -->
+        <div class="hero-grid-mask absolute inset-0 pointer-events-none"></div>
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <!-- Encabezado Editorial Fiel al Contenido del Cliente -->
@@ -967,20 +1492,21 @@
                 </h2>
 
                 <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 font-light leading-relaxed max-w-2xl mx-auto">
-                    ¿Buscas la manera de cómo cotizar mobiliario para tu próximo evento? En <span class="font-medium text-zinc-900 dark:text-white">{{ $settings->site_name ?? 'Fiesta Rent' }}</span> te ayudamos a hacerlo fácil y rápido. Nuestro servicio incluye una amplia variedad de mobiliario para eventos, perfecto para cualquier ocasión. Ya sea que necesites sillas, mesas o decoración, nuestro equipo está listo para asistirte. Consulta cómo cotizar mobiliario con nosotros y haz de tu celebración una experiencia inolvidable.
+                    ¿Buscas la manera de cómo cotizar mobiliario para tu próximo evento? En <span class="font-medium text-zinc-900 dark:text-white">{{ $settings->site_name ?? 'Arriendos & Eventos' }}</span> te ayudamos a hacerlo fácil y rápido. Nuestro servicio incluye una amplia variedad de mobiliario para eventos, perfecto para cualquier ocasión. Ya sea que necesites sillas, mesas o decoración, nuestro equipo está listo para asistirte. Consulta cómo cotizar mobiliario con nosotros y haz de tu celebración una experiencia inolvidable.
                 </p>
             </div>
 
-            <!-- Cajones de Pasos del Proceso (5 Cajones Bonitos & Ordenados) -->
+            <!-- Cajones de Pasos del Proceso (5 Cajones Bonitos & Ordenados con Revelado y Borde Luminoso) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
                 <!-- Cajón 1: COTIZA -->
-                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                <div data-reveal class="relative overflow-hidden bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
                         <div class="flex items-center justify-between mb-5">
                             <span class="text-xs font-mono font-bold tracking-widest text-amber-700 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 px-3 py-1 rounded-full uppercase">
                                 Paso 01
                             </span>
-                            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition-transform duration-300">
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                             </div>
                         </div>
@@ -1012,13 +1538,14 @@
                 </div>
 
                 <!-- Cajón 2: ABONA -->
-                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                <div data-reveal class="relative overflow-hidden bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 hover:border-emerald-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
                         <div class="flex items-center justify-between mb-5">
                             <span class="text-xs font-mono font-bold tracking-widest text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/80 px-3 py-1 rounded-full uppercase">
                                 Paso 02
                             </span>
-                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition-transform duration-300">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                             </div>
                         </div>
@@ -1050,13 +1577,14 @@
                 </div>
 
                 <!-- Cajón 3: RECIBE -->
-                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                <div data-reveal class="relative overflow-hidden bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 hover:border-sky-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-sky-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
                         <div class="flex items-center justify-between mb-5">
                             <span class="text-xs font-mono font-bold tracking-widest text-sky-700 dark:text-sky-400 bg-sky-100/70 dark:bg-sky-950/60 border border-sky-200 dark:border-sky-800/80 px-3 py-1 rounded-full uppercase">
                                 Paso 03
                             </span>
-                            <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-500/20 group-hover:scale-110 transition-transform duration-300">
+                            <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
                             </div>
                         </div>
@@ -1092,13 +1620,14 @@
                 </div>
 
                 <!-- Cajón 4: DEVUELVE -->
-                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                <div data-reveal class="relative overflow-hidden bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 hover:border-violet-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
                         <div class="flex items-center justify-between mb-5">
                             <span class="text-xs font-mono font-bold tracking-widest text-violet-700 dark:text-violet-400 bg-violet-100/70 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800/80 px-3 py-1 rounded-full uppercase">
                                 Paso 04
                             </span>
-                            <div class="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center border border-violet-500/20 group-hover:scale-110 transition-transform duration-300">
+                            <div class="w-12 h-12 rounded-2xl bg-violet-500/10 text-violet-600 dark:text-violet-400 flex items-center justify-center border border-violet-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                             </div>
                         </div>
@@ -1130,13 +1659,14 @@
                 </div>
 
                 <!-- Cajón 5: GARANTÍA -->
-                <div class="bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                <div data-reveal class="relative overflow-hidden bg-zinc-50/80 dark:bg-zinc-900/90 rounded-3xl p-6 sm:p-8 border border-zinc-200/90 dark:border-zinc-800 hover:border-teal-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-teal-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
                         <div class="flex items-center justify-between mb-5">
                             <span class="text-xs font-mono font-bold tracking-widest text-teal-700 dark:text-teal-400 bg-teal-100/70 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/80 px-3 py-1 rounded-full uppercase">
                                 Paso 05
                             </span>
-                            <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20 group-hover:scale-110 transition-transform duration-300">
+                            <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                         </div>
@@ -1168,7 +1698,7 @@
                 </div>
 
                 <!-- Tarjeta Destacada Extra: Soporte Directo -->
-                <div class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-transparent dark:from-amber-950/30 dark:via-zinc-900 dark:to-zinc-900 rounded-3xl p-6 sm:p-8 border border-amber-300/80 dark:border-amber-700/60 shadow-sm flex flex-col justify-between">
+                <div data-reveal class="bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-transparent dark:from-amber-950/30 dark:via-zinc-900 dark:to-zinc-900 rounded-3xl p-6 sm:p-8 border border-amber-300/80 dark:border-amber-700/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
                     <div>
                         <div class="w-12 h-12 rounded-2xl bg-amber-500 text-zinc-950 flex items-center justify-center font-bold text-xl shadow-md mb-5">
                             ?
@@ -1219,7 +1749,7 @@
 
                     <div class="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
                         <a href="#catalogo" 
-                           class="inline-flex items-center justify-center gap-2.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold px-7 py-3.5 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 text-xs sm:text-sm active:scale-98">
+                           class="hero-btn-shimmer inline-flex items-center justify-center gap-2.5 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold px-7 py-3.5 rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 text-xs sm:text-sm active:scale-98">
                             <svg class="w-4 h-4 text-zinc-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                             <span>Armar Cotización Ahora</span>
                         </a>
@@ -1235,9 +1765,33 @@
         </div>
     </section>
 
-    <!-- SECCIÓN DE ENVÍOS Y LOGÍSTICA EDITORIAL -->
-    <section id="envios" class="py-20 sm:py-24 bg-zinc-100/70 dark:bg-zinc-900/60 border-t border-b border-zinc-200/80 dark:border-zinc-800 scroll-mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- SECCIÓN DE ENVÍOS Y LOGÍSTICA EDITORIAL CON LUZ SPOTLIGHT INTERACTIVA -->
+    <section id="envios"
+             x-data="{
+                 mouseX: 50,
+                 mouseY: 50,
+                 spotlightActive: false,
+                 handleMouseMove(e) {
+                     const rect = e.currentTarget.getBoundingClientRect();
+                     this.mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+                     this.mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+                     this.spotlightActive = true;
+                 }
+             }"
+             @mousemove="handleMouseMove($event)"
+             @mouseleave="spotlightActive = false"
+             class="relative overflow-hidden py-20 sm:py-24 bg-zinc-100/70 dark:bg-zinc-900/60 border-t border-b border-zinc-200/80 dark:border-zinc-800 scroll-mt-16">
+        <!-- 1. Luz Spotlight Interactiva que sigue el cursor -->
+        <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
+             :class="spotlightActive ? 'opacity-100' : 'opacity-50'"
+             :style="`background: radial-gradient(600px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.17), rgba(200, 147, 51, 0.06) 45%, transparent 75%);`">
+        </div>
+
+        <!-- 2. Orbes Flotantes de Luz Ambiental y Retícula -->
+        <div class="hero-orb-2 pointer-events-none absolute -top-24 left-1/3 w-80 h-80 rounded-full bg-amber-400/12 dark:bg-amber-500/10 blur-3xl"></div>
+        <div class="hero-grid-mask absolute inset-0 pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <span class="text-[10px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-amber-800 dark:text-amber-400 bg-amber-100/70 dark:bg-amber-950/40 px-3 py-1 rounded-full border border-amber-200/80 dark:border-amber-800/60 inline-block mb-3">
                     Logística & Cobertura
@@ -1252,13 +1806,14 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Tarjeta 1: Tarifa por Comuna y Volumen -->
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                <div data-reveal class="group relative overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 hover:border-amber-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
                         </div>
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1">01. Tarifa & Volumen</span>
-                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mb-2.5">Flete por Zona y Capacidad</h3>
+                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors mb-2.5">Flete por Zona y Capacidad</h3>
                         <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
                             {{ $settings->shipping_zones_info ?? 'Despachamos a todas las comunas del Gran Santiago y alrededores. La tarifa se cotiza según volumen del pedido y distancia desde nuestra bodega.' }}
                         </p>
@@ -1270,13 +1825,14 @@
                 </div>
 
                 <!-- Tarjeta 2: Condiciones de Descarga -->
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                <div data-reveal class="group relative overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 hover:border-amber-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1">02. Descarga</span>
-                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mb-2.5">Acceso y Primer Piso</h3>
+                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors mb-2.5">Acceso y Primer Piso</h3>
                         <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
                             {{ $settings->shipping_unload_rules ?? 'Entrega y retiro a nivel de calle o primer piso (máximo 20 metros desde el camión). Escaleras o montacargas deben informarse previamente.' }}
                         </p>
@@ -1288,13 +1844,14 @@
                 </div>
 
                 <!-- Tarjeta 3: Instalación Técnica Obligatoria -->
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                <div data-reveal class="group relative overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 hover:border-amber-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                         </div>
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1">03. Montaje</span>
-                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mb-2.5">Instalación Certificada</h3>
+                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors mb-2.5">Instalación Certificada</h3>
                         <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
                             {{ $settings->shipping_setup_rules ?? 'Carpas estructurales y equipamiento gastronómico a gas son montados exclusivamente por nuestro personal técnico especializado.' }}
                         </p>
@@ -1306,13 +1863,14 @@
                 </div>
 
                 <!-- Tarjeta 4: Recepción y Retiro con Guía -->
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                <div data-reveal class="group relative overflow-hidden bg-white dark:bg-zinc-900 rounded-3xl p-6 sm:p-7 border border-zinc-200/80 dark:border-zinc-800 hover:border-amber-500/60 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between">
+                    <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div>
-                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/60 text-amber-800 dark:text-amber-400 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                         </div>
                         <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1">04. Coordinación</span>
-                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white mb-2.5">Conteo en Terreno</h3>
+                        <h3 class="font-serif text-lg sm:text-xl font-bold text-zinc-900 dark:text-white group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors mb-2.5">Conteo en Terreno</h3>
                         <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 font-light leading-relaxed">
                             {{ $settings->shipping_schedule_rules ?? 'Conteo conjunto al entregar y retirar el día hábil posterior al evento mediante guía foliada y firma responsable.' }}
                         </p>
@@ -1382,9 +1940,34 @@
         </div>
     </section>
 
-    <!-- ZONA DE CONTACTO COMPLETA -->
-    <section id="contacto" class="py-20 sm:py-24 bg-white dark:bg-zinc-950 border-t border-zinc-200/80 dark:border-zinc-800 scroll-mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- ZONA DE CONTACTO COMPLETA CON LUZ SPOTLIGHT INTERACTIVA -->
+    <section id="contacto"
+             x-data="{
+                 mouseX: 50,
+                 mouseY: 45,
+                 spotlightActive: false,
+                 handleMouseMove(e) {
+                     const rect = e.currentTarget.getBoundingClientRect();
+                     this.mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+                     this.mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+                     this.spotlightActive = true;
+                 }
+             }"
+             @mousemove="handleMouseMove($event)"
+             @mouseleave="spotlightActive = false"
+             class="relative overflow-hidden py-20 sm:py-24 bg-white dark:bg-zinc-950 border-t border-zinc-200/80 dark:border-zinc-800 scroll-mt-16">
+        <!-- 1. Luz Spotlight Interactiva que sigue el cursor -->
+        <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
+             :class="spotlightActive ? 'opacity-100' : 'opacity-50'"
+             :style="`background: radial-gradient(640px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.16), rgba(16, 185, 129, 0.06) 45%, transparent 75%);`">
+        </div>
+
+        <!-- 2. Orbes Flotantes de Luz Ambiental y Retícula -->
+        <div class="hero-orb-1 pointer-events-none absolute -top-24 left-1/4 w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-amber-400/12 dark:bg-amber-500/10 blur-3xl"></div>
+        <div class="hero-orb-2 pointer-events-none absolute -bottom-24 right-1/4 w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-emerald-400/10 dark:bg-emerald-500/10 blur-3xl"></div>
+        <div class="hero-grid-mask absolute inset-0 pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             
             <div class="text-center max-w-3xl mx-auto mb-16">
                 <span class="text-[10px] sm:text-xs font-mono font-semibold uppercase tracking-widest text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-3 py-1 rounded-full border border-amber-200 dark:border-amber-800/60 inline-block mb-3">
@@ -1624,43 +2207,53 @@
         </div>
     </section>
 
-    <!-- FOOTER BOUTIQUE LUXURY (Blanco Puro + Modo Oscuro Obsidian) -->
-    <footer class="bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 mt-20 py-14 text-zinc-600 dark:text-zinc-400">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <!-- FOOTER BOUTIQUE LUXURY (Spotlight Reactivo + Subrayado Magnético + Marca de Agua Editorial Gigante) -->
+    <footer x-data="{
+                mouseX: 50,
+                mouseY: 50,
+                spotlightActive: false,
+                handleMouseMove(e) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    this.mouseX = ((e.clientX - rect.left) / rect.width) * 100;
+                    this.mouseY = ((e.clientY - rect.top) / rect.height) * 100;
+                    this.spotlightActive = true;
+                }
+            }"
+            @mousemove="handleMouseMove($event)"
+            @mouseleave="spotlightActive = false"
+            class="relative overflow-hidden bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 mt-20 pt-16 pb-10 text-zinc-600 dark:text-zinc-400">
+        <!-- Haz de luz viajero en el borde superior del Footer -->
+        <div class="absolute inset-x-0 top-0 h-[2px] bg-zinc-100 dark:bg-zinc-900 overflow-hidden">
+            <div class="hero-step-beam"></div>
+        </div>
+
+        <!-- Luz Spotlight Interactiva que sigue el cursor en el Footer -->
+        <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
+             :class="spotlightActive ? 'opacity-100' : 'opacity-40'"
+             :style="`background: radial-gradient(560px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.14), rgba(16, 185, 129, 0.05) 45%, transparent 75%);`">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Columna 1: Marca & Lema -->
                 <div class="md:col-span-2 space-y-4">
-                    <div class="flex items-center gap-3">
-                        @if(!empty($settings?->logo_path))
-                            <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="{{ $settings->site_name ?? 'Logo' }}" class="w-10 h-10 rounded-xl object-cover shadow border border-zinc-200 dark:border-zinc-800">
-                        @else
-                            <div class="w-10 h-10 rounded-xl bg-zinc-900 dark:bg-zinc-800 text-zinc-100 flex items-center justify-center font-serif text-xl font-bold shadow border border-zinc-800 dark:border-zinc-700">
-                                {{ mb_substr($settings->site_name ?? 'A', 0, 1) }}
-                            </div>
-                        @endif
-                        <div>
-                            <span class="font-serif text-lg font-bold tracking-wider text-zinc-900 dark:text-white uppercase block">
-                                {{ $settings->site_name ?? 'Arriendos & Eventos' }}
-                            </span>
-                            <span class="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
-                                {{ $settings->company_legal_info ?? 'Menaje & Banquetería de Alta Gala' }}
-                            </span>
-                        </div>
-                    </div>
+                    <a href="{{ route('catalog.index') }}" class="inline-block group focus:outline-none">
+                        <x-brand-logo variant="footer" :settings="$settings" />
+                    </a>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-md">
-                        {{ $settings->site_tagline ?? 'Boutique especializada en arriendo de vajilla, copas de cristal, mantelería fina y mobiliario premium para eventos inolvidables.' }}
+                        {{ $settings->site_tagline ?? 'Productora de eventos con servicios integrales: catering, mobiliario, mesas, sillas, carpas y toldos para celebraciones inolvidables.' }}
                     </p>
                     
                     <!-- Teléfonos directos dinámicos en Footer -->
                     <div class="flex flex-wrap items-center gap-4 text-xs font-mono pt-1">
                         @if(!empty($settings?->company_phone))
-                            <a href="tel:{{ $settings->cleanTelPhone() }}" class="inline-flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-400 transition">
+                            <a href="tel:{{ $settings->cleanTelPhone() }}" class="footer-link-magnetic inline-flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-400 transition">
                                 <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                                 <span>{{ $settings->company_phone }}</span>
                             </a>
                         @endif
                         @if(!empty($settings?->whatsapp_phone))
-                            <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-semibold transition">
+                            <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" target="_blank" rel="noopener noreferrer" class="footer-link-magnetic inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 font-semibold transition">
                                 <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.529 1.831.812 2.791.812 3.179 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.768-5.768-5.768zm9.969 5.768c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.819-1.242l-5.181 1.356 1.381-5.048c-.902-1.492-1.381-3.21-1.381-5.066 0-5.518 4.482-10 10-10s10 4.482 10 10z"/></svg>
                                 <span>WhatsApp: {{ $settings->whatsapp_phone }}</span>
                             </a>
@@ -1668,41 +2261,41 @@
                     </div>
                 </div>
 
-                <!-- Columna 2: Navegación Rápida Destacando FAQ -->
+                <!-- Columna 2: Navegación Rápida con Subrayado Magnético Destacando FAQ -->
                 <div>
                     <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white mb-4">
                         Navegación
                     </h5>
                     <ul class="space-y-2.5 text-xs">
                         <li>
-                            <a href="#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition">
+                            <a href="#catalogo" class="footer-link-magnetic hover:text-zinc-900 dark:hover:text-white transition">
                                 Catálogo de Productos
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('catalog.montajes') }}" class="hover:text-zinc-900 dark:hover:text-white transition font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                            <a href="{{ route('catalog.montajes') }}" class="footer-link-magnetic hover:text-zinc-900 dark:hover:text-white transition font-semibold text-amber-700 dark:text-amber-400 inline-flex items-center gap-1.5">
                                 <span>Montajes & Puesta en Escena</span>
                                 <span class="text-[9px] font-mono uppercase bg-amber-500/10 px-1 py-0.2 rounded border border-amber-500/30">Nuevo</span>
                             </a>
                         </li>
                         <li>
-                            <a href="#como-cotizar" class="hover:text-zinc-900 dark:hover:text-white transition">
+                            <a href="#como-cotizar" class="footer-link-magnetic hover:text-zinc-900 dark:hover:text-white transition">
                                 Cómo Cotizar Mobiliario
                             </a>
                         </li>
                         <li>
-                            <a href="#envios" class="hover:text-zinc-900 dark:hover:text-white transition">
+                            <a href="#envios" class="footer-link-magnetic hover:text-zinc-900 dark:hover:text-white transition">
                                 Políticas de Despacho & Envíos
                             </a>
                         </li>
                         <li>
-                            <a href="#contacto" class="hover:text-zinc-900 dark:hover:text-white transition">
+                            <a href="#contacto" class="footer-link-magnetic hover:text-zinc-900 dark:hover:text-white transition">
                                 Contacto & Bodega
                             </a>
                         </li>
                         <li class="pt-1.5">
                             <a href="#preguntas-frecuentes" 
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-400 font-bold border border-amber-200/80 dark:border-amber-800/60 transition-all shadow-sm">
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-400 font-bold border border-amber-200/80 dark:border-amber-800/60 hover:-translate-y-0.5 transition-all shadow-sm">
                                 <svg class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
@@ -1712,47 +2305,65 @@
                     </ul>
                 </div>
 
-                <!-- Columna 3: Redes & Atención -->
-                <div>
-                    <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white mb-4">
-                        Síguenos
-                    </h5>
-                    <div class="flex items-center gap-2.5 mb-4">
-                        @if(!empty($settings?->instagram_url))
-                            <a href="{{ $settings->instagram_url }}" target="_blank" rel="noopener noreferrer" 
-                               title="Instagram"
-                               class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-white transition-all flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                <!-- Columna 3: Redes, Atención & Botón Magnético Volver Arriba -->
+                <div class="flex flex-col justify-between">
+                    <div>
+                        <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white mb-4">
+                            Síguenos
+                        </h5>
+                        <div class="flex items-center gap-2.5 mb-4">
+                            @if(!empty($settings?->instagram_url))
+                                <a href="{{ $settings->instagram_url }}" target="_blank" rel="noopener noreferrer" 
+                                   title="Instagram"
+                                   class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                                </a>
+                            @endif
+                            @if(!empty($settings?->facebook_url))
+                                <a href="{{ $settings->facebook_url }}" target="_blank" rel="noopener noreferrer" 
+                                   title="Facebook"
+                                   class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.595 0 9 1.583 9 4.615V8z"/></svg>
+                                </a>
+                            @endif
+                            @if(!empty($settings?->tiktok_url))
+                                <a href="{{ $settings->tiktok_url }}" target="_blank" rel="noopener noreferrer" 
+                                   title="TikTok"
+                                   class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 00-1-.08A6.34 6.34 0 003 15.66a6.34 6.34 0 0010.86 4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-.04-4.52z"/></svg>
+                                </a>
+                            @endif
+                            <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" target="_blank" rel="noopener noreferrer" 
+                               title="WhatsApp"
+                               class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-800 dark:text-emerald-300 hover:text-white hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.529 1.831.812 2.791.812 3.179 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.768-5.768-5.768zm9.969 5.768c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.819-1.242l-5.181 1.356 1.381-5.048c-.902-1.492-1.381-3.21-1.381-5.066 0-5.518 4.482-10 10-10s10 4.482 10 10z"/></svg>
                             </a>
-                        @endif
-                        @if(!empty($settings?->facebook_url))
-                            <a href="{{ $settings->facebook_url }}" target="_blank" rel="noopener noreferrer" 
-                               title="Facebook"
-                               class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-white transition-all flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.595 0 9 1.583 9 4.615V8z"/></svg>
-                            </a>
-                        @endif
-                        @if(!empty($settings?->tiktok_url))
-                            <a href="{{ $settings->tiktok_url }}" target="_blank" rel="noopener noreferrer" 
-                               title="TikTok"
-                               class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 hover:text-white transition-all flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 00-1-.08A6.34 6.34 0 003 15.66a6.34 6.34 0 0010.86 4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-.04-4.52z"/></svg>
-                            </a>
-                        @endif
-                        <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" target="_blank" rel="noopener noreferrer" 
-                           title="WhatsApp"
-                           class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-800 dark:text-emerald-300 hover:text-white transition-all flex items-center justify-center border border-emerald-200 dark:border-emerald-800">
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.529 1.831.812 2.791.812 3.179 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.768-5.768-5.768zm9.969 5.768c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.819-1.242l-5.181 1.356 1.381-5.048c-.902-1.492-1.381-3.21-1.381-5.066 0-5.518 4.482-10 10-10s10 4.482 10 10z"/></svg>
-                        </a>
+                        </div>
+                        <p class="text-[11px] text-zinc-400 dark:text-zinc-500">
+                            Atención personalizada para cotizaciones corporativas y bodas.
+                        </p>
                     </div>
-                    <p class="text-[11px] text-zinc-400 dark:text-zinc-500">
-                        Atención personalizada para cotizaciones corporativas y bodas.
-                    </p>
+
+                    <div class="pt-4">
+                        <button type="button"
+                                @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+                                class="group inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-600 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-400 bg-zinc-100/80 dark:bg-zinc-900 hover:bg-white dark:hover:bg-zinc-800 px-3.5 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 hover:border-amber-500/50 shadow-sm hover:-translate-y-0.5 transition-all duration-300">
+                            <span>Volver arriba</span>
+                            <svg class="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marca de Agua Tipográfica Monumental (Luxury Editorial Watermark) -->
+            <div class="pt-4 select-none pointer-events-none overflow-hidden text-center">
+                <div class="font-serif font-bold uppercase tracking-[0.16em] text-3xl sm:text-6xl md:text-7xl lg:text-8xl leading-none bg-gradient-to-r from-zinc-200/70 via-amber-500/25 to-zinc-200/70 dark:from-zinc-800/70 dark:via-amber-400/25 dark:to-zinc-800/70 bg-clip-text text-transparent transition-all duration-500">
+                    {{ $settings->site_name ?? 'Arriendos & Eventos' }}
                 </div>
             </div>
 
             <!-- Copyright -->
-            <div class="pt-6 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500 font-mono gap-2">
+            <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between text-[11px] text-zinc-400 dark:text-zinc-500 font-mono gap-2">
                 <p>&copy; {{ date('Y') }} {{ $settings->site_name ?? 'Arriendos & Eventos' }}. Todos los derechos reservados.</p>
                 <p>Menaje & Banquetería de Alta Gala &bull; Santiago, Chile</p>
             </div>
@@ -1782,10 +2393,10 @@
                  x-transition:leave="ease-in duration-200"
                  x-transition:leave-start="opacity-100 scale-100"
                  x-transition:leave-end="opacity-0 scale-95"
-                 class="inline-block w-full max-w-3xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 text-left align-middle transition-all transform rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden relative z-10">
+                 class="inline-block w-full max-w-3xl max-h-[90dvh] overflow-y-auto bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 text-left align-middle transition-all transform rounded-3xl shadow-2xl border border-zinc-200 dark:border-zinc-800 relative z-10">
                 
                 <!-- Encabezado del Modal -->
-                <div class="p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50/70 dark:bg-zinc-900/70">
+                <div class="p-5 sm:p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50/70 dark:bg-zinc-900/70 sticky top-0 z-10 backdrop-blur-md">
                     <div>
                         <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-0.5 rounded border border-amber-200 dark:border-amber-800/60 font-semibold">
                             Ficha de Colección
@@ -1800,13 +2411,15 @@
                     </button>
                 </div>
 
-                <div class="p-6 sm:p-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div class="p-5 sm:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-start">
                         <!-- Fotografía del Producto -->
-                        <div class="rounded-2xl bg-zinc-100 dark:bg-zinc-800/60 p-2 border border-zinc-200/80 dark:border-zinc-700/60 overflow-hidden relative group">
+                        <div :class="(detailModal.product?.image || '').includes('default-') ? 'bg-white' : 'bg-zinc-100 dark:bg-zinc-800/60'"
+                             class="rounded-2xl p-2 border border-zinc-200/80 dark:border-zinc-700/60 overflow-hidden relative group">
                             <img :src="detailModal.product?.image" 
                                  :alt="detailModal.product?.name" 
-                                 class="w-full h-72 object-cover rounded-xl shadow-inner">
+                                 :class="(detailModal.product?.image || '').includes('default-') ? 'object-contain p-3 bg-white' : 'object-cover shadow-inner'"
+                                 class="w-full h-64 sm:h-72 rounded-xl">
                             <span class="absolute top-4 left-4 backdrop-blur-md bg-white/90 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-100 text-xs font-mono font-medium px-3 py-1 rounded shadow-sm border border-zinc-200 dark:border-zinc-700" 
                                   x-text="'Cód: ' + detailModal.product?.code"></span>
                             <template x-if="detailModal.product?.is_sale">
@@ -1866,20 +2479,20 @@
 
                                 <!-- Botón de Agregar -->
                                 <div class="mt-6" x-data="{ modalAdded: false }">
-                                    <button @click="addDetailToCart(); modalAdded = true; setTimeout(() => modalAdded = false, 1200)" 
+                                    <button @click="addDetailToCart($event); modalAdded = true; setTimeout(() => modalAdded = false, 1200)" 
                                             :disabled="!detailModal.product || detailModal.product.stock <= 0"
                                             :class="modalAdded ? 'bg-emerald-600 text-white' : 'bg-zinc-900 dark:bg-amber-600 hover:bg-zinc-800 dark:hover:bg-amber-500 text-white'"
                                             class="w-full uppercase tracking-wider py-3.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 shadow-md active:scale-98 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-600 disabled:cursor-not-allowed">
                                         <template x-if="!modalAdded">
                                             <span class="flex items-center gap-2">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                                <span>+ Agregar a la Cotización</span>
+                                                <span>Agregar a la Cotización</span>
                                             </span>
                                         </template>
                                         <template x-if="modalAdded">
                                             <span class="flex items-center gap-2 font-bold">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                                <span>✓ ¡Agregado a tu Lista!</span>
+                                                <span>¡Agregado a tu Lista!</span>
                                             </span>
                                         </template>
                                     </button>
@@ -1944,116 +2557,127 @@
              x-transition:leave="transform transition ease-in duration-200"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="translate-x-full"
-             class="fixed inset-y-0 right-0 max-w-md w-full bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl flex flex-col justify-between z-50">
+             class="fixed inset-y-0 right-0 max-w-md w-full h-[100dvh] bg-white dark:bg-zinc-900 border-l border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 shadow-2xl flex flex-col justify-between z-50">
             
             <!-- Header del Drawer -->
-            <div class="p-5 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50/70 dark:bg-zinc-900/80">
+            <div class="p-4 sm:p-5 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50/70 dark:bg-zinc-900/80 shrink-0">
                 <div>
-                    <h2 class="font-serif font-bold text-2xl text-zinc-900 dark:text-white tracking-wide">Tu Cotización</h2>
+                    <h2 class="font-serif font-bold text-xl sm:text-2xl text-zinc-900 dark:text-white tracking-wide">Tu Cotización</h2>
                     <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Revisa tus artículos antes de consultar disponibilidad</p>
                 </div>
-                <button @click="cartOpen = false" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition text-2xl font-light">
+                <button @click="cartOpen = false" aria-label="Cerrar cotización" class="text-zinc-400 hover:text-zinc-900 dark:hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition text-2xl font-light">
                     &times;
                 </button>
             </div>
 
-            <!-- Alerta de Error si aplica -->
-            <template x-if="errorMessage">
-                <div class="mx-5 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs rounded-xl flex items-start gap-2 shadow-sm">
-                    <svg class="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                    <span x-text="errorMessage"></span>
-                </div>
-            </template>
-
-            <!-- Listado de Artículos -->
-            <div class="p-5 overflow-y-auto flex-1 space-y-3.5 divide-y divide-zinc-100 dark:divide-zinc-800">
-                <template x-if="cart.length === 0">
-                    <div class="text-center py-20 text-zinc-400 dark:text-zinc-500">
-                        <svg class="w-12 h-12 mx-auto stroke-zinc-300 dark:stroke-zinc-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                        <p class="font-serif text-xl font-medium text-zinc-700 dark:text-zinc-300">Tu lista está vacía</p>
-                        <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xs mx-auto">Explora nuestro catálogo y agrega mobiliario o vajilla para comenzar.</p>
-                    </div>
-                </template>
-
-                <template x-for="item in cart" :key="item.id">
-                    <div class="pt-3.5 first:pt-0 flex items-start justify-between text-sm gap-3">
-                        <div class="flex-1">
-                            <p class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm leading-snug" x-text="item.name"></p>
-                            <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono mt-0.5" x-text="'Cód: ' + item.code + ' • $' + item.price.toLocaleString('es-CL') + ' c/u'"></p>
-                            
-                            <div class="flex items-center gap-2 mt-2.5">
-                                <button @click="updateQty(item.id, -1)" 
-                                        class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 text-zinc-800 dark:text-zinc-200 font-bold flex items-center justify-center transition border border-zinc-200 dark:border-zinc-700 text-xs">
-                                    -
-                                </button>
-                                <span class="text-xs font-mono font-bold px-1 min-w-[1.5rem] text-center text-zinc-900 dark:text-white" x-text="item.qty"></span>
-                                <button @click="updateQty(item.id, 1)" 
-                                        class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 text-zinc-800 dark:text-zinc-200 font-bold flex items-center justify-center transition border border-zinc-200 dark:border-zinc-700 text-xs">
-                                    +
-                                </button>
-                                <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono" x-text="'(Máx: ' + item.stock + ')'"></span>
-                            </div>
-                        </div>
-
-                        <div class="text-right flex flex-col justify-between items-end">
-                            <p class="font-bold text-zinc-900 dark:text-white text-sm font-mono" x-text="'$' + (item.price * item.qty).toLocaleString('es-CL')"></p>
-                            <button @click="removeItem(item.id)" class="text-[11px] text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 hover:underline mt-2.5 transition">
-                                Quitar
-                            </button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-
-            <!-- Resumen y Formulario para Solicitud por WhatsApp -->
-            <div class="p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/80 space-y-4">
-                <div class="bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 p-4 rounded-xl space-y-2 shadow-sm">
-                    <div class="flex justify-between items-center text-xs text-zinc-500 dark:text-zinc-400">
-                        <span>Total de artículos:</span>
-                        <span class="font-semibold text-zinc-800 dark:text-zinc-200 font-mono" x-text="countItems() + ' unidades'"></span>
-                    </div>
-                    <div class="flex justify-between items-center text-sm font-bold text-zinc-900 dark:text-white pt-2.5 border-t border-zinc-100 dark:border-zinc-700">
-                        <span>Total Estimado:</span>
-                        <span class="text-2xl font-bold font-mono text-zinc-900 dark:text-white" x-text="'$' + getTotal().toLocaleString('es-CL')"></span>
-                    </div>
-                </div>
-
-                <div class="space-y-3 pt-1 text-xs">
-                    <label class="block font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[10px]">Datos para la reserva:</label>
-                    <div>
-                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px] mb-1">Nombre y Apellido *</label>
-                        <input type="text" x-model="form.name" placeholder="Tu Nombre y Apellido *" 
-                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
-                    </div>
-                    <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px]">Fecha del Evento <span class="text-zinc-400 font-normal">(opcional)</span></label>
-                            <span class="text-[10px] text-zinc-400 dark:text-zinc-500">Mínimo hoy</span>
-                        </div>
-                        <input type="date" 
-                               x-model="form.date" 
-                               min="{{ now()->format('Y-m-d') }}"
-                               max="{{ now()->addYears(2)->format('Y-m-d') }}"
-                               :min="minDate"
-                               :max="maxDate"
-                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
-                    </div>
-                    <div>
-                        <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px] mb-1">Comuna o Lugar del Evento *</label>
-                        <input type="text" x-model="form.location" placeholder="Comuna / Lugar del Evento *" 
-                               class="w-full p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
-                    </div>
-                </div>
-
-                <!-- Alerta de Error visible en el pie del carrito -->
+            <!-- Cuerpo Scrolleable Unificado (Artículos + Formulario de Reserva cómodos en móvil) -->
+            <div class="flex-1 overflow-y-auto flex flex-col justify-between">
+                <!-- Alerta de Error si aplica -->
                 <template x-if="errorMessage">
-                    <div class="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs rounded-xl flex items-start gap-2 shadow-sm animate-pulse">
+                    <div class="mx-4 sm:mx-5 mt-4 p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs rounded-xl flex items-start gap-2 shadow-sm">
                         <svg class="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                         <span x-text="errorMessage"></span>
                     </div>
                 </template>
 
-                <!-- Botón de Envío POST a route('quote.store') y Apertura de WhatsApp -->
+                <!-- Listado de Artículos -->
+                <div class="p-4 sm:p-5 space-y-3.5 divide-y divide-zinc-100 dark:divide-zinc-800">
+                    <template x-if="cart.length === 0">
+                        <div class="text-center py-12 sm:py-16 text-zinc-400 dark:text-zinc-500">
+                            <svg class="w-12 h-12 mx-auto stroke-zinc-300 dark:stroke-zinc-700 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                            <p class="font-serif text-xl font-medium text-zinc-700 dark:text-zinc-300">Tu lista está vacía</p>
+                            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-xs mx-auto">Explora nuestro catálogo y agrega mobiliario o vajilla para comenzar.</p>
+                        </div>
+                    </template>
+
+                    <template x-for="item in cart" :key="item.id">
+                        <div class="pt-3.5 first:pt-0 flex items-start justify-between text-sm gap-3">
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-zinc-900 dark:text-white text-xs sm:text-sm leading-snug" x-text="item.name"></p>
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono mt-0.5" x-text="'Cód: ' + item.code + ' • $' + item.price.toLocaleString('es-CL') + ' c/u'"></p>
+                                
+                                <div class="flex items-center gap-2 mt-2.5">
+                                    <button @click="updateQty(item.id, -1)" 
+                                            class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 text-zinc-800 dark:text-zinc-200 font-bold flex items-center justify-center transition border border-zinc-200 dark:border-zinc-700 text-xs">
+                                        -
+                                    </button>
+                                    <span class="text-xs font-mono font-bold px-1 min-w-[1.5rem] text-center text-zinc-900 dark:text-white" x-text="item.qty"></span>
+                                    <button @click="updateQty(item.id, 1)" 
+                                            class="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 text-zinc-800 dark:text-zinc-200 font-bold flex items-center justify-center transition border border-zinc-200 dark:border-zinc-700 text-xs">
+                                        +
+                                    </button>
+                                    <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono" x-text="'(Máx: ' + item.stock + ')'"></span>
+                                </div>
+                            </div>
+
+                            <div class="text-right flex flex-col justify-between items-end shrink-0">
+                                <p class="font-bold text-zinc-900 dark:text-white text-sm font-mono" x-text="'$' + (item.price * item.qty).toLocaleString('es-CL')"></p>
+                                <button @click="removeItem(item.id)" class="text-[11px] text-rose-600 dark:text-rose-400 hover:text-rose-800 dark:hover:text-rose-300 hover:underline mt-2.5 transition">
+                                    Quitar
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Resumen y Datos del Evento -->
+                <div class="p-4 sm:p-5 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/80 space-y-4">
+                    <div class="bg-white dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 p-3.5 sm:p-4 rounded-xl space-y-2 shadow-sm">
+                        <div class="flex justify-between items-center text-xs text-zinc-500 dark:text-zinc-400">
+                            <span>Total de artículos:</span>
+                            <span class="font-semibold text-zinc-800 dark:text-zinc-200 font-mono" x-text="countItems() + ' unidades'"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm font-bold text-zinc-900 dark:text-white pt-2.5 border-t border-zinc-100 dark:border-zinc-700">
+                            <span>Total Estimado:</span>
+                            <span class="text-xl sm:text-2xl font-bold font-mono text-zinc-900 dark:text-white" x-text="'$' + getTotal().toLocaleString('es-CL')"></span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 pt-1 text-xs">
+                        <!-- Campo Honeypot Oculto anti-bots -->
+                        <div class="hidden" aria-hidden="true" style="display: none !important;">
+                            <label for="quote_website_hp">Website</label>
+                            <input type="text" id="quote_website_hp" name="website_hp" x-model="form.website_hp" tabindex="-1" autocomplete="off">
+                        </div>
+
+                        <label class="block font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider text-[10px]">Datos para la reserva:</label>
+                        <div>
+                            <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px] mb-1">Nombre y Apellido *</label>
+                            <input type="text" x-model="form.name" placeholder="Tu Nombre y Apellido *" 
+                                   class="w-full p-2.5 sm:p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px]">Fecha del Evento <span class="text-zinc-400 font-normal">(opcional)</span></label>
+                                <span class="text-[10px] text-zinc-400 dark:text-zinc-500">Mínimo hoy</span>
+                            </div>
+                            <input type="date" 
+                                   x-model="form.date" 
+                                   min="{{ now()->format('Y-m-d') }}"
+                                   max="{{ now()->addYears(2)->format('Y-m-d') }}"
+                                   :min="minDate"
+                                   :max="maxDate"
+                                   class="w-full p-2.5 sm:p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-zinc-700 dark:text-zinc-300 text-[11px] mb-1">Comuna o Lugar del Evento *</label>
+                            <input type="text" x-model="form.location" placeholder="Comuna / Lugar del Evento *" 
+                                   class="w-full p-2.5 sm:p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-600 transition shadow-sm">
+                        </div>
+                    </div>
+
+                    <!-- Alerta de Error visible en el pie del carrito -->
+                    <template x-if="errorMessage">
+                        <div class="p-3 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-700 dark:text-rose-300 text-xs rounded-xl flex items-start gap-2 shadow-sm animate-pulse">
+                            <svg class="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <span x-text="errorMessage"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Pie Fijo CTA WhatsApp siempre visible en móvil -->
+            <div class="p-4 sm:p-5 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
                 <button @click="submitQuote()" 
                         :disabled="isSubmitting || cart.length === 0"
                         class="w-full bg-emerald-700 hover:bg-emerald-800 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 dark:disabled:text-zinc-600 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all duration-200 shadow-md active:scale-98">
@@ -2178,6 +2802,16 @@
                 categoryCache: {},
 
                 init() {
+                    // Abrir el cajón de cotización si el cliente llega desde otra vista (ej: /como-cotizar)
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.get('abrir_cotizacion') === '1') {
+                        this.cartOpen = true;
+                        params.delete('abrir_cotizacion');
+                        const cleanQuery = params.toString();
+                        const cleanUrl = window.location.pathname + (cleanQuery ? '?' + cleanQuery : '') + window.location.hash;
+                        window.history.replaceState({}, '', cleanUrl);
+                    }
+
                     // Interceptar clics en la paginación dentro del contenedor del catálogo
                     document.addEventListener('click', (e) => {
                         const pageLink = e.target.closest('#products-grid-container .custom-pagination a, #products-grid-container nav a');
@@ -2339,7 +2973,7 @@
                 },
 
                 cart: JSON.parse(localStorage.getItem('cotizacion_arriendo') || '[]'),
-                form: JSON.parse(localStorage.getItem('cotizacion_form') || '{"name":"","date":"","location":""}'),
+                form: Object.assign({ name: '', date: '', location: '', website_hp: '' }, JSON.parse(localStorage.getItem('cotizacion_form') || '{}')),
 
                 save() {
                     localStorage.setItem('cotizacion_arriendo', JSON.stringify(this.cart));
@@ -2386,7 +3020,66 @@
                     }
                 },
 
-                addDetailToCart() {
+                flyToCart(evt, imageUrl) {
+                    try {
+                        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                        const cartBtn = document.getElementById('open-quote-drawer-btn');
+                        if (!cartBtn) return;
+
+                        const targetRect = cartBtn.getBoundingClientRect();
+                        let startX = window.innerWidth / 2;
+                        let startY = window.innerHeight / 2;
+
+                        if (evt && evt.currentTarget) {
+                            const srcRect = evt.currentTarget.getBoundingClientRect();
+                            startX = srcRect.left + srcRect.width / 2;
+                            startY = srcRect.top + srcRect.height / 2;
+                        } else if (evt && evt.clientX) {
+                            startX = evt.clientX;
+                            startY = evt.clientY;
+                        }
+
+                        const flyer = document.createElement('div');
+                        flyer.style.position = 'fixed';
+                        flyer.style.left = (startX - 26) + 'px';
+                        flyer.style.top = (startY - 26) + 'px';
+                        flyer.style.width = '52px';
+                        flyer.style.height = '52px';
+                        flyer.style.borderRadius = '9999px';
+                        flyer.style.zIndex = '9999';
+                        flyer.style.pointerEvents = 'none';
+                        flyer.style.border = '2px solid #EAB759';
+                        flyer.style.boxShadow = '0 14px 30px rgba(234, 183, 89, 0.45)';
+                        flyer.style.backgroundColor = '#18181B';
+                        flyer.style.backgroundSize = 'cover';
+                        flyer.style.backgroundPosition = 'center';
+                        if (imageUrl) {
+                            flyer.style.backgroundImage = `url("${imageUrl}")`;
+                        }
+                        flyer.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s ease-in';
+
+                        document.body.appendChild(flyer);
+
+                        const deltaX = (targetRect.left + targetRect.width / 2) - startX;
+                        const deltaY = (targetRect.top + targetRect.height / 2) - startY;
+
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                flyer.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0) scale(0.22) rotate(12deg)`;
+                                flyer.style.opacity = '0.25';
+                            });
+                        });
+
+                        setTimeout(() => {
+                            flyer.remove();
+                            cartBtn.classList.remove('cart-hit-shockwave');
+                            void cartBtn.offsetWidth;
+                            cartBtn.classList.add('cart-hit-shockwave');
+                        }, 640);
+                    } catch (e) {}
+                },
+
+                addDetailToCart(evt) {
                     if (!this.detailModal.product) return;
                     const p = this.detailModal.product;
                     this.trackProductClick(p.id);
@@ -2398,6 +3091,7 @@
                         if (newQty <= p.stock) {
                             item.qty = newQty;
                             this.showToast(`Agregaste ${qtyToAdd} un. más de "${p.name}"`);
+                            this.flyToCart(evt, p.image);
                         } else {
                             item.qty = p.stock;
                             this.showToast(`Ajustado al stock máximo de "${p.name}" (${p.stock} un.)`);
@@ -2413,24 +3107,27 @@
                             qty: initialQty
                         });
                         this.showToast(`"${p.name}" (${initialQty} un.) añadido a tu lista`);
+                        this.flyToCart(evt, p.image);
                     }
 
                     this.save();
                 },
 
-                addItem(id, name, price, stock, code) {
+                addItem(id, name, price, stock, code, evt = null, imageUrl = null) {
                     this.trackProductClick(id);
                     let item = this.cart.find(i => i.id === id);
                     if (item) {
                         if (item.qty < stock) {
                             item.qty++;
                             this.showToast(`Agregaste otra unidad de "${name}"`);
+                            this.flyToCart(evt, imageUrl);
                         } else {
                             this.showToast(`Alcanzaste el stock disponible de "${name}" (${stock} un.)`);
                         }
                     } else {
                         this.cart.push({ id, name, price, stock, code, qty: 1 });
                         this.showToast(`"${name}" añadido a tu lista`);
+                        this.flyToCart(evt, imageUrl);
                     }
                     this.save();
                     this.errorMessage = '';
@@ -2508,6 +3205,7 @@
                                 'X-CSRF-TOKEN': token || ''
                             },
                             body: JSON.stringify({
+                                website_hp: this.form.website_hp || '',
                                 customer_name: this.form.name.trim(),
                                 event_date: this.form.date || null,
                                 location: this.form.location.trim(),
@@ -2541,6 +3239,39 @@
                 }
             }
         }
+
+        // === SISTEMA GLOBAL DE SCROLL REVEAL & BARRA DE PROGRESO DE LECTURA ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressBar = document.getElementById('scroll-progress-bar');
+            const updateScrollProgress = () => {
+                if (!progressBar) return;
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+                progressBar.style.width = pct + '%';
+            };
+            window.addEventListener('scroll', updateScrollProgress, { passive: true });
+            updateScrollProgress();
+
+            const revealNodes = document.querySelectorAll('[data-reveal]');
+            if ('IntersectionObserver' in window && revealNodes.length > 0) {
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-revealed');
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+                revealNodes.forEach((node, index) => {
+                    node.style.transitionDelay = ((index % 4) * 75) + 'ms';
+                    observer.observe(node);
+                });
+            } else {
+                revealNodes.forEach((node) => node.classList.add('is-revealed'));
+            }
+        });
     </script>
 </body>
 </html>

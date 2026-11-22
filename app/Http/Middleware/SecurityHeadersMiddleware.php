@@ -19,20 +19,38 @@ class SecurityHeadersMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // 0. Sincronización Dinámica de Host y Esquema (Ngrok / Proxy Reverso / HTTPS)
-        if ($request->header('x-forwarded-proto') === 'https' || $request->isSecure()) {
-            URL::forceScheme('https');
-        }
+        // 0. Sincronización Segura de Host y Esquema (solo confía en esquema HTTPS real o proxies confiables configurados)
+        $isHttps = $request->isSecure();
 
-        $schemeAndHost = $request->getSchemeAndHttpHost();
-        if ($schemeAndHost && ! str_contains($schemeAndHost, '127.0.0.1:0')) {
-            URL::forceRootUrl($schemeAndHost);
-            config(['filesystems.disks.public.url' => $schemeAndHost.'/storage']);
-            // Reiniciar la instancia del disco public si ya fue resuelta previamente
-            Storage::forgetDisk('public');
+        if (app()->isProduction()) {
+            $appUrl = rtrim((string) config('app.url', ''), '/');
+            if ($appUrl !== '') {
+                URL::forceRootUrl($appUrl);
+                config(['filesystems.disks.public.url' => $appUrl.'/storage']);
+            }
+            if ($isHttps || str_starts_with($appUrl, 'https://')) {
+                URL::forceScheme('https');
+            }
+        } else {
+            if ($isHttps) {
+                URL::forceScheme('https');
+            }
+
+            $schemeAndHost = $request->getSchemeAndHttpHost();
+            if ($schemeAndHost && ! str_contains($schemeAndHost, '127.0.0.1:0')) {
+                URL::forceRootUrl($schemeAndHost);
+                config(['filesystems.disks.public.url' => $schemeAndHost.'/storage']);
+                // Reiniciar la instancia del disco public si ya fue resuelta previamente
+                Storage::forgetDisk('public');
+            }
         }
 
         $response = $next($request);
+
+        // HSTS estricto bajo HTTPS en producción (OWASP A02 / A05)
+        if (app()->isProduction() && $isHttps) {
+            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+        }
 
         // Anti-Clickjacking: DENY estricto en rutas administrativas y SAMEORIGIN en catálogo público
         if ($request->is('admin*')) {
@@ -51,10 +69,17 @@ class SecurityHeadersMiddleware
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-        // En rutas públicas, aplicar la directiva Content-Security-Policy (CSP) estricta
-        if (! $request->is('admin*') && ! $request->is('livewire*')) {
+        // Content-Security-Policy diferenciada:
+        // - Rutas públicas: CSP estricta 100% self-hosted para scripts (Alpine.js local sin CDN de terceros)
+        // - Panel /admin: CSP base compatible con Filament/Livewire que refuerza anti-clickjacking y bloquea plugins/base hijack
+        if ($request->is('admin*')) {
+            $response->headers->set(
+                'Content-Security-Policy',
+                "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+            );
+        } elseif (! $request->is('livewire*')) {
             $csp = "default-src 'self'; "
-                ."script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; "
+                ."script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
                 ."style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
                 ."font-src 'self' https://fonts.gstatic.com data:; "
                 ."img-src 'self' data: https://images.unsplash.com; "

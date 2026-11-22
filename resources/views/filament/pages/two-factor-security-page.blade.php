@@ -1,330 +1,352 @@
 <x-filament-panels::page>
-    <div class="two-factor-wrapper space-y-6">
+    <div class="tfa-shell">
         @if(!$isEnabled && !$isConfiguring)
-            <!-- Estado: Desactivado -->
-            <div class="two-factor-card space-y-6">
-                <div class="flex flex-col sm:flex-row items-start gap-5">
-                    <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0 border border-amber-500/20 shadow-inner">
-                        <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
+            <!-- ESTADO: DESACTIVADO (Layout equilibrado 2 columnas) -->
+            <div class="tfa-layout-grid">
+                <!-- Columna Principal: Invitación + 3 Pasos + Acción -->
+                <div class="tfa-card tfa-card-accent-amber">
+                    <div class="tfa-header-row">
+                        <div class="tfa-header-main">
+                            <div class="tfa-icon-box tfa-icon-amber">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem; margin-bottom:0.35rem;">
+                                    <span class="tfa-badge tfa-badge-amber">
+                                        <span class="tfa-dot tfa-dot-amber"></span>
+                                        Acción Recomendada
+                                    </span>
+                                </div>
+                                <h3 class="tfa-title">Protege tu panel administrativo con 2FA</h3>
+                                <p class="tfa-subtitle">
+                                    Añade una segunda capa de seguridad que solicita un código temporal de 6 dígitos desde tu teléfono cada vez que inicies sesión en producción.
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="space-y-2 flex-1">
-                        <div class="flex flex-wrap items-center gap-2">
-                            <h3 class="text-xl font-bold font-serif">
-                                Doble Factor de Autenticación (2FA) Desactivado
-                            </h3>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">
-                                RECOMENDADO
-                            </span>
+
+                    <div class="tfa-divider"></div>
+
+                    <!-- Flujo visual en 3 pasos claros -->
+                    <div style="margin-bottom: 1.25rem;">
+                        <span class="tfa-label">Cómo se activa en menos de 1 minuto</span>
+                        <div class="tfa-steps-grid">
+                            <div class="tfa-step-box">
+                                <span class="tfa-step-num">01</span>
+                                <span class="tfa-step-title">Abre tu app autenticadora</span>
+                                <span class="tfa-step-desc">Usa Google Authenticator, Microsoft Authenticator, Authy o 1Password.</span>
+                            </div>
+                            <div class="tfa-step-box">
+                                <span class="tfa-step-num">02</span>
+                                <span class="tfa-step-title">Escanea el código QR</span>
+                                <span class="tfa-step-desc">Apunta la cámara o copia la clave secreta cifrada en 1 clic.</span>
+                            </div>
+                            <div class="tfa-step-box">
+                                <span class="tfa-step-num">03</span>
+                                <span class="tfa-step-title">Confirma y guarda respaldos</span>
+                                <span class="tfa-step-desc">Ingresa el código de 6 dígitos y guarda tus 8 códigos de emergencia.</span>
+                            </div>
                         </div>
-                        <!-- Píldoras de Apps Compatibles -->
-                        <div class="flex flex-wrap items-center gap-2 pt-2">
-                            <span class="text-xs font-semibold mr-1">Compatible con:</span>
-                            <span class="two-factor-badge-app">Google Authenticator</span>
-                            <span class="two-factor-badge-app">Microsoft Authenticator</span>
-                            <span class="two-factor-badge-app">1Password</span>
-                            <span class="two-factor-badge-app">Authy</span>
-                        </div>
+                    </div>
+
+                    <!-- Apps compatibles -->
+                    <div class="tfa-apps-row">
+                        <span style="font-size:0.75rem; font-weight:600; color:#71717a; margin-right:0.25rem;">Compatible con:</span>
+                        <span class="tfa-app-pill">Google Authenticator</span>
+                        <span class="tfa-app-pill">Microsoft Authenticator</span>
+                        <span class="tfa-app-pill">Authy</span>
+                        <span class="tfa-app-pill">1Password</span>
+                    </div>
+
+                    <!-- Barra de Acción -->
+                    <div class="tfa-footer-bar">
+                        <span style="display:inline-flex; align-items:center; gap:0.45rem; font-size:0.78rem; color:#71717a;">
+                            <svg style="width:1.05rem; height:1.05rem; color:#10b981; flex-shrink:0;" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            Bloqueo automático ante 5 intentos fallidos
+                        </span>
+
+                        <button type="button" wire:click="startConfiguration" wire:loading.attr="disabled" class="tfa-btn tfa-btn-primary">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            <span wire:loading.remove wire:target="startConfiguration">Activar Doble Factor (2FA)</span>
+                            <span wire:loading wire:target="startConfiguration">Generando QR seguro...</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="pt-5 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <span class="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                        Protección contra accesos no autorizados
-                    </span>
-                    <button 
-                        type="button" 
-                        wire:click="startConfiguration" 
-                        class="two-factor-btn-primary">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <span>Comenzar Configuración de 2FA</span>
-                    </button>
+                <!-- Columna Lateral: Estado Actual y Garantías -->
+                <div class="tfa-card">
+                    <span class="tfa-label">Estado de tu cuenta</span>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:0.75rem; margin-top:0.25rem;">
+                        <div style="min-width:0;">
+                            <div style="font-size:0.9rem; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                {{ auth()->user()?->email }}
+                            </div>
+                            <div style="font-size:0.75rem; color:#71717a; margin-top:0.15rem;">
+                                Nivel actual: Solo contraseña
+                            </div>
+                        </div>
+                        <span class="tfa-badge tfa-badge-amber">Inactivo</span>
+                    </div>
+
+                    <div class="tfa-side-list">
+                        <div class="tfa-side-item">
+                            <svg style="color:#f59e0b;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                            </svg>
+                            <div>
+                                <div class="tfa-step-title">Estándar bancario TOTP (RFC 6238)</div>
+                                <div class="tfa-step-desc">Códigos de 6 dígitos que caducan cada 30 segundos y no se pueden reutilizar.</div>
+                            </div>
+                        </div>
+
+                        <div class="tfa-side-item">
+                            <svg style="color:#10b981;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            <div>
+                                <div class="tfa-step-title">Secretos cifrados AES-256</div>
+                                <div class="tfa-step-desc">Tu llave privada y códigos de respaldo se guardan cifrados en la base de datos.</div>
+                            </div>
+                        </div>
+
+                        <div class="tfa-side-item">
+                            <svg style="color:#0284c7;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                            <div>
+                                <div class="tfa-step-title">Acceso de respaldo garantizado</div>
+                                <div class="tfa-step-desc">Al finalizar recibirás 8 códigos de emergencia por si cambias o pierdes tu celular.</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+
         @elseif($isConfiguring)
-            <!-- Asistente de Configuración Paso a Paso -->
-            <div class="two-factor-card space-y-7">
-                
-                <!-- Encabezado del Asistente -->
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800 gap-3">
-                    <div>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/30">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                            Asistente de Vinculación
-                        </span>
-                        <h3 class="text-2xl font-bold font-serif mt-1">
-                            Vincular tu Teléfono Móvil
-                        </h3>
+            <!-- ESTADO: ASISTENTE DE CONFIGURACIÓN PASO A PASO -->
+            <div class="tfa-card tfa-card-accent-amber">
+                <div class="tfa-header-row">
+                    <div class="tfa-header-main">
+                        <div class="tfa-icon-box tfa-icon-amber">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="tfa-badge tfa-badge-amber" style="margin-bottom:0.35rem;">
+                                <span class="tfa-dot tfa-dot-amber"></span>
+                                Asistente de Vinculación
+                            </span>
+                            <h3 class="tfa-title">Vincular tu aplicación autenticadora</h3>
+                            <p class="tfa-subtitle">
+                                Escanea el código QR con tu teléfono y luego confirma con el código de 6 dígitos generado.
+                            </p>
+                        </div>
                     </div>
-                    <button 
-                        type="button" 
-                        wire:click="cancelConfiguration" 
-                        class="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition">
-                        &times; Cancelar Proceso
+
+                    <button type="button" wire:click="cancelConfiguration" class="tfa-btn tfa-btn-secondary">
+                        &times; Cancelar
                     </button>
                 </div>
 
-                <!-- PASO 1: Escaneo y Clave Secreta -->
-                <div class="space-y-4">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-6 h-6 rounded-full bg-amber-500 text-zinc-950 font-mono font-bold text-xs flex items-center justify-center shrink-0">1</span>
-                        <h4 class="font-bold text-sm uppercase tracking-wider">
-                            Escanea el Código QR en tu Aplicación
-                        </h4>
+                <div class="tfa-divider"></div>
+
+                <!-- PASO 1: QR y Clave Manual -->
+                <div style="margin-bottom: 1.75rem;">
+                    <div style="display:flex; align-items:center; gap:0.65rem; margin-bottom:0.9rem;">
+                        <span class="tfa-step-num">01</span>
+                        <span style="font-size:0.875rem; font-weight:700;">Escanea el código QR en tu app</span>
                     </div>
 
-                    <div class="two-factor-inner grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                        <!-- Código QR con Marco de Alto Contraste -->
-                        <div class="md:col-span-5 flex flex-col items-center space-y-2">
-                            <div class="p-3 bg-white rounded-2xl shadow-md border border-zinc-200 flex items-center justify-center">
-                                <img src="{{ $setupQrUri }}" alt="Código QR de configuración 2FA" class="w-48 h-48 object-contain">
+                    <div class="tfa-inner tfa-qr-grid">
+                        <div style="text-align:center;">
+                            <div class="tfa-qr-frame">
+                                <img src="{{ $setupQrUri }}" alt="Código QR de configuración 2FA">
                             </div>
-                            <span class="text-[11px] font-mono text-zinc-400 text-center">
-                                Apunta la cámara de tu app aquí
+                            <span style="display:block; margin-top:0.6rem; font-size:0.72rem; color:#71717a; font-family:ui-monospace, monospace;">
+                                Emisor: VYS Eventos
                             </span>
                         </div>
 
-                        <!-- Opción de Clave Manual con Copia en 1 Clic -->
-                        <div class="md:col-span-7 space-y-3" x-data="{ copied: false }">
-                            <label class="block text-xs font-semibold uppercase tracking-wider">
-                                ¿No puedes escanear el código QR?
-                            </label>
-                            <p class="text-xs leading-relaxed">
-                                Selecciona <em>"Ingresar clave manualmente"</em> en tu app e introduce la siguiente clave secreta:
+                        <div x-data="{ copied: false }">
+                            <span class="tfa-label">¿Prefieres ingresarlo manualmente?</span>
+                            <p class="tfa-step-desc" style="margin-top:0.2rem;">
+                                En tu app elige <em>«Ingresar clave de configuración»</em> y pega esta llave secreta:
                             </p>
 
-                            <div class="flex items-center gap-2">
-                                <code class="px-3.5 py-2.5 bg-white dark:bg-zinc-900 text-amber-500 font-mono text-xs sm:text-sm font-bold rounded-xl border border-zinc-200 dark:border-zinc-800 select-all tracking-wider shadow-inner flex-1 overflow-x-auto">
-                                    {{ $setupSecret }}
-                                </code>
-                                <button 
-                                    type="button" 
-                                    @click="navigator.clipboard.writeText('{{ $setupSecret }}'); copied = true; setTimeout(() => copied = false, 2000)"
-                                    class="two-factor-btn-secondary shrink-0">
-                                    <template x-if="!copied">
-                                        <span class="flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                                            <span>Copiar</span>
-                                        </span>
-                                    </template>
-                                    <template x-if="copied">
-                                        <span class="flex items-center gap-1 text-emerald-500 font-bold">
-                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                            <span>¡Copiado!</span>
-                                        </span>
-                                    </template>
+                            <div class="tfa-secret-box">
+                                <code class="tfa-secret-code">{{ $setupSecret }}</code>
+                                <button type="button"
+                                        @click="navigator.clipboard.writeText('{{ $setupSecret }}'); copied = true; setTimeout(() => copied = false, 2200)"
+                                        class="tfa-btn tfa-btn-secondary">
+                                    <span x-show="!copied">Copiar</span>
+                                    <span x-show="copied" style="color:#10b981; display:none;">¡Copiado!</span>
                                 </button>
                             </div>
 
-                            <div class="pt-2 text-[11px] text-zinc-400 space-y-1">
-                                <p>&bull; Tipo: Basado en tiempo (TOTP - RFC 6238)</p>
-                                <p>&bull; Ventana: 30 segundos &bull; Cifrado: AES-256 en base de datos</p>
+                            <div style="margin-top:0.9rem; display:flex; flex-wrap:wrap; gap:0.5rem;">
+                                <span class="tfa-app-pill">Tipo: TOTP (30s)</span>
+                                <span class="tfa-app-pill">Algoritmo: SHA-1 · 6 dígitos</span>
+                                <span class="tfa-app-pill">Almacenamiento: AES-256</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- PASO 2: Confirmación con Código de 6 Dígitos y Modo Sudo -->
-                <form wire:submit.prevent="confirmConfiguration" class="space-y-4 pt-2">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-6 h-6 rounded-full bg-emerald-500 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0">2</span>
-                        <h4 class="font-bold text-sm uppercase tracking-wider">
-                            Confirmar Identidad y Activar Protección
-                        </h4>
+                <!-- PASO 2: Verificación y Activación -->
+                <form wire:submit.prevent="confirmConfiguration">
+                    <div style="display:flex; align-items:center; gap:0.65rem; margin-bottom:0.9rem;">
+                        <span class="tfa-step-num" style="background:#059669; color:#ffffff;">02</span>
+                        <span style="font-size:0.875rem; font-weight:700;">Confirma tu identidad para activar la protección</span>
                     </div>
 
-                    <div class="two-factor-inner grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="tfa-inner tfa-two-col">
                         <div>
-                            <label for="confirmationCode" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
-                                Código de 6 Dígitos de la App *
-                            </label>
-                            <input 
-                                type="text" 
-                                id="confirmationCode" 
-                                wire:model.defer="confirmationCode" 
-                                maxlength="6" 
-                                inputmode="numeric"
-                                pattern="[0-9]*"
-                                placeholder="123 456" 
-                                class="two-factor-input-text font-mono text-center text-2xl tracking-[0.3em] font-extrabold py-3 shadow-inner">
+                            <label for="confirmationCode" class="tfa-label">Código de 6 dígitos de la app *</label>
+                            <input type="text"
+                                   id="confirmationCode"
+                                   wire:model.defer="confirmationCode"
+                                   maxlength="6"
+                                   inputmode="numeric"
+                                   pattern="[0-9]*"
+                                   autocomplete="one-time-code"
+                                   placeholder="000000"
+                                   class="tfa-input tfa-input-otp">
                             @error('confirmationCode')
-                                <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                                <p class="tfa-error">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="currentPassword" class="block text-xs font-bold uppercase tracking-wider mb-1.5">
-                                Contraseña Actual (Modo Sudo) *
-                            </label>
-                            <input 
-                                type="password" 
-                                id="currentPassword" 
-                                wire:model.defer="currentPassword" 
-                                placeholder="••••••••••••" 
-                                class="two-factor-input-text py-3 text-sm shadow-inner">
+                            <label for="currentPassword" class="tfa-label">Tu contraseña actual *</label>
+                            <input type="password"
+                                   id="currentPassword"
+                                   wire:model.defer="currentPassword"
+                                   placeholder="Ingresa tu contraseña de acceso"
+                                   class="tfa-input"
+                                   style="padding-top:1rem; padding-bottom:1rem;">
                             @error('currentPassword')
-                                <p class="mt-1.5 text-xs text-rose-500 font-medium">{{ $message }}</p>
+                                <p class="tfa-error">{{ $message }}</p>
                             @enderror
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-end gap-3 pt-3">
-                        <button 
-                            type="button" 
-                            wire:click="cancelConfiguration" 
-                            class="two-factor-btn-secondary">
+                    <div class="tfa-footer-bar">
+                        <button type="button" wire:click="cancelConfiguration" class="tfa-btn tfa-btn-secondary">
                             Cancelar
                         </button>
-                        <button 
-                            type="submit" 
-                            class="two-factor-btn-success">
-                            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                            <span>Verificar y Activar 2FA</span>
+                        <button type="submit" wire:loading.attr="disabled" class="tfa-btn tfa-btn-success">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            <span wire:loading.remove wire:target="confirmConfiguration">Verificar y Activar 2FA</span>
+                            <span wire:loading wire:target="confirmConfiguration">Verificando código...</span>
                         </button>
                     </div>
                 </form>
             </div>
+
         @else
-            <!-- Estado: Activado y Protegido -->
-            <div class="two-factor-card space-y-7">
-                
-                <!-- Encabezado de Protección Activa -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-zinc-200 dark:border-zinc-800 gap-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 border border-emerald-500/20 shadow-inner">
-                            <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            <!-- ESTADO: ACTIVADO Y PROTEGIDO -->
+            <div class="tfa-card tfa-card-accent-emerald">
+                <div class="tfa-header-row">
+                    <div class="tfa-header-main">
+                        <div class="tfa-icon-box tfa-icon-emerald">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                             </svg>
                         </div>
                         <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="text-xl font-bold font-serif">
-                                    Doble Factor de Autenticación Activo
-                                </h3>
-                                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/30 font-mono">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                                    PROTEGIDO
+                            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:0.5rem; margin-bottom:0.35rem;">
+                                <span class="tfa-badge tfa-badge-emerald">
+                                    <span class="tfa-dot tfa-dot-emerald"></span>
+                                    Protegido · 2FA Activo
                                 </span>
                             </div>
-                            <p class="text-xs mt-1">
-                                Tu cuenta administrativa exige el código dinámico TOTP en cada inicio de sesión.
+                            <h3 class="tfa-title">Doble Factor de Autenticación Activo</h3>
+                            <p class="tfa-subtitle">
+                                Tu cuenta <strong>{{ auth()->user()?->email }}</strong> exige el código dinámico TOTP al iniciar sesión desde nuevos dispositivos.
                             </p>
                         </div>
                     </div>
                 </div>
 
                 @if(!empty($recoveryCodes))
-                    <!-- Sección de Códigos de Emergencia con Botón de Copiado Masivo -->
-                    <div class="two-factor-inner space-y-4" x-data="{ copiedAll: false }">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-amber-500">
-                                    Códigos de Emergencia (Guárdalos en un Lugar Seguro)
-                                </h4>
-                            </div>
+                    <div class="tfa-divider"></div>
 
-                            <button 
-                                type="button" 
-                                @click="navigator.clipboard.writeText('{{ implode("\n", $recoveryCodes) }}'); copiedAll = true; setTimeout(() => copiedAll = false, 2500)"
-                                class="two-factor-btn-primary py-1.5 px-3 text-xs self-start sm:self-auto">
-                                <template x-if="!copiedAll">
-                                    <span class="flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
-                                        <span>Copiar Todos</span>
-                                    </span>
-                                </template>
-                                <template x-if="copiedAll">
-                                    <span class="flex items-center gap-1 font-extrabold text-zinc-950">
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                        <span>¡Códigos Copiados!</span>
-                                    </span>
-                                </template>
+                    <!-- Códigos de Emergencia recién generados -->
+                    <div class="tfa-inner" x-data="{ copiedAll: false }" style="border-color: #fcd34d;">
+                        <div class="tfa-header-row" style="align-items:center;">
+                            <div>
+                                <span class="tfa-badge tfa-badge-amber" style="margin-bottom:0.35rem;">Guárdalos ahora</span>
+                                <h4 style="margin:0; font-size:0.95rem; font-weight:800;">Códigos de Emergencia de Un Solo Uso</h4>
+                                <p class="tfa-step-desc" style="margin-top:0.2rem;">
+                                    Guárdalos en un lugar seguro fuera del servidor. Sirven para recuperar acceso si pierdes tu teléfono.
+                                </p>
+                            </div>
+                            <button type="button"
+                                    @click="navigator.clipboard.writeText('{{ implode("\n", $recoveryCodes) }}'); copiedAll = true; setTimeout(() => copiedAll = false, 2500)"
+                                    class="tfa-btn tfa-btn-primary">
+                                <span x-show="!copiedAll">Copiar Todos</span>
+                                <span x-show="copiedAll" style="display:none;">¡Códigos Copiados!</span>
                             </button>
                         </div>
 
-                        <p class="text-xs">
-                            Cada código puede ser utilizado exactamente 1 sola vez en caso de pérdida o avería de tu teléfono inteligente:
-                        </p>
-
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+                        <div class="tfa-codes-grid">
                             @foreach($recoveryCodes as $code)
-                                <div class="two-factor-code-item select-all">
-                                    {{ $code }}
-                                </div>
+                                <div class="tfa-code-chip">{{ $code }}</div>
                             @endforeach
                         </div>
                     </div>
                 @endif
 
-                <!-- Tarjetas de Gestión en Modo Sudo -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                    
-                    <!-- Tarjeta 1: Regenerar Códigos -->
-                    <div class="two-factor-inner space-y-3">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                            </svg>
-                            <h4 class="text-xs font-bold uppercase tracking-wider">
-                                Regenerar Códigos de Emergencia
-                            </h4>
-                        </div>
-                        <p class="text-xs leading-relaxed">
-                            Invalida de inmediato todos los códigos previos y genera un nuevo conjunto de 8 códigos de un solo uso.
+                <div class="tfa-divider"></div>
+
+                <!-- Gestión de Códigos y Desactivación (2 Columnas) -->
+                <div class="tfa-two-col">
+                    <div class="tfa-inner">
+                        <span class="tfa-label">Códigos de respaldo</span>
+                        <p class="tfa-step-desc" style="margin-bottom:1rem;">
+                            Revoca inmediatamente los códigos anteriores y genera un nuevo lote de 8 códigos de emergencia.
                         </p>
-                        <form wire:submit.prevent="regenerateRecoveryCodes" class="space-y-3 pt-1">
+                        <form wire:submit.prevent="regenerateRecoveryCodes" style="display:flex; flex-direction:column; gap:0.75rem;">
                             <div>
-                                <input 
-                                    type="password" 
-                                    wire:model.defer="regeneratePassword" 
-                                    placeholder="Contraseña actual *" 
-                                    class="two-factor-input-text py-2.5 text-xs">
+                                <input type="password"
+                                       wire:model.defer="regeneratePassword"
+                                       placeholder="Confirma tu contraseña actual *"
+                                       class="tfa-input">
                                 @error('regeneratePassword')
-                                    <p class="mt-1 text-[11px] text-rose-500 font-medium">{{ $message }}</p>
+                                    <p class="tfa-error">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <button 
-                                type="submit" 
-                                class="two-factor-btn-secondary w-full py-2.5 font-bold">
+                            <button type="submit" class="tfa-btn tfa-btn-secondary tfa-btn-full">
                                 Regenerar Nuevos Códigos
                             </button>
                         </form>
                     </div>
 
-                    <!-- Tarjeta 2: Desactivar 2FA -->
-                    <div class="two-factor-inner space-y-3 border-rose-300 dark:border-rose-900/50">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-rose-500">
-                                Desactivar Doble Factor
-                            </h4>
-                        </div>
-                        <p class="text-xs leading-relaxed">
-                            Removerá la protección de tu cuenta. Solo se recomienda si vas a cambiar o desvincular tu dispositivo.
+                    <div class="tfa-inner tfa-danger-zone">
+                        <span class="tfa-label" style="color:#e11d48;">Zona de peligro · Desactivar 2FA</span>
+                        <p class="tfa-step-desc" style="margin-bottom:1rem;">
+                            Quitará la protección de doble factor de tu cuenta. Úsalo solo si necesitas vincular otro teléfono.
                         </p>
-                        <form wire:submit.prevent="disableTwoFactor" class="space-y-3 pt-1">
+                        <form wire:submit.prevent="disableTwoFactor" style="display:flex; flex-direction:column; gap:0.75rem;">
                             <div>
-                                <input 
-                                    type="password" 
-                                    wire:model.defer="disablePassword" 
-                                    placeholder="Contraseña actual *" 
-                                    class="two-factor-input-text py-2.5 text-xs">
+                                <input type="password"
+                                       wire:model.defer="disablePassword"
+                                       placeholder="Confirma tu contraseña actual *"
+                                       class="tfa-input">
                                 @error('disablePassword')
-                                    <p class="mt-1 text-[11px] text-rose-500 font-medium">{{ $message }}</p>
+                                    <p class="tfa-error">{{ $message }}</p>
                                 @enderror
                             </div>
-                            <button 
-                                type="submit" 
-                                class="two-factor-btn-danger w-full py-2.5 font-bold">
+                            <button type="submit" class="tfa-btn tfa-btn-danger tfa-btn-full">
                                 Confirmar y Desactivar 2FA
                             </button>
                         </form>

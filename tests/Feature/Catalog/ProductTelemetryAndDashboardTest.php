@@ -4,15 +4,28 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Catalog;
 
+use App\Filament\Resources\CategoryResource;
+use App\Filament\Resources\CategoryResource\Pages\ListCategories;
+use App\Filament\Resources\ContactMessageResource;
+use App\Filament\Resources\GalleryImageResource\Pages\ListGalleryImages;
+use App\Filament\Resources\ProductResource;
+use App\Filament\Resources\ProductResource\Pages\ListProducts;
+use App\Filament\Resources\QuoteLogResource;
 use App\Filament\Widgets\BusinessStatsOverview;
 use App\Filament\Widgets\ExecutiveOverviewWidget;
 use App\Filament\Widgets\LatestQuotesWidget;
 use App\Filament\Widgets\ProductInterestRankingWidget;
 use App\Models\Category;
+use App\Models\ContactMessage;
+use App\Models\GalleryImage;
+use App\Models\Montaje;
 use App\Models\Product;
 use App\Models\QuoteLog;
+use App\Models\SiteSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class ProductTelemetryAndDashboardTest extends TestCase
@@ -191,5 +204,210 @@ class ProductTelemetryAndDashboardTest extends TestCase
 
         $response = $this->get('/admin/montajes');
         $response->assertOk();
+    }
+
+    /**
+     * 7. Impide eliminar una categoría que tiene productos vinculados (evitando borrado en cascada accidental).
+     */
+    public function test_category_with_products_cannot_be_deleted_from_admin_panel(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'is_active' => true,
+        ]);
+
+        $categoryWithProducts = Category::factory()->create(['name' => 'Vajilla Fina']);
+        $product = Product::factory()->create([
+            'category_id' => $categoryWithProducts->id,
+            'name' => 'Plato Base Dorado',
+        ]);
+
+        $emptyCategory = Category::factory()->create(['name' => 'Categoría Vacía']);
+
+        Livewire::actingAs($admin)
+            ->test(ListCategories::class)
+            ->callTableAction('delete', $categoryWithProducts);
+
+        $this->assertDatabaseHas('categories', ['id' => $categoryWithProducts->id]);
+        $this->assertDatabaseHas('products', ['id' => $product->id]);
+
+        Livewire::actingAs($admin)
+            ->test(ListCategories::class)
+            ->callTableAction('delete', $emptyCategory);
+
+        $this->assertDatabaseMissing('categories', ['id' => $emptyCategory->id]);
+    }
+
+    /**
+     * 8. Invalida instantáneamente los contadores en caché del menú lateral al modificar registros.
+     */
+    public function test_navigation_badges_invalidate_cache_immediately_when_records_change(): void
+    {
+        $category = Category::factory()->create();
+        $this->assertSame('1', CategoryResource::getNavigationBadge());
+
+        $product = Product::factory()->create([
+            'category_id' => $category->id,
+            'is_active' => true,
+        ]);
+        $this->assertSame('1', ProductResource::getNavigationBadge());
+
+        $product->update(['is_active' => false]);
+        $this->assertSame('0', ProductResource::getNavigationBadge());
+
+        $quote = QuoteLog::create([
+            'customer_name' => 'Cliente Prueba',
+            'location' => 'Providencia',
+            'total_amount' => 15000,
+            'items_count' => 5,
+            'items_payload' => [],
+            'status' => 'pendiente',
+        ]);
+        $this->assertSame('1', QuoteLogResource::getNavigationBadge());
+
+        $quote->update(['status' => 'confirmado']);
+        $this->assertNull(QuoteLogResource::getNavigationBadge());
+
+        $message = ContactMessage::create([
+            'name' => 'Consulta Prueba',
+            'email' => 'consulta@cliente.cl',
+            'event_address' => 'Las Condes',
+            'event_date' => now()->addDays(10)->format('Y-m-d'),
+            'message' => 'Mensaje de prueba',
+            'is_read' => false,
+        ]);
+        $this->assertSame('1', ContactMessageResource::getNavigationBadge());
+
+        $message->update(['is_read' => true]);
+        $this->assertNull(ContactMessageResource::getNavigationBadge());
+    }
+
+    /**
+     * 9. Almacena atributos primitivos en caché para SiteSetting::current() evitando __PHP_Incomplete_Class.
+     */
+    public function test_site_setting_caches_primitive_array_compatible_with_disabled_serializable_classes(): void
+    {
+        $setting = SiteSetting::current();
+        $cachedPayload = Cache::get('site_settings.current');
+
+        $this->assertIsArray($cachedPayload);
+        $this->assertSame($setting->id, $cachedPayload['id']);
+
+        $hydrated = SiteSetting::current();
+        $this->assertSame($setting->id, $hydrated->id);
+        $this->assertTrue($hydrated->exists);
+    }
+
+    /**
+     * 10. Permite mover productos entre categorías tanto seleccionando manualmente como todos por categoría.
+     */
+    public function test_admin_can_move_products_between_categories_manually_or_all_by_category(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'is_active' => true,
+        ]);
+
+        $catVajilla = Category::factory()->create(['name' => 'Vajilla']);
+        $catCristaleria = Category::factory()->create(['name' => 'Cristalería']);
+        $catMobiliario = Category::factory()->create(['name' => 'Mobiliario']);
+
+        $p1 = Product::factory()->create(['category_id' => $catVajilla->id, 'code' => 101, 'name' => 'Copa Vino']);
+        $p2 = Product::factory()->create(['category_id' => $catVajilla->id, 'code' => 102, 'name' => 'Copa Agua']);
+        $p3 = Product::factory()->create(['category_id' => $catVajilla->id, 'code' => 103, 'name' => 'Plato Fondo']);
+
+        // Caso A: Selección manual por categoría (solo mover p1 y p2 de Vajilla a Cristalería, dejando p3 en Vajilla)
+        Livewire::actingAs($admin)
+            ->test(ListProducts::class)
+            ->callAction('moveByCategory', data: [
+                'source_category_id' => $catVajilla->id,
+                'target_category_id' => $catCristaleria->id,
+                'selection_mode' => 'manual',
+                'product_ids' => [$p1->id, $p2->id],
+            ])
+            ->assertHasNoActionErrors();
+
+        $this->assertSame($catCristaleria->id, $p1->fresh()->category_id);
+        $this->assertSame($catCristaleria->id, $p2->fresh()->category_id);
+        $this->assertSame($catVajilla->id, $p3->fresh()->category_id);
+
+        // Caso B: Mover TODOS los productos de una categoría (de Cristalería a Mobiliario) desde la tabla de Categorías
+        Livewire::actingAs($admin)
+            ->test(ListCategories::class)
+            ->callTableAction('moveProducts', $catCristaleria, data: [
+                'target_category_id' => $catMobiliario->id,
+                'selection_mode' => 'all',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $this->assertSame($catMobiliario->id, $p1->fresh()->category_id);
+        $this->assertSame($catMobiliario->id, $p2->fresh()->category_id);
+
+        // Caso C: Acción en lote (Bulk Action) marcando filas manualmente en la tabla de Productos
+        Livewire::actingAs($admin)
+            ->test(ListProducts::class)
+            ->callTableBulkAction('moveToCategory', [$p1, $p3], data: [
+                'target_category_id' => $catCristaleria->id,
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $this->assertSame($catCristaleria->id, $p1->fresh()->category_id);
+        $this->assertSame($catMobiliario->id, $p2->fresh()->category_id);
+        $this->assertSame($catCristaleria->id, $p3->fresh()->category_id);
+    }
+
+    /**
+     * 11. Permite clasificar fotos en la sección Galería y enviarlas a Montajes existentes o crear un Montaje nuevo.
+     */
+    public function test_admin_can_categorize_gallery_images_and_promote_them_to_montajes(): void
+    {
+        $admin = User::factory()->create([
+            'is_admin' => true,
+            'is_active' => true,
+        ]);
+
+        $img1 = GalleryImage::factory()->create([
+            'title' => 'Foto Evento 01',
+            'category' => 'Sin clasificar',
+            'image_path' => 'images/montajes/teno-mesa-principal.jpg',
+            'sort_order' => 1,
+        ]);
+        $img2 = GalleryImage::factory()->create([
+            'title' => 'Foto Evento 02',
+            'category' => 'Sin clasificar',
+            'image_path' => 'images/montajes/gala-nocturna-dorada.jpg',
+            'sort_order' => 2,
+        ]);
+
+        // 1. Clasificar en lote en la Galería
+        Livewire::actingAs($admin)
+            ->test(ListGalleryImages::class)
+            ->callTableBulkAction('bulkAssignCategory', [$img1, $img2], data: [
+                'category' => 'Matrimonios & Bodas',
+            ])
+            ->assertHasNoTableBulkActionErrors();
+
+        $this->assertSame('Matrimonios & Bodas', $img1->fresh()->category);
+        $this->assertSame('Matrimonios & Bodas', $img2->fresh()->category);
+
+        // 2. Crear un Nuevo Montaje desde las fotos seleccionadas en la Galería
+        Livewire::actingAs($admin)
+            ->test(ListGalleryImages::class)
+            ->callTableBulkAction('bulkCreateMontaje', [$img1, $img2], data: [
+                'title' => 'Boda Real en Pirque',
+                'client' => 'Familia Valdés',
+                'type' => 'Matrimonio & Boda',
+                'year' => '2026',
+                'location' => 'Pirque, Santiago',
+                'capacity' => '180 personas',
+            ])
+            ->assertHasNoTableBulkActionErrors();
+
+        $createdMontaje = Montaje::query()->where('title', 'Boda Real en Pirque')->first();
+        $this->assertNotNull($createdMontaje);
+        $this->assertSame('images/montajes/teno-mesa-principal.jpg', $createdMontaje->cover_image);
+        $this->assertCount(2, $createdMontaje->gallery);
+        $this->assertSame($createdMontaje->id, $img1->fresh()->montaje_id);
+        $this->assertSame($createdMontaje->id, $img2->fresh()->montaje_id);
     }
 }

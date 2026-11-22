@@ -7,11 +7,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MontajeResource\Pages;
 use App\Models\Montaje;
 use App\Services\Security\SafeImageSanitizer;
+use App\Support\Filament\PreviewImageResolver;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -75,10 +78,12 @@ class MontajeResource extends Resource
                                                 'Lanzamiento de Marca' => 'Lanzamiento de Marca',
                                             ])
                                             ->default('Evento Empresa')
+                                            ->live()
                                             ->required(),
                                         Forms\Components\TextInput::make('year')
                                             ->label('Año de Realización')
                                             ->default(date('Y'))
+                                            ->live(onBlur: true)
                                             ->maxLength(20)
                                             ->required(),
                                     ]),
@@ -87,14 +92,17 @@ class MontajeResource extends Resource
                                         Forms\Components\TextInput::make('location')
                                             ->label('Lugar o Comuna')
                                             ->placeholder('Ej: Teno, Curicó / Las Condes, Santiago')
+                                            ->live(onBlur: true)
                                             ->maxLength(150),
                                         Forms\Components\TextInput::make('capacity')
                                             ->label('Capacidad / Personas')
                                             ->placeholder('Ej: Montaje completo para 250 personas')
+                                            ->live(onBlur: true)
                                             ->maxLength(150),
                                     ]),
                                 Forms\Components\Textarea::make('summary')
                                     ->label('Resumen Corto (Para tarjetas de presentación)')
+                                    ->live(onBlur: true)
                                     ->rows(2)
                                     ->maxLength(300)
                                     ->columnSpanFull(),
@@ -128,11 +136,12 @@ class MontajeResource extends Resource
                                     ->directory('montajes')
                                     ->visibility('public')
                                     ->image()
+                                    ->live()
                                     ->maxSize(4096)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'montajes'))
                                     ->deleteUploadedFileUsing(function (?string $file): void {
-                                        if ($file && Storage::disk('public')->exists($file)) {
+                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
                                             Storage::disk('public')->delete($file);
                                         }
                                     })
@@ -140,7 +149,7 @@ class MontajeResource extends Resource
                                     ->openable()
                                     ->downloadable()
                                     ->nullable()
-                                    ->helperText('Foto representativa principal. Máx 4 MB. Formato JPG, PNG o WebP. Puedes quitar la foto actual con el botón de papelera o subir una nueva.')
+                                    ->helperText('Foto representativa principal. Máx 4 MB. Al subirla o cambiarla verás abajo cómo queda en vivo.')
                                     ->columnSpanFull(),
                                 Forms\Components\FileUpload::make('gallery')
                                     ->label('Galería Fotográfica del Evento (Múltiples Fotos)')
@@ -149,6 +158,7 @@ class MontajeResource extends Resource
                                     ->visibility('public')
                                     ->multiple()
                                     ->reorderable()
+                                    ->live()
                                     ->deletable(true)
                                     ->openable()
                                     ->downloadable()
@@ -158,11 +168,26 @@ class MontajeResource extends Resource
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'montajes/galeria'))
                                     ->deleteUploadedFileUsing(function (?string $file): void {
-                                        if ($file && Storage::disk('public')->exists($file)) {
+                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
                                             Storage::disk('public')->delete($file);
                                         }
                                     })
-                                    ->helperText('Sube múltiples fotos para mostrar todos los ángulos del montaje. Puedes quitar cualquiera individualmente con el botón de papelera o reorganizarlas.')
+                                    ->helperText('Sube múltiples fotos para mostrar todos los ángulos del montaje. Puedes reordenarlas o quitarlas individualmente.')
+                                    ->columnSpanFull(),
+
+                                Forms\Components\Placeholder::make('montaje_live_preview')
+                                    ->label('Vista Previa en Tiempo Real (Cómo se verá en la Web)')
+                                    ->content(fn (Get $get): View => view('filament.previews.montaje-live-preview', [
+                                        'title' => (string) ($get('title') ?? ''),
+                                        'type' => (string) ($get('type') ?? ''),
+                                        'year' => (string) ($get('year') ?? ''),
+                                        'location' => (string) ($get('location') ?? ''),
+                                        'capacity' => (string) ($get('capacity') ?? ''),
+                                        'summary' => (string) ($get('summary') ?? ''),
+                                        'description' => (string) ($get('description') ?? ''),
+                                        'coverUrl' => PreviewImageResolver::resolveSingle($get('cover_image')),
+                                        'galleryUrls' => PreviewImageResolver::resolveMultiple($get('gallery')),
+                                    ]))
                                     ->columnSpanFull(),
                             ]),
 

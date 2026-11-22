@@ -19,18 +19,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Usuario Administrador Inicial para Filament con acceso OWASP A01
-        $admin = User::query()->firstOrCreate(
-            ['email' => 'admin@arriendoseventos.cl'],
-            [
+        $admin = User::query()->firstOrNew(['email' => 'admin@arriendoseventos.cl']);
+        if (! $admin->exists) {
+            $admin->forceFill([
                 'name' => 'Administrador General',
-                'password' => Hash::make('Admin2026!#Secure'),
+                'password' => Hash::make((string) env('SEED_ADMIN_PASSWORD', 'Admin2026!#Secure')),
                 'is_admin' => true,
-            ]
-        );
-        $admin->update(['is_admin' => true]);
-
-        // Asegurar que si existe un usuario previo (ej: id=1), también sea admin
-        User::query()->where('id', 1)->update(['is_admin' => true]);
+                'is_active' => true,
+            ])->save();
+        } else {
+            $admin->forceFill(['is_admin' => true, 'is_active' => true])->save();
+        }
 
         // 2. Catálogo Oficial de Productos y Categorías
         $this->call(ProductCatalogSeeder::class);

@@ -1,8 +1,7 @@
-<!-- Pie de Pantalla de Login: Regreso al Catálogo -->
-<div class="mt-6 text-center">
-    <a href="{{ route('catalog.index') }}" 
-       class="inline-flex items-center gap-1.5 text-xs text-stone-500 hover:text-stone-900 transition font-medium">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        <span>Volver a la tienda & catálogo</span>
+{{-- Enlace discreto de regreso al sitio público --}}
+<div style="margin-top:1.25rem; text-align:center;">
+    <a href="{{ route('catalog.index') }}"
+       style="display:inline-flex; align-items:center; gap:0.4rem; font-size:0.75rem; font-weight:600; color:#71717a; text-decoration:none;">
+        <span>&larr; Volver al sitio web</span>
     </a>
 </div>
