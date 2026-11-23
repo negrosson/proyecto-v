@@ -2502,40 +2502,56 @@
                     </ul>
                 </div>
 
-                <!-- Columna 3: Redes, Atención & Botón Magnético Volver Arriba -->
+                <!-- Columna 3: Redes (solo las configuradas), Atención & Botón Magnético Volver Arriba -->
+                @php
+                    $socialLinks = $settings?->socialLinks() ?? [];
+                @endphp
                 <div class="flex flex-col justify-between">
                     <div>
-                        <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white mb-4">
-                            Síguenos
-                        </h5>
-                        <div class="flex items-center gap-2.5 mb-4">
-                            @if(!empty($settings?->instagram_url))
-                                <a href="{{ $settings->instagram_url }}" target="_blank" rel="noopener noreferrer" 
-                                   title="Instagram"
-                                   class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
-                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        @if(count($socialLinks) > 0)
+                            <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white mb-4">
+                                Síguenos
+                            </h5>
+                            <div class="flex items-center gap-2.5 mb-4">
+                                @if(isset($socialLinks['instagram']))
+                                    <a href="{{ $socialLinks['instagram'] }}" target="_blank" rel="noopener noreferrer" 
+                                       title="Instagram"
+                                       class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                                    </a>
+                                @endif
+                                @if(isset($socialLinks['facebook']))
+                                    <a href="{{ $socialLinks['facebook'] }}" target="_blank" rel="noopener noreferrer" 
+                                       title="Facebook"
+                                       class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.595 0 9 1.583 9 4.615V8z"/></svg>
+                                    </a>
+                                @endif
+                                @if(isset($socialLinks['tiktok']))
+                                    <a href="{{ $socialLinks['tiktok'] }}" target="_blank" rel="noopener noreferrer" 
+                                       title="TikTok"
+                                       class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 00-1-.08A6.34 6.34 0 003 15.66a6.34 6.34 0 0010.86 4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-.04-4.52z"/></svg>
+                                    </a>
+                                @endif
+                                <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" target="_blank" rel="noopener noreferrer" 
+                                   title="WhatsApp"
+                                   class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-800 dark:text-emerald-300 hover:text-white hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
+                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.529 1.831.812 2.791.812 3.179 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.768-5.768-5.768zm9.969 5.768c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.819-1.242l-5.181 1.356 1.381-5.048c-.902-1.492-1.381-3.21-1.381-5.066 0-5.518 4.482-10 10-10s10 4.482 10 10z"/></svg>
                                 </a>
-                            @endif
-                            @if(!empty($settings?->facebook_url))
-                                <a href="{{ $settings->facebook_url }}" target="_blank" rel="noopener noreferrer" 
-                                   title="Facebook"
-                                   class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
-                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.595 0 9 1.583 9 4.615V8z"/></svg>
+                            </div>
+                        @else
+                            <h5 class="text-xs font-bold uppercase tracking-wider text-zinc-900 dark:text-white mb-4">
+                                Atención Directa
+                            </h5>
+                            <div class="mb-4">
+                                <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" target="_blank" rel="noopener noreferrer"
+                                   class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-emerald-100/90 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-800 dark:text-emerald-300 hover:text-white transition-all duration-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold shadow-sm">
+                                    <svg class="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.529 1.831.812 2.791.812 3.179 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.768-5.768-5.768zm9.969 5.768c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.819-1.242l-5.181 1.356 1.381-5.048c-.902-1.492-1.381-3.21-1.381-5.066 0-5.518 4.482-10 10-10s10 4.482 10 10z"/></svg>
+                                    <span>Cotizar por WhatsApp</span>
                                 </a>
-                            @endif
-                            @if(!empty($settings?->tiktok_url))
-                                <a href="{{ $settings->tiktok_url }}" target="_blank" rel="noopener noreferrer" 
-                                   title="TikTok"
-                                   class="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-amber-500 text-zinc-700 dark:text-zinc-300 hover:text-white dark:hover:text-zinc-950 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
-                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 00-1-.08A6.34 6.34 0 003 15.66a6.34 6.34 0 0010.86 4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-.04-4.52z"/></svg>
-                                </a>
-                            @endif
-                            <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}" target="_blank" rel="noopener noreferrer" 
-                               title="WhatsApp"
-                               class="w-9 h-9 rounded-full bg-emerald-100 dark:bg-emerald-950/60 hover:bg-emerald-600 text-emerald-800 dark:text-emerald-300 hover:text-white hover:-translate-y-1 transition-all duration-300 flex items-center justify-center border border-emerald-200 dark:border-emerald-800 shadow-sm">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.529 1.831.812 2.791.812 3.179 0 5.767-2.587 5.768-5.766 0-3.18-2.588-5.768-5.768-5.768zm9.969 5.768c0 5.518-4.482 10-10 10-1.748 0-3.385-.45-4.819-1.242l-5.181 1.356 1.381-5.048c-.902-1.492-1.381-3.21-1.381-5.066 0-5.518 4.482-10 10-10s10 4.482 10 10z"/></svg>
-                            </a>
-                        </div>
+                            </div>
+                        @endif
                         <p class="text-[11px] text-zinc-400 dark:text-zinc-500">
                             Atención personalizada para cotizaciones corporativas y bodas.
                         </p>

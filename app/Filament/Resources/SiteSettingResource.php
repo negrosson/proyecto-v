@@ -6,9 +6,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SiteSettingResource\Pages;
 use App\Models\SiteSetting;
+use App\Services\Media\PublicMediaCleaner;
 use App\Services\Security\SafeImageSanitizer;
 use App\Support\Filament\PreviewImageResolver;
 use Filament\Forms;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
@@ -16,7 +18,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class SiteSettingResource extends Resource
 {
@@ -66,10 +67,10 @@ class SiteSettingResource extends Resource
                                     ->downloadable()
                                     ->nullable()
                                     ->helperText('Formato PNG, WebP o JPG. Tamaño máx: 4 MB. Si lo dejas vacío se muestra el logo vectorial oficial VYS.')
-                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site'))
-                                    ->deleteUploadedFileUsing(function (?string $file): void {
-                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
-                                            Storage::disk('public')->delete($file);
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file, BaseFileUpload $component): string => SafeImageSanitizer::sanitizeForFilament($file, 'public', 'site', $component->getStatePath()))
+                                    ->deleteUploadedFileUsing(function (mixed $file): void {
+                                        if (is_string($file)) {
+                                            PublicMediaCleaner::deleteIfUnreferenced($file);
                                         }
                                     }),
                                 Forms\Components\TextInput::make('hero_badge')
@@ -102,10 +103,10 @@ class SiteSettingResource extends Resource
                                     ->downloadable()
                                     ->nullable()
                                     ->helperText('Fotografía de fondo (JPG, PNG, WebP). Tamaño máx: 4 MB. Al subirla verás abajo cómo queda aplicada.')
-                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'site'))
-                                    ->deleteUploadedFileUsing(function (?string $file): void {
-                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
-                                            Storage::disk('public')->delete($file);
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file, BaseFileUpload $component): string => SafeImageSanitizer::sanitizeForFilament($file, 'public', 'site', $component->getStatePath()))
+                                    ->deleteUploadedFileUsing(function (mixed $file): void {
+                                        if (is_string($file)) {
+                                            PublicMediaCleaner::deleteIfUnreferenced($file);
                                         }
                                     })
                                     ->columnSpanFull(),
@@ -160,14 +161,23 @@ class SiteSettingResource extends Resource
                                     ->columnSpanFull(),
                                 Forms\Components\TextInput::make('instagram_url')
                                     ->label('URL Instagram')
+                                    ->placeholder('https://instagram.com/tu_cuenta')
+                                    ->helperText('Opcional. Si lo dejas vacío, el ícono no se mostrará en la web.')
+                                    ->nullable()
                                     ->url()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('facebook_url')
                                     ->label('URL Facebook')
+                                    ->placeholder('https://facebook.com/tu_pagina')
+                                    ->helperText('Opcional. Si lo dejas vacío, el ícono no se mostrará en la web.')
+                                    ->nullable()
                                     ->url()
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('tiktok_url')
                                     ->label('URL TikTok')
+                                    ->placeholder('https://tiktok.com/@tu_cuenta')
+                                    ->helperText('Opcional. Si lo dejas vacío, el ícono no se mostrará en la web.')
+                                    ->nullable()
                                     ->url()
                                     ->maxLength(255),
                             ])->columns(['default' => 1, 'md' => 2]),

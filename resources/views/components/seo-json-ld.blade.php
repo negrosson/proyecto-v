@@ -15,11 +15,7 @@
         ? asset('storage/'.$settings->logo_path)
         : asset('images/brand/logo-vys.svg');
 
-    $sameAs = array_values(array_filter([
-        $settings?->instagram_url,
-        $settings?->facebook_url,
-        $settings?->tiktok_url,
-    ], static fn (mixed $url): bool => is_string($url) && trim($url) !== ''));
+    $sameAs = array_values($settings?->socialLinks() ?? []);
 
     $localBusiness = [
         '@context' => 'https://schema.org',

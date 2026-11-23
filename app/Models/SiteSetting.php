@@ -101,6 +101,47 @@ class SiteSetting extends Model
     }
 
     /**
+     * Valida y normaliza una URL de red social; retorna null si está vacía o es un dominio raíz genérico sin perfil.
+     */
+    public static function validSocialUrl(?string $value): ?string
+    {
+        $trimmed = trim((string) $value);
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $parsed = parse_url($trimmed);
+        $scheme = strtolower((string) ($parsed['scheme'] ?? ''));
+        $host = strtolower((string) ($parsed['host'] ?? ''));
+        $path = trim((string) ($parsed['path'] ?? ''), '/');
+
+        if (! in_array($scheme, ['http', 'https'], true) || $host === '') {
+            return null;
+        }
+
+        $bareHost = preg_replace('/^www\./', '', $host) ?? $host;
+        if (in_array($bareHost, ['instagram.com', 'facebook.com', 'tiktok.com'], true) && $path === '') {
+            return null;
+        }
+
+        return $trimmed;
+    }
+
+    /**
+     * Retorna únicamente las redes sociales realmente configuradas con un perfil válido.
+     *
+     * @return array<string, string>
+     */
+    public function socialLinks(): array
+    {
+        return array_filter([
+            'instagram' => self::validSocialUrl($this->instagram_url),
+            'facebook' => self::validSocialUrl($this->facebook_url),
+            'tiktok' => self::validSocialUrl($this->tiktok_url),
+        ], static fn (?string $url): bool => $url !== null);
+    }
+
+    /**
      * Obtiene la configuración activa del sitio mediante singleton en caché permanente.
      *
      * Almacena los atributos primitivos (array) en caché para ser 100% compatible con
@@ -147,9 +188,9 @@ class SiteSetting extends Model
             'business_hours' => 'Lunes a Viernes de 09:00 a 19:00 hrs. Sábados de 09:00 a 14:00 hrs (Atención y Despachos).',
             'company_legal_info' => 'Arriendos & Eventos SpA • RUT: 76.543.210-K • Servicios de Banquetería y Mobiliario de Alta Gama.',
             'map_embed_url' => 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3330.822830386548!2d-70.66986682343828!3d-33.37435887342083!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9662c6f6634c44f3%3A0xbc4e5e4125b060d4!2sCiudad%20Empresarial!5e0!3m2!1ses!2scl!4v1700000000000!5m2!1ses!2scl',
-            'instagram_url' => 'https://instagram.com',
-            'facebook_url' => 'https://facebook.com',
-            'tiktok_url' => 'https://tiktok.com',
+            'instagram_url' => null,
+            'facebook_url' => null,
+            'tiktok_url' => null,
             'shipping_title' => 'Políticas de Envíos, Montaje y Logística',
             'shipping_subtitle' => 'Coordinación profesional de transporte y retiro en terreno para que tu evento transcurra con total serenidad y puntualidad.',
             'shipping_zones_info' => 'Despachamos a todas las comunas del Gran Santiago y alrededores (Chicureo, Lampa, Colina, Pirque, Calera de Tango, Talagante). La tarifa de flete se cotiza según volumen del pedido y distancia desde nuestra bodega central.',

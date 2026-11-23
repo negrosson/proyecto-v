@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\AdminLogin;
+use App\Filament\Pages\Auth\AdminRequestPasswordReset;
+use App\Filament\Pages\Auth\AdminResetPassword;
 use App\Filament\Pages\Dashboard;
 use App\Http\Middleware\EnforceAdminMfaMiddleware;
 use Filament\Http\Middleware\Authenticate;
@@ -32,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(AdminLogin::class)
+            ->passwordReset(AdminRequestPasswordReset::class, AdminResetPassword::class)
             ->spa()
             ->unsavedChangesAlerts()
             ->brandName('VYS · Productora de Eventos')
