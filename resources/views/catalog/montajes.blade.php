@@ -83,13 +83,13 @@
             this.currentPhotoIndex = (this.currentPhotoIndex - 1 + this.selectedProject.gallery.length) % this.selectedProject.gallery.length;
         }
     }" 
-    class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased min-h-screen flex flex-col selection:bg-amber-500 selection:text-white transition-colors duration-200">
+    class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased min-h-screen flex flex-col selection:bg-amber-500 selection:text-white overflow-x-clip transition-colors duration-200">
 
     <!-- HEADER / NAVEGACIÓN PRINCIPAL -->
     <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4 min-w-0">
             <!-- Brand Logo Oficial VYS -->
-            <a href="{{ route('catalog.index') }}" class="flex items-center shrink-0 group focus:outline-none">
+            <a href="{{ route('catalog.index') }}" class="flex items-center min-w-0 shrink group focus:outline-none">
                 <x-brand-logo variant="header" :settings="$settings" />
             </a>
 
@@ -141,10 +141,10 @@
                     </svg>
                 </button>
 
-                <!-- Botón Login Panel -->
+                <!-- Botón Login Panel (oculto en móvil porque ya está en el menú desplegable) -->
                 <a href="{{ route('filament.admin.auth.login') }}" 
                    title="Acceso Administración"
-                   class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white transition flex items-center justify-center border border-zinc-200/80 dark:border-zinc-700 shadow-sm">
+                   class="hidden sm:flex w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white transition items-center justify-center border border-zinc-200/80 dark:border-zinc-700 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
@@ -187,7 +187,7 @@
     <!-- HERO EDITORIAL DE MONTAJES (Inspirado en imagen 2) -->
     <section class="py-12 sm:py-16 bg-zinc-50/70 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl">
-            <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-4 py-1 rounded-full inline-block mb-4 font-semibold">
+            <span class="text-[10px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 sm:px-4 py-1 rounded-full inline-block mb-4 font-semibold max-w-full">
                 Portafolio Exclusivo &bull; Trabajos Reales
             </span>
             <h1 class="font-serif text-3xl sm:text-5xl md:text-6xl font-light text-zinc-900 dark:text-white tracking-wide">
@@ -223,18 +223,18 @@
             ->all();
     @endphp
     @if($teno)
-    <section id="proyecto-destacado" class="py-14 sm:py-20 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+    <section id="proyecto-destacado" class="py-12 sm:py-20 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 overflow-x-clip">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-10 shadow-sm">
+            <div class="bg-zinc-50/70 dark:bg-zinc-900/60 rounded-3xl border border-zinc-200/90 dark:border-zinc-800 p-4 sm:p-10 shadow-sm">
                 
                 <!-- Encabezado Editorial Spaced -->
                 <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6 pb-6 border-b border-zinc-200/80 dark:border-zinc-800 mb-8">
-                    <div>
-                        <h2 class="font-serif text-3xl sm:text-5xl font-light tracking-[0.3em] uppercase text-zinc-900 dark:text-white">
+                    <div class="min-w-0">
+                        <h2 class="font-serif text-2xl sm:text-5xl font-light tracking-[0.08em] sm:tracking-[0.22em] uppercase text-zinc-900 dark:text-white break-words">
                             {{ $teno['title'] }}
                         </h2>
                         
-                        <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
+                        <div class="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 text-xs">
                             <div>
                                 <span class="text-zinc-500 dark:text-zinc-400 block font-medium">Cliente / Empresa</span>
                                 <span class="text-zinc-900 dark:text-zinc-100 font-semibold text-sm">{{ $teno['client'] ?: 'Cliente Privado' }}</span>

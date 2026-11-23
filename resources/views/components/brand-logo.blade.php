@@ -60,9 +60,9 @@
     </div>
 @elseif($variant === 'footer')
     {{-- Versión Completa Oficial VYS (Footer Editorial) --}}
-    <div {{ $attributes->merge(['class' => 'inline-flex flex-col items-start select-none']) }}>
-        <div class="flex items-center gap-3.5 sm:gap-4">
-            <svg viewBox="0 0 180 116" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-14 sm:h-16 w-auto shrink-0 text-zinc-900 dark:text-zinc-50 transition-transform duration-300 group-hover:scale-105" role="img" aria-label="{{ $siteName }}">
+    <div {{ $attributes->merge(['class' => 'inline-flex flex-col items-start max-w-full select-none']) }}>
+        <div class="flex items-center gap-3 sm:gap-4 max-w-full">
+            <svg viewBox="0 0 180 116" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-12 sm:h-16 w-auto shrink-0 text-zinc-900 dark:text-zinc-50 transition-transform duration-300 group-hover:scale-105" role="img" aria-label="{{ $siteName }}">
                 <defs>
                     <linearGradient id="vysGoldFooter" x1="15" y1="8" x2="165" y2="108" gradientUnits="userSpaceOnUse">
                         <stop offset="0%" stop-color="#B68228"/>
@@ -98,7 +98,7 @@
             </div>
         </div>
         <div class="mt-2.5 pt-2 border-t border-amber-500/30 w-full">
-            <span class="block text-[9px] sm:text-[10px] font-mono tracking-[0.16em] text-zinc-600 dark:text-zinc-400 uppercase">
+            <span class="block text-[8.5px] sm:text-[10px] font-mono tracking-[0.08em] sm:tracking-[0.16em] text-zinc-600 dark:text-zinc-400 uppercase leading-relaxed">
                 <span class="text-amber-600 dark:text-amber-400">&bull;</span> Catering
                 <span class="text-amber-600 dark:text-amber-400">&bull;</span> Mobiliario
                 <span class="text-amber-600 dark:text-amber-400">&bull;</span> Mesas
@@ -110,9 +110,9 @@
         </div>
     </div>
 @else
-    {{-- Versión Header Responsiva (Nítida desde móvil 360px hasta Desktop 4K) --}}
-    <div {{ $attributes->merge(['class' => 'inline-flex items-center gap-2 sm:gap-2.5 shrink-0 select-none']) }}>
-        <svg viewBox="0 0 180 116" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-10 sm:h-11 w-auto shrink-0 text-zinc-900 dark:text-zinc-50 transition-transform duration-300 group-hover:scale-105" role="img" aria-label="{{ $siteName }}">
+    {{-- Versión Header Responsiva (Nítida y proporcional desde 320px hasta Desktop 4K) --}}
+    <div {{ $attributes->merge(['class' => 'inline-flex items-center gap-1.5 sm:gap-2.5 min-w-0 max-w-full shrink select-none']) }}>
+        <svg viewBox="0 0 180 116" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-8 sm:h-11 w-auto shrink-0 text-zinc-900 dark:text-zinc-50 transition-transform duration-300 group-hover:scale-105" role="img" aria-label="{{ $siteName }}">
             <defs>
                 <linearGradient id="vysGoldHeader" x1="15" y1="8" x2="165" y2="108" gradientUnits="userSpaceOnUse">
                     <stop offset="0%" stop-color="#B68228"/>
@@ -140,14 +140,14 @@
                 Productora de Eventos
             </span>
             <div class="flex items-baseline gap-1.5">
-                <span class="font-serif text-2xl sm:text-[26px] font-bold tracking-[0.06em] leading-none">
+                <span class="font-serif text-xl sm:text-[26px] font-bold tracking-[0.06em] leading-none">
                     <span class="text-zinc-950 dark:text-white">V</span><span class="bg-gradient-to-b from-amber-500 via-amber-600 to-amber-700 dark:from-amber-300 dark:via-amber-400 dark:to-amber-500 bg-clip-text text-transparent">Y</span><span class="text-zinc-950 dark:text-white">S</span>
                 </span>
                 <span class="hidden md:inline text-[8px] font-mono tracking-[0.14em] text-zinc-500 dark:text-zinc-400 uppercase whitespace-nowrap">
                     Servicios Integrales
                 </span>
             </div>
-            <span class="block sm:hidden text-[7.5px] font-mono tracking-[0.12em] text-zinc-500 dark:text-zinc-400 uppercase whitespace-nowrap mt-0.5">
+            <span class="block sm:hidden text-[6.5px] font-mono tracking-[0.08em] text-zinc-500 dark:text-zinc-400 uppercase truncate mt-0.5">
                 Productora de Eventos
             </span>
         </div>

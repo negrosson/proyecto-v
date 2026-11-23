@@ -53,13 +53,13 @@
     </style>
 </head>
 <body x-data="quoteCart()" 
-      class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased min-h-screen flex flex-col selection:bg-amber-500 selection:text-white transition-colors duration-200">
+      class="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans antialiased min-h-screen flex flex-col selection:bg-amber-500 selection:text-white overflow-x-clip transition-colors duration-200">
 
     <!-- HEADER / NAVEGACIÓN PRINCIPAL -->
     <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors duration-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4 min-w-0">
             <!-- Brand Logo Oficial VYS -->
-            <a href="{{ route('catalog.index') }}" class="flex items-center shrink-0 group focus:outline-none">
+            <a href="{{ route('catalog.index') }}" class="flex items-center min-w-0 shrink group focus:outline-none">
                 <x-brand-logo variant="header" :settings="$settings" />
             </a>
 
@@ -122,10 +122,10 @@
                     </svg>
                 </button>
 
-                <!-- Botón Login Panel -->
+                <!-- Botón Login Panel (en móvil disponible dentro del menú para no saturar la barra superior) -->
                 <a href="{{ route('filament.admin.auth.login') }}"
                    title="Acceso Administración"
-                   class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white transition flex items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                   class="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white transition items-center justify-center border border-zinc-200 dark:border-zinc-700 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
@@ -227,9 +227,9 @@
             <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none" style="background-image: radial-gradient(#18181B 1px, transparent 1px); background-size: 24px 24px;"></div>
 
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                <div class="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-4 py-1.5 rounded-full mb-6 shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
-                    <span class="text-[10px] sm:text-xs font-mono font-medium tracking-widest uppercase text-zinc-700 dark:text-zinc-300">
+                <div class="inline-flex flex-wrap items-center justify-center gap-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 px-3.5 sm:px-4 py-1.5 rounded-full mb-6 shadow-sm max-w-full">
+                    <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0"></span>
+                    <span class="text-[10px] sm:text-xs font-mono font-medium tracking-wider sm:tracking-widest uppercase text-zinc-700 dark:text-zinc-300">
                         CELEBRA CON ESTILO &bull; TU EVENTO, NUESTRO MOBILIARIO
                     </span>
                 </div>
@@ -497,18 +497,18 @@
             </div>
 
             <!-- Gran Banner de Valor: ¡NOSOTROS LAVAMOS POR TI! -->
-            <div class="mt-14 sm:mt-20 bg-gradient-to-r from-zinc-900 via-zinc-950 to-zinc-900 text-white rounded-3xl p-8 sm:p-12 border border-zinc-800 shadow-2xl relative overflow-hidden group">
+            <div class="mt-12 sm:mt-20 bg-gradient-to-r from-zinc-900 via-zinc-950 to-zinc-900 text-white rounded-3xl p-5 sm:p-12 border border-zinc-800 shadow-2xl relative overflow-hidden group">
                 <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none group-hover:bg-amber-500/20 transition-all duration-700"></div>
 
-                <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                    <div class="max-w-2xl">
-                        <div class="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3.5 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-4">
+                <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
+                    <div class="max-w-2xl min-w-0">
+                        <div class="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 bg-amber-500/10 border border-amber-500/30 text-amber-300 px-3 py-1 rounded-full text-[10px] sm:text-xs font-mono uppercase tracking-wider mb-4 max-w-full">
                             <span>✨ Cero Preocupaciones</span>
                             <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                             <span>Higiene & Desinfección Certificada</span>
                         </div>
 
-                        <h3 class="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-white tracking-wide">
+                        <h3 class="font-serif text-2xl sm:text-4xl md:text-5xl font-light text-white tracking-wide break-words">
                             ¡NOSOTROS <span class="font-bold text-amber-400">LAVAMOS POR TI!</span>
                         </h3>
 
