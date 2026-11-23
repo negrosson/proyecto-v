@@ -307,15 +307,15 @@
         $hasHeroBanner = !request('categoria') && !request('buscar');
     @endphp
 
-    <!-- Franja Superior Boutique (Announcement Bar) -->
-    <div class="bg-zinc-950 text-zinc-200 border-b border-amber-500/20 text-[10px] sm:text-[11px] font-medium relative z-50">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-1.5 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2 sm:gap-3 min-w-0 truncate">
+    <!-- Franja Superior Boutique (solo desde tablet/desktop para no saturar pantalla móvil) -->
+    <div class="hidden sm:block bg-zinc-950 text-zinc-200 border-b border-amber-500/20 text-[11px] font-medium relative z-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-1.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0 truncate">
                 <span class="inline-flex items-center gap-1.5 text-amber-300 font-semibold shrink-0">
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
                     <span>Santiago &amp; Regiones</span>
                 </span>
-                <span class="text-zinc-600 hidden sm:inline">&bull;</span>
+                <span class="text-zinc-600">&bull;</span>
                 <span class="truncate text-zinc-300">Lavado de vajilla y mantelería 100% incluido</span>
                 <span class="text-zinc-600 hidden md:inline">&bull;</span>
                 <span class="hidden md:inline text-zinc-400">Despacho y retiro coordinado</span>
@@ -325,8 +325,7 @@
                rel="noopener noreferrer"
                class="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold shrink-0 transition">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                <span class="hidden sm:inline">WhatsApp Directo</span>
-                <span class="sm:hidden">WhatsApp</span>
+                <span>WhatsApp Directo</span>
             </a>
         </div>
     </div>
@@ -338,8 +337,8 @@
             :class="(hasHero && !scrolled && !mobileMenuOpen)
                 ? 'navbar-over-hero bg-zinc-950/40 backdrop-blur-md border-white/10 text-white'
                 : 'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-zinc-200/80 dark:border-zinc-800 shadow-sm text-zinc-900 dark:text-white'"
-            class="sticky top-0 z-40 border-b transition-all duration-300 {{ $hasHeroBanner ? '-mb-[66px] sm:-mb-[76px]' : '' }}">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-[74px] flex items-center justify-between gap-3 sm:gap-5 min-w-0">
+            class="sticky top-0 z-40 border-b transition-all duration-300 {{ $hasHeroBanner ? '-mb-[58px] sm:-mb-[76px]' : '' }}">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-[74px] flex items-center justify-between gap-2 sm:gap-5 min-w-0">
 
             <!-- Brand Logo Oficial VYS (shrink-0 en desktop para jamás chocar con la navegación) -->
             <a href="{{ route('catalog.index') }}" class="group flex items-center shrink-0 focus:outline-none">
@@ -594,7 +593,7 @@
                  x-init="initHero()"
                  @mousemove="handleMouseMove($event)"
                  @mouseleave="spotlightActive = false"
-                 class="relative bg-zinc-950 border-b border-zinc-800 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-36 lg:pb-32 overflow-hidden select-none min-h-[540px] sm:min-h-[620px] lg:min-h-[670px] flex items-center">
+                 class="relative bg-zinc-950 border-b border-zinc-800 pt-20 pb-12 sm:pt-32 sm:pb-28 lg:pt-36 lg:pb-32 overflow-hidden select-none min-h-[450px] sm:min-h-[620px] lg:min-h-[670px] flex items-center">
 
             <!-- 0. Carrusel Fotográfico Real de Montajes con Crossfade & Zoom Suave (Ken Burns) -->
             <div class="absolute inset-0 z-0 overflow-hidden bg-zinc-950">
@@ -633,24 +632,24 @@
 
             <!-- Contenido Editorial Principal -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 w-full">
-                <!-- Badges Superiores en Cristal (Glassmorphism) + Rotador de Especialidades -->
-                <div class="hero-reveal-1 flex flex-col sm:flex-row items-center justify-center gap-2.5 mb-5 sm:mb-7">
-                    <div class="inline-flex items-center gap-2 bg-zinc-950/55 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full shadow-lg">
+                <!-- Badges Superiores: en móvil 1 sola píldora limpia; en tablet/desktop ambas -->
+                <div class="hero-reveal-1 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-2.5 mb-3.5 sm:mb-7">
+                    <div class="hidden sm:inline-flex items-center gap-2 bg-zinc-950/55 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full shadow-lg">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
                         </span>
-                        <span class="text-[10px] sm:text-xs font-mono font-semibold tracking-widest uppercase text-zinc-100">
+                        <span class="text-xs font-mono font-semibold tracking-widest uppercase text-zinc-100">
                             {{ $settings->hero_badge ?? 'Catálogo Oficial • Temporada 2026' }}
                         </span>
                     </div>
 
                     <!-- Píldora Dinámica Cambiante en Champaña Dorado -->
-                    <div class="inline-flex items-center gap-2 bg-amber-400/15 backdrop-blur-md border border-amber-300/35 px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-medium text-amber-200 shadow-lg overflow-hidden max-w-full h-7 sm:h-8">
-                        <svg class="w-3.5 h-3.5 text-amber-300 shrink-0 animate-spin" style="animation-duration: 9s;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="inline-flex items-center gap-1.5 sm:gap-2 bg-zinc-950/55 sm:bg-amber-400/15 backdrop-blur-md border border-amber-300/35 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-medium text-amber-200 shadow-lg overflow-hidden max-w-full h-7 sm:h-8">
+                        <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300 shrink-0 animate-spin" style="animation-duration: 9s;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
                         </svg>
-                        <div class="relative flex items-center justify-center min-w-0 w-[205px] max-w-[74vw] sm:w-[240px] sm:max-w-none">
+                        <div class="relative flex items-center justify-center min-w-0 w-[195px] max-w-[70vw] sm:w-[240px] sm:max-w-none">
                             <template x-for="(tag, idx) in eventTags" :key="idx">
                                 <span x-show="activeTagIndex === idx"
                                       x-transition:enter="transition ease-out duration-500"
@@ -666,8 +665,8 @@
                     </div>
                 </div>
 
-                <!-- Título Principal Editorial Cinematográfico -->
-                <h1 class="hero-reveal-2 font-serif text-[2rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] font-light tracking-tight text-white max-w-4xl mx-auto leading-[1.09] drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)] break-words">
+                <!-- Título Principal Editorial Cinematográfico (respirable en móvil, monumental en desktop) -->
+                <h1 class="hero-reveal-2 font-serif text-[1.75rem] leading-[1.13] sm:text-5xl md:text-6xl lg:text-[4.25rem] sm:leading-[1.09] font-light tracking-tight text-white max-w-md sm:max-w-4xl mx-auto drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)] break-words">
                     @if(!empty($settings?->hero_title) && $settings->hero_title !== 'Equipamiento y ambientación para ocasiones extraordinarias')
                         {{ $settings->hero_title }}
                     @else
@@ -676,48 +675,52 @@
                 </h1>
 
                 <!-- Subtítulo Editorial -->
-                <p class="hero-reveal-3 text-xs sm:text-sm md:text-base text-zinc-200/95 mt-4 sm:mt-6 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-sm">
+                <p class="hero-reveal-3 text-[13px] sm:text-sm md:text-base text-zinc-200/95 mt-3 sm:mt-6 max-w-sm sm:max-w-2xl mx-auto font-light leading-relaxed drop-shadow-sm line-clamp-3 sm:line-clamp-none">
                     {{ $settings->hero_subtitle ?? 'Mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y celebraciones corporativas. Celebra con distinción y logística puntual garantizada.' }}
                 </p>
 
-                <!-- Botones CTA de Alto Contraste (Dorado Luxury + Cristal Transparente) -->
-                <div class="hero-reveal-4 mt-7 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-3.5 max-w-md sm:max-w-none mx-auto">
-                    <a href="#catalogo" class="hero-btn-shimmer group inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-xs sm:text-sm px-7 py-3.5 rounded-full shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-400/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                <!-- Botones CTA en una fila limpia desde móvil (cero saturación vertical) -->
+                <div class="hero-reveal-4 mt-5 sm:mt-9 flex flex-wrap items-center justify-center gap-2 sm:gap-3.5">
+                    <a href="#catalogo" class="hero-btn-shimmer group inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-xs sm:text-sm px-5 sm:px-7 py-2.5 sm:py-3.5 rounded-full shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-400/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
                         <span>Explorar Catálogo</span>
-                        <svg class="w-4 h-4 text-zinc-950 group-hover:translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-950 group-hover:translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
                     </a>
-                    <a href="{{ route('catalog.montajes') }}" class="group inline-flex items-center justify-center gap-2.5 bg-white/12 hover:bg-white/22 backdrop-blur-md text-white border border-white/25 hover:border-amber-300/60 font-medium text-xs sm:text-sm px-6 py-3.5 rounded-full shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                        <span>Montajes Realizados</span>
-                        <span class="text-[10px] font-mono bg-amber-400/20 text-amber-200 px-2 py-0.5 rounded-full font-bold border border-amber-300/30 group-hover:bg-amber-400 group-hover:text-zinc-950 transition-colors duration-300">2023-2026</span>
+                    <a href="{{ route('catalog.montajes') }}" class="group inline-flex items-center justify-center gap-2 bg-white/12 hover:bg-white/22 backdrop-blur-md text-white border border-white/25 hover:border-amber-300/60 font-medium text-xs sm:text-sm px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-full shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                        <span class="sm:hidden">Ver Montajes</span>
+                        <span class="hidden sm:inline">Montajes Realizados</span>
+                        <span class="hidden sm:inline-block text-[10px] font-mono bg-amber-400/20 text-amber-200 px-2 py-0.5 rounded-full font-bold border border-amber-300/30 group-hover:bg-amber-400 group-hover:text-zinc-950 transition-colors duration-300">2023-2026</span>
                     </a>
                 </div>
 
-                <!-- Mini-Stats en Cristal Oscuro Frosted (Proporcionales desde móvil) -->
-                <div class="hero-reveal-5 mt-8 sm:mt-11 grid grid-cols-3 gap-2 sm:gap-4 max-w-3xl mx-auto">
-                    <a href="#catalogo" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-amber-400/50 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
+                <!-- Mini-Stats en Cristal Oscuro Frosted (compactas en móvil para dejar respirar la fotografía) -->
+                <div class="hero-reveal-5 mt-6 sm:mt-11 grid grid-cols-3 gap-1.5 sm:gap-4 max-w-md sm:max-w-3xl mx-auto">
+                    <a href="#catalogo" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-amber-400/50 py-2 px-1.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
                         <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span class="block font-serif text-lg sm:text-3xl font-bold text-white group-hover:scale-105 transition-transform duration-300"
+                        <span class="block font-serif text-base sm:text-3xl font-bold text-white group-hover:scale-105 transition-transform duration-300 leading-tight"
                               x-text="'+' + (itemsCounter || 190)">+190</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-300 font-medium mt-0.5 block leading-tight">Ítems de colección</span>
+                        <span class="sm:hidden text-[9.5px] text-zinc-300 font-medium mt-0.5 block leading-tight">Ítems</span>
+                        <span class="hidden sm:block text-xs text-zinc-300 font-medium mt-0.5 leading-tight">Ítems de colección</span>
                     </a>
 
-                    <a href="#como-cotizar" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-emerald-400/50 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
+                    <a href="#como-cotizar" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-emerald-400/50 py-2 px-1.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
                         <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span class="block font-serif text-lg sm:text-3xl font-bold text-emerald-400 group-hover:scale-105 transition-transform duration-300"
+                        <span class="block font-serif text-base sm:text-3xl font-bold text-emerald-400 group-hover:scale-105 transition-transform duration-300 leading-tight"
                               x-text="(sanitizedCounter || 100) + '%'">100%</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-300 font-medium mt-0.5 block leading-tight">Lavado incluido</span>
+                        <span class="sm:hidden text-[9.5px] text-zinc-300 font-medium mt-0.5 block leading-tight">Lavado incl.</span>
+                        <span class="hidden sm:block text-xs text-zinc-300 font-medium mt-0.5 leading-tight">Lavado incluido</span>
                     </a>
 
-                    <a href="#envios" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-amber-400/50 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
+                    <a href="#envios" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-amber-400/50 py-2 px-1.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
                         <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span class="block font-serif text-lg sm:text-3xl font-bold text-amber-300 group-hover:scale-105 transition-transform duration-300">Puntual</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-300 font-medium mt-0.5 block leading-tight">Entrega coordinada</span>
+                        <span class="block font-serif text-base sm:text-3xl font-bold text-amber-300 group-hover:scale-105 transition-transform duration-300 leading-tight">Puntual</span>
+                        <span class="sm:hidden text-[9.5px] text-zinc-300 font-medium mt-0.5 block leading-tight">Despacho</span>
+                        <span class="hidden sm:block text-xs text-zinc-300 font-medium mt-0.5 leading-tight">Entrega coordinada</span>
                     </a>
                 </div>
 
-                <!-- Control Discreto de Escenas Reales del Hero -->
-                <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4 text-[10px] sm:text-[11px] font-mono text-zinc-300/90">
-                    <span class="inline-flex items-center gap-1.5 bg-zinc-950/45 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full">
+                <!-- Control Discreto de Escenas Reales (en móvil solo puntos sutiles) -->
+                <div class="mt-4 sm:mt-8 flex items-center justify-center gap-3 sm:gap-4 text-[11px] font-mono text-zinc-300/90">
+                    <span class="hidden sm:inline-flex items-center gap-1.5 bg-zinc-950/45 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full">
                         <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                         <span x-text="slides[activeSlide]?.caption"></span>
                     </span>
@@ -735,14 +738,14 @@
         </section>
 
         <!-- Barra de 3 Pasos de Reserva Visual con Pulso Luminoso Conector -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 relative z-20">
-            <div class="relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-4 sm:p-6 shadow-xl shadow-zinc-900/5 overflow-hidden">
+        <section class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 -mt-5 sm:-mt-10 relative z-20">
+            <div class="relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-3 sm:p-6 shadow-xl shadow-zinc-900/5 overflow-hidden">
                 <!-- Haz de luz animado recorriendo el borde superior de los 3 pasos -->
                 <div class="absolute inset-x-0 top-0 h-[2px] bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
                     <div class="hero-step-beam"></div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 relative">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-6 relative">
                     <!-- Paso 1 -->
                     <a href="#catalogo" class="group flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/50 hover:bg-white dark:hover:bg-zinc-800 border border-zinc-200/60 dark:border-zinc-700/60 hover:border-amber-500/40 dark:hover:border-amber-400/40 hover:shadow-md transition-all duration-300">
                         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-zinc-900 dark:bg-zinc-700 group-hover:bg-amber-500 text-amber-300 group-hover:text-zinc-950 font-serif text-base font-bold flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-all duration-300">
