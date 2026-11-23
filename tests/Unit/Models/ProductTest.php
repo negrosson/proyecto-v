@@ -137,12 +137,15 @@ class ProductTest extends TestCase
 
         $this->assertNull($plato->image_url);
         $this->assertTrue($plato->usesFallbackImage());
+        $this->assertTrue($plato->usesWhiteStudioBackground());
         $this->assertStringEndsWith('/images/products/default-platos.webp', $plato->display_image_url);
         $this->assertStringEndsWith('/images/products/default-plato-base.webp', $platoBase->display_image_url);
         $this->assertStringEndsWith('/images/products/default-cubiertos.webp', $cubiertoPlata->display_image_url);
-        $this->assertStringEndsWith('/images/products/default-cubiertos-dorados.webp', $cubiertoDorado->display_image_url);
+        $this->assertStringEndsWith('/images/products/articulo-cubiertos-dorados.webp', $cubiertoDorado->display_image_url);
+        $this->assertFalse($cubiertoDorado->usesWhiteStudioBackground());
         $this->assertStringEndsWith('/images/products/default-copas.webp', $copa->display_image_url);
-        $this->assertStringEndsWith('/images/products/default-vasos.webp', $vaso->display_image_url);
+        $this->assertStringEndsWith('/images/products/articulo-vaso-vidrio.webp', $vaso->display_image_url);
+        $this->assertFalse($vaso->usesWhiteStudioBackground());
         $this->assertStringEndsWith('/images/products/default-manteleria.webp', $mantel->display_image_url);
     }
 }

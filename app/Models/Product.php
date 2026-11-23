@@ -150,6 +150,14 @@ class Product extends Model
         $categorySlug = $this->category?->slug ?? '';
 
         // 1. Vajilla, Cristalería y Cubertería
+        if (str_contains($normalizedName, 'ALCUZA')) {
+            return asset('images/products/articulo-alcuza-completa.webp');
+        }
+
+        if (str_contains($normalizedName, 'TAZA')) {
+            return asset('images/products/articulo-taza-cafe.webp');
+        }
+
         if (str_contains($normalizedName, 'PLATO BASE')
             || str_contains($normalizedName, 'PLATO DORADO')
             || str_contains($normalizedName, 'PLATO PLAQUET')) {
@@ -163,7 +171,7 @@ class Product extends Model
             || str_contains($normalizedName, 'PALETA PARA ENSALADAS')
             || str_contains($normalizedName, 'PINZA METAL')) {
             return str_contains($normalizedName, 'DORAD')
-                ? asset('images/products/default-cubiertos-dorados.webp')
+                ? asset('images/products/articulo-cubiertos-dorados.webp')
                 : asset('images/products/default-cubiertos.webp');
         }
 
@@ -176,7 +184,7 @@ class Product extends Model
         }
 
         if (str_contains($normalizedName, 'VASO') || str_contains($normalizedName, 'SHOT')) {
-            return asset('images/products/default-vasos.webp');
+            return asset('images/products/articulo-vaso-vidrio.webp');
         }
 
         if ($categorySlug === 'vajilla'
@@ -184,19 +192,21 @@ class Product extends Model
                 || str_contains($normalizedName, 'POCILLO')
                 || str_contains($normalizedName, 'ENSALADERA')
                 || str_contains($normalizedName, 'REMEKEN')
-                || str_contains($normalizedName, 'TAZA')
                 || str_contains($normalizedName, 'AZUCARERO')
                 || str_contains($normalizedName, 'CAFETERO')
                 || str_contains($normalizedName, 'SALERO')
                 || str_contains($normalizedName, 'PIMENTERO')
-                || str_contains($normalizedName, 'ALCUZA')
                 || str_contains($normalizedName, 'PANERA'))) {
             return asset('images/products/default-platos.webp');
         }
 
         // 2. Equipamiento de Cocina & Banquetería Industrial
         if ($categorySlug === 'equipamiento-cocina') {
-            if (str_contains($normalizedName, 'ARROCERA') || str_contains($normalizedName, 'FONDO GRANDE')) {
+            if (str_contains($normalizedName, 'ARROCERA')) {
+                return asset('images/products/articulo-arrocera-15kg.webp');
+            }
+
+            if (str_contains($normalizedName, 'FONDO GRANDE')) {
                 return asset('images/products/default-arrocera.webp');
             }
 
@@ -230,6 +240,34 @@ class Product extends Model
 
         // 3. Bar, Ambientación y Decoración
         if ($categorySlug === 'bar-decoracion') {
+            if (str_contains($normalizedName, 'ATRIL')) {
+                return asset('images/products/articulo-atril-porta-letrero.webp');
+            }
+
+            if (str_contains($normalizedName, 'BANDEJA PLAQUET')) {
+                return asset('images/products/articulo-bandeja-plaquet-tapa-vidrio.webp');
+            }
+
+            if (str_contains($normalizedName, 'BASURERO')) {
+                return asset('images/products/articulo-basurero.webp');
+            }
+
+            if (str_contains($normalizedName, 'COCTELERA')) {
+                return asset('images/products/articulo-coctelera.webp');
+            }
+
+            if (str_contains($normalizedName, 'DECANTADOR')) {
+                return asset('images/products/articulo-decantador-vino.webp');
+            }
+
+            if (str_contains($normalizedName, 'FLORERO 20 CM CUADRADO')) {
+                return asset('images/products/articulo-florero-20cm-cuadrado.webp');
+            }
+
+            if (str_contains($normalizedName, 'PORTA CERVEZA')) {
+                return asset('images/products/articulo-porta-cerveza.webp');
+            }
+
             if (str_contains($normalizedName, 'ARCO DE NOVIO') || str_contains($normalizedName, 'CORTINAJE')) {
                 return asset('images/products/catalog-arco-novio.webp');
             }
@@ -246,7 +284,6 @@ class Product extends Model
                 || str_contains($normalizedName, 'PEDESTAL')
                 || str_contains($normalizedName, 'JAULA DORADA')
                 || str_contains($normalizedName, 'PLATO MADERA')
-                || str_contains($normalizedName, 'ATRIL')
                 || str_contains($normalizedName, 'PASTO ARTIFICIAL')) {
                 return asset('images/products/catalog-decoracion-floral.webp');
             }
@@ -287,6 +324,10 @@ class Product extends Model
 
         // 5. Mobiliario, Carpas y Lounge
         if ($categorySlug === 'mobiliario') {
+            if (str_contains($normalizedName, 'ALFOMBRA')) {
+                return asset('images/products/articulo-alfombra-roja.webp');
+            }
+
             if (str_contains($normalizedName, 'CARPA')) {
                 return asset('images/products/catalog-carpa-evento.webp');
             }
@@ -300,10 +341,6 @@ class Product extends Model
                 || str_contains($normalizedName, 'TRIO MESA')
                 || str_contains($normalizedName, 'MESA DE APOYO')) {
                 return asset('images/products/catalog-mesa-novios.webp');
-            }
-
-            if (str_contains($normalizedName, 'ALFOMBRA')) {
-                return asset('images/products/silla-plegable-blanca.jpg');
             }
 
             return asset('images/products/default-mobiliario.webp');

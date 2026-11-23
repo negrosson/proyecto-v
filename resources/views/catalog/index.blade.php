@@ -37,7 +37,7 @@
     <meta property="og:url" content="{{ $canonicalUrl }}">
     <meta property="og:title" content="{{ $seoTitle }}">
     <meta property="og:description" content="{{ $seoDescription }}">
-    <meta property="og:image" content="{{ !empty($settings?->hero_bg_image) ? asset('storage/' . $settings->hero_bg_image) : asset('images/montajes/teno-mesa-principal.jpg') }}">
+    <meta property="og:image" content="{{ $activeCategory?->slug === 'vajilla' ? asset('images/products/portada-vajilla-cristaleria.webp') : (!empty($settings?->hero_bg_image) ? asset('storage/' . $settings->hero_bg_image) : asset('images/montajes/teno-mesa-principal.jpg')) }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{{ $seoTitle }}">
     <meta name="twitter:description" content="{{ $seoDescription }}">
