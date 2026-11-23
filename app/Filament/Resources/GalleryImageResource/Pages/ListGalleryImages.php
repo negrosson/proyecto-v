@@ -94,7 +94,7 @@ class ListGalleryImages extends ListRecords
                         ->image()
                         ->maxSize(4096)
                         ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                        ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'galeria'))
+                        ->saveUploadedFileUsing(fn (UploadedFile $file, BaseFileUpload $component): string => SafeImageSanitizer::sanitizeForFilament($file, 'public', 'galeria', $component->getStatePath()))
                         ->required()
                         ->helperText('Solo JPG, PNG o WebP verificados (máx. 4 MB por foto).')
                         ->columnSpanFull(),

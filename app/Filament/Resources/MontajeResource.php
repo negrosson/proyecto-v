@@ -6,9 +6,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MontajeResource\Pages;
 use App\Models\Montaje;
+use App\Services\Media\PublicMediaCleaner;
 use App\Services\Security\SafeImageSanitizer;
 use App\Support\Filament\PreviewImageResolver;
 use Filament\Forms;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
@@ -16,7 +18,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MontajeResource extends Resource
@@ -139,10 +140,10 @@ class MontajeResource extends Resource
                                     ->live()
                                     ->maxSize(4096)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'montajes'))
-                                    ->deleteUploadedFileUsing(function (?string $file): void {
-                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
-                                            Storage::disk('public')->delete($file);
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file, BaseFileUpload $component): string => SafeImageSanitizer::sanitizeForFilament($file, 'public', 'montajes', $component->getStatePath()))
+                                    ->deleteUploadedFileUsing(function (mixed $file): void {
+                                        if (is_string($file)) {
+                                            PublicMediaCleaner::deleteIfUnreferenced($file);
                                         }
                                     })
                                     ->deletable(true)
@@ -166,10 +167,10 @@ class MontajeResource extends Resource
                                     ->image()
                                     ->maxSize(4096)
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                                    ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'montajes/galeria'))
-                                    ->deleteUploadedFileUsing(function (?string $file): void {
-                                        if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
-                                            Storage::disk('public')->delete($file);
+                                    ->saveUploadedFileUsing(fn (UploadedFile $file, BaseFileUpload $component): string => SafeImageSanitizer::sanitizeForFilament($file, 'public', 'montajes/galeria', $component->getStatePath()))
+                                    ->deleteUploadedFileUsing(function (mixed $file): void {
+                                        if (is_string($file)) {
+                                            PublicMediaCleaner::deleteIfUnreferenced($file);
                                         }
                                     })
                                     ->helperText('Sube múltiples fotos para mostrar todos los ángulos del montaje. Puedes reordenarlas o quitarlas individualmente.')

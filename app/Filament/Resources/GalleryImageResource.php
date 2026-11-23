@@ -18,7 +18,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 
 class GalleryImageResource extends Resource
 {
@@ -81,10 +80,10 @@ class GalleryImageResource extends Resource
                             ->image()
                             ->maxSize(4096)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->saveUploadedFileUsing(fn (UploadedFile $file): string => SafeImageSanitizer::sanitize($file, 'public', 'galeria'))
-                            ->deleteUploadedFileUsing(function (?string $file): void {
-                                if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
-                                    Storage::disk('public')->delete($file);
+                            ->saveUploadedFileUsing(fn (UploadedFile $file, BaseFileUpload $component): string => SafeImageSanitizer::sanitizeForFilament($file, 'public', 'galeria', $component->getStatePath()))
+                            ->deleteUploadedFileUsing(function (mixed $file): void {
+                                if (is_string($file)) {
+                                    PublicMediaCleaner::deleteIfUnreferenced($file);
                                 }
                             })
                             ->deletable(true)

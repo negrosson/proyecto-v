@@ -76,12 +76,29 @@
                 </button>
             </form>
 
-            <div class="tfa-footer-bar" style="justify-content:center; padding-top:1rem; margin-top:1.25rem;">
+            <div class="tfa-footer-bar" style="flex-direction:column; align-items:center; gap:0.85rem; padding-top:1rem; margin-top:1.25rem;">
                 <button type="button"
                         wire:click="$toggle('useRecoveryCode')"
                         style="background:none; border:none; cursor:pointer; font-size:0.78rem; font-weight:600; color:#71717a; text-decoration:underline;">
                     {{ $useRecoveryCode ? 'Volver al código de 6 dígitos de la app' : '¿Sin acceso al teléfono? Usar código de emergencia' }}
                 </button>
+
+                <div style="display:flex; align-items:center; justify-content:center; gap:1rem; flex-wrap:wrap;">
+                    <form method="POST" action="{{ \Filament\Facades\Filament::getLogoutUrl() }}" style="margin:0;">
+                        @csrf
+                        <button type="submit"
+                                style="background:none; border:none; cursor:pointer; font-size:0.78rem; font-weight:600; color:#ef4444; text-decoration:underline;">
+                            Cerrar sesión y volver al login
+                        </button>
+                    </form>
+
+                    <span style="color:#d4d4d8;">·</span>
+
+                    <a href="{{ route('catalog.index') }}"
+                       style="font-size:0.78rem; font-weight:600; color:#71717a; text-decoration:underline;">
+                        Ir al catálogo público
+                    </a>
+                </div>
             </div>
         </div>
     </div>

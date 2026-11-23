@@ -8,9 +8,11 @@ use App\Actions\Admin\MoveProductsToCategoryAction;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\Media\PublicMediaCleaner;
 use App\Services\Security\SafeImageSanitizer;
 use App\Support\Filament\PreviewImageResolver;
 use Filament\Forms;
+use Filament\Forms\Components\BaseFileUpload;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
@@ -21,7 +23,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductResource extends Resource
@@ -174,12 +175,10 @@ class ProductResource extends Resource
                             ->downloadable()
                             ->nullable()
                             ->helperText('Formatos permitidos: JPG, PNG, WebP. Tamaño máximo: 4 MB. Al subirla verás abajo cómo queda la tarjeta en el catálogo.')
-                            ->saveUploadedFileUsing(function (UploadedFile $file): string {
-                                return SafeImageSanitizer::sanitize($file, 'public', 'products');
-                            })
-                            ->deleteUploadedFileUsing(function (?string $file): void {
-                                if ($file && ! str_starts_with($file, 'images/') && Storage::disk('public')->exists($file)) {
-                                    Storage::disk('public')->delete($file);
+                            ->saveUploadedFileUsing(fn (UploadedFile $file, BaseFileUpload $component): string => SafeImageSanitizer::sanitizeForFilament($file, 'public', 'products', $component->getStatePath()))
+                            ->deleteUploadedFileUsing(function (mixed $file): void {
+                                if (is_string($file)) {
+                                    PublicMediaCleaner::deleteIfUnreferenced($file);
                                 }
                             })
                             ->columnSpanFull(),
