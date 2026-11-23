@@ -59,7 +59,7 @@
     <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4 min-w-0">
             <!-- Brand Logo Oficial VYS -->
-            <a href="{{ route('catalog.index') }}" class="flex items-center min-w-0 shrink group focus:outline-none">
+            <a href="{{ route('catalog.index') }}" class="flex items-center shrink-0 group focus:outline-none">
                 <x-brand-logo variant="header" :settings="$settings" />
             </a>
 

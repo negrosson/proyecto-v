@@ -303,87 +303,138 @@
       x-data="quoteCart()" 
       x-cloak>
 
-    <!-- Barra de Navegación Pegajosa (Sticky Top) -->
-    <header class="sticky top-0 z-40 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800 transition-colors duration-300">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 sm:gap-4 min-w-0">
-            
-            <!-- Brand Logo Oficial VYS -->
-            <a href="{{ route('catalog.index') }}" class="group flex items-center min-w-0 shrink focus:outline-none">
+    @php
+        $hasHeroBanner = !request('categoria') && !request('buscar');
+    @endphp
+
+    <!-- Franja Superior Boutique (Announcement Bar) -->
+    <div class="bg-zinc-950 text-zinc-200 border-b border-amber-500/20 text-[10px] sm:text-[11px] font-medium relative z-50">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-1.5 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0 truncate">
+                <span class="inline-flex items-center gap-1.5 text-amber-300 font-semibold shrink-0">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span>Santiago &amp; Regiones</span>
+                </span>
+                <span class="text-zinc-600 hidden sm:inline">&bull;</span>
+                <span class="truncate text-zinc-300">Lavado de vajilla y mantelería 100% incluido</span>
+                <span class="text-zinc-600 hidden md:inline">&bull;</span>
+                <span class="hidden md:inline text-zinc-400">Despacho y retiro coordinado</span>
+            </div>
+            <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico desde el catálogo de ' . ($settings->site_name ?? 'VYS Productora de Eventos') . '.') }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold shrink-0 transition">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span class="hidden sm:inline">WhatsApp Directo</span>
+                <span class="sm:hidden">WhatsApp</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Barra de Navegación Adaptativa (Cristal sobre Hero cinematográfico → Sólida elegante al hacer scroll) -->
+    <header x-data="{ scrolled: false, hasHero: {{ $hasHeroBanner ? 'true' : 'false' }} }"
+            x-init="scrolled = window.scrollY > 36"
+            @scroll.window="scrolled = window.scrollY > 36"
+            :class="(hasHero && !scrolled && !mobileMenuOpen)
+                ? 'navbar-over-hero bg-zinc-950/40 backdrop-blur-md border-white/10 text-white'
+                : 'bg-white/95 dark:bg-zinc-950/95 backdrop-blur-xl border-zinc-200/80 dark:border-zinc-800 shadow-sm text-zinc-900 dark:text-white'"
+            class="sticky top-0 z-40 border-b transition-all duration-300 {{ $hasHeroBanner ? '-mb-[66px] sm:-mb-[76px]' : '' }}">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-[74px] flex items-center justify-between gap-3 sm:gap-5 min-w-0">
+
+            <!-- Brand Logo Oficial VYS (shrink-0 en desktop para jamás chocar con la navegación) -->
+            <a href="{{ route('catalog.index') }}" class="group flex items-center shrink-0 focus:outline-none">
                 <x-brand-logo variant="header" :settings="$settings" />
             </a>
 
-            <!-- Enlaces de Navegación Desktop (Responsivo desde lg:1024px sin saturar tablets) -->
-            <nav class="hidden lg:flex items-center gap-3.5 xl:gap-6 text-[11px] xl:text-xs uppercase tracking-wider font-semibold text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
-                <a href="{{ route('catalog.index') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1 relative {{ !request('categoria') && !request('buscar') ? 'text-zinc-950 dark:text-white font-bold border-b-2 border-zinc-900 dark:border-amber-400' : '' }}">
+            <!-- Enlaces de Navegación Desktop (Cápsula elegante de 6 enlaces equilibrados, cero saturación) -->
+            <nav :class="(hasHero && !scrolled && !mobileMenuOpen)
+                    ? 'bg-white/10 border-white/15 text-zinc-100'
+                    : 'bg-zinc-100/80 dark:bg-zinc-900/90 border-zinc-200/80 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300'"
+                 class="hidden lg:flex items-center gap-1 xl:gap-1.5 px-2 py-1.5 rounded-full border backdrop-blur-md text-[11px] xl:text-xs uppercase tracking-wider font-semibold whitespace-nowrap transition-all duration-300">
+                <a href="{{ route('catalog.index') }}"
+                   :class="(hasHero && !scrolled)
+                       ? '{{ !request('categoria') && !request('buscar') ? 'bg-white/18 text-white shadow-xs' : 'hover:bg-white/10 hover:text-white' }}'
+                       : '{{ !request('categoria') && !request('buscar') ? 'bg-white dark:bg-zinc-800 text-zinc-950 dark:text-white shadow-xs' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60' }}'"
+                   class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200">
                     Inicio
                 </a>
-                <a href="{{ (request('categoria') || request('buscar')) ? route('catalog.index') . '#destacados' : '#destacados' }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
-                    Destacados
-                </a>
-                <a href="#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
+                <a href="#catalogo"
+                   :class="(hasHero && !scrolled) ? 'hover:bg-white/10 hover:text-white' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60'"
+                   class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200">
                     Catálogo
                 </a>
-                <a href="{{ route('catalog.montajes') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1 flex items-center gap-1">
+                <a href="{{ route('catalog.montajes') }}"
+                   :class="(hasHero && !scrolled) ? 'hover:bg-white/10 hover:text-white' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60'"
+                   class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
                     <span>Montajes</span>
-                    <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/30">Nuevo</span>
+                    <span class="text-[9px] font-mono uppercase bg-amber-400/20 text-amber-500 dark:text-amber-300 px-1.5 py-0.5 rounded-full border border-amber-400/40 leading-none">Nuevo</span>
                 </a>
-                <a href="#como-cotizar" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
+                <a href="#como-cotizar"
+                   :class="(hasHero && !scrolled) ? 'hover:bg-white/10 hover:text-white' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60'"
+                   class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200">
                     Cómo Cotizar
                 </a>
-                <a href="#envios" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
+                <a href="#envios"
+                   :class="(hasHero && !scrolled) ? 'hover:bg-white/10 hover:text-white' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60'"
+                   class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200">
                     Envíos
                 </a>
-                <a href="#contacto" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
+                <a href="#contacto"
+                   :class="(hasHero && !scrolled) ? 'hover:bg-white/10 hover:text-white' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60'"
+                   class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200">
                     Contacto
-                </a>
-                <a href="https://wa.me/{{ $settings->cleanWhatsappPhone() }}?text={{ rawurlencode('Hola, me comunico desde el catálogo de ' . ($settings->site_name ?? 'VYS Productora de Eventos') . '.') }}" 
-                   target="_blank" 
-                   rel="noopener noreferrer"
-                   class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors py-1 flex items-center gap-1.5 font-bold">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    WhatsApp
                 </a>
             </nav>
 
-            <!-- Acciones: Botón de Cotización, Botón Toggle Sol/Luna, Icono de Usuario y Menú Móvil -->
-            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <!-- Acciones: Botón de Cotización Dorado, Toggle Sol/Luna, Admin y Menú Móvil -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <div x-data="{ bump: false }" 
                      x-init="$watch('countItems()', () => { bump = true; setTimeout(() => bump = false, 350) })">
                     <button @click="cartOpen = true" 
                             id="open-quote-drawer-btn"
-                            class="relative inline-flex items-center gap-1.5 sm:gap-2 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-zinc-950 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 active:scale-95 group">
-                        <svg class="w-4 h-4 text-amber-300 dark:text-zinc-950 group-hover:rotate-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            :class="(hasHero && !scrolled && !mobileMenuOpen)
+                                ? 'bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 text-zinc-950 shadow-lg shadow-amber-500/25'
+                                : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 shadow-md'"
+                            class="relative inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full hover:shadow-lg transition-all duration-200 active:scale-95 group">
+                        <svg :class="(hasHero && !scrolled && !mobileMenuOpen) ? 'text-zinc-950' : 'text-amber-300 dark:text-zinc-950'"
+                             class="w-4 h-4 group-hover:rotate-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
-                        <span class="hidden sm:inline text-xs font-semibold tracking-wide">Cotización</span>
+                        <span class="hidden sm:inline text-xs font-bold tracking-wide">Cotización</span>
                         <span class="transition-transform duration-300 font-mono font-bold text-xs px-1.5 sm:px-2 py-0.5 rounded-full" 
-                              :class="{ 'scale-125 bg-amber-400 dark:bg-zinc-900 text-zinc-950 dark:text-amber-400 shadow-md': bump, 'scale-100 bg-white/20 dark:bg-black/20 text-white dark:text-zinc-950': !bump }" 
+                              :class="bump
+                                  ? 'scale-125 bg-zinc-950 text-amber-300 shadow-md'
+                                  : ((hasHero && !scrolled && !mobileMenuOpen) ? 'scale-100 bg-zinc-950/15 text-zinc-950' : 'scale-100 bg-white/20 dark:bg-black/20 text-white dark:text-zinc-950')" 
                               x-text="countItems()"></span>
                     </button>
                 </div>
 
-                <!-- Botón Toggle Sol / Luna Interactiva (Alpine.js) -->
+                <!-- Botón Toggle Sol / Luna -->
                 <button @click="toggleTheme()" 
                         type="button" 
                         id="theme-toggle-btn"
                         title="Alternar Modo Claro / Modo Oscuro"
-                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-amber-400 transition-all duration-200 flex items-center justify-center border border-zinc-200/80 dark:border-zinc-700 shadow-sm hover:scale-105 active:scale-95"
+                        :class="(hasHero && !scrolled && !mobileMenuOpen)
+                            ? 'bg-white/12 hover:bg-white/20 text-amber-300 border-white/20'
+                            : 'bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-amber-400 border-zinc-200/80 dark:border-zinc-700'"
+                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all duration-200 flex items-center justify-center border shadow-sm hover:scale-105 active:scale-95"
                         aria-label="Cambiar tema claro/oscuro">
-                    <!-- Icono Sol (visible en modo oscuro) -->
-                    <svg x-show="isDark" class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
+                    <svg x-show="isDark" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: none;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                     </svg>
-                    <!-- Icono Luna (visible en modo claro) -->
-                    <svg x-show="!isDark" class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg x-show="!isDark" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                     </svg>
                 </button>
 
-                <!-- Botón de Acceso / Login de Administrador (en móvil disponible dentro del menú desplegable) -->
+                <!-- Botón Login Panel Admin (en móvil disponible dentro del menú desplegable) -->
                 <a href="{{ route('filament.admin.auth.login') }}" 
                    title="Acceso Administración / Iniciar Sesión"
-                   class="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white dark:hover:text-white transition-all duration-200 items-center justify-center border border-zinc-200/80 dark:border-zinc-700 shadow-sm hover:scale-105 active:scale-95 group">
-                    <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   :class="(hasHero && !scrolled && !mobileMenuOpen)
+                       ? 'bg-white/12 hover:bg-white/20 text-white border-white/20'
+                       : 'bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-900 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 hover:text-white border-zinc-200/80 dark:border-zinc-700'"
+                   class="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full transition-all duration-200 items-center justify-center border shadow-sm hover:scale-105 active:scale-95 group">
+                    <svg class="w-4 h-4 transition-transform duration-200 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                 </a>
@@ -392,7 +443,10 @@
                         type="button"
                         aria-label="Abrir menú de navegación"
                         :aria-expanded="mobileMenuOpen"
-                        class="lg:hidden p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 transition">
+                        :class="(hasHero && !scrolled && !mobileMenuOpen)
+                            ? 'bg-white/12 hover:bg-white/20 text-white border border-white/20'
+                            : 'bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200'"
+                        class="lg:hidden p-2 rounded-xl transition">
                     <svg x-show="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
                     </svg>
@@ -469,13 +523,30 @@
         </div>
     </header>
 
-    @if(!request('categoria') && !request('buscar'))
-        <!-- Hero Banner Editorial Interactivo (Spotlight Reactivo + Orbes Aurora + Contadores Animados) -->
+    @if($hasHeroBanner)
+        @php
+            $heroSlides = [];
+            if (!empty($settings?->hero_bg_image)) {
+                $heroSlides[] = [
+                    'url' => asset('storage/' . $settings->hero_bg_image),
+                    'caption' => 'Montaje Destacado • Colección Oficial',
+                ];
+            }
+            $heroSlides[] = ['url' => asset('images/hero/hero-1.webp'), 'caption' => 'Pabellón de Cristal • Banquete de Gala'];
+            $heroSlides[] = ['url' => asset('images/hero/hero-2.webp'), 'caption' => 'Salón Principal • Iluminación & Pista'];
+            $heroSlides[] = ['url' => asset('images/hero/hero-3.webp'), 'caption' => 'Ceremonia Exterior • Arco de Novios'];
+            $heroSlides[] = ['url' => asset('images/hero/hero-4.webp'), 'caption' => 'Recepción de Etiqueta • Vajilla & Flores'];
+            $heroSlides = array_slice($heroSlides, 0, 4);
+        @endphp
+
+        <!-- Hero Banner Cinematográfico Editorial (Carrusel Real de Montajes + Scrim Cálido + Glassmorphism) -->
         <section id="inicio"
                  x-data="{
                      mouseX: 50,
                      mouseY: 40,
                      spotlightActive: false,
+                     activeSlide: 0,
+                     slides: {{ Js::from($heroSlides) }},
                      activeTagIndex: 0,
                      eventTags: [
                          'Matrimonios & Bodas de Gala',
@@ -485,7 +556,12 @@
                      ],
                      itemsCounter: 0,
                      sanitizedCounter: 0,
+                     slideTimer: null,
                      initHero() {
+                         this.slideTimer = setInterval(() => {
+                             this.activeSlide = (this.activeSlide + 1) % this.slides.length;
+                         }, 6000);
+
                          setInterval(() => {
                              this.activeTagIndex = (this.activeTagIndex + 1) % this.eventTags.length;
                          }, 3200);
@@ -501,6 +577,13 @@
                          };
                          requestAnimationFrame(step);
                      },
+                     goToSlide(idx) {
+                         this.activeSlide = idx;
+                         if (this.slideTimer) clearInterval(this.slideTimer);
+                         this.slideTimer = setInterval(() => {
+                             this.activeSlide = (this.activeSlide + 1) % this.slides.length;
+                         }, 6000);
+                     },
                      handleMouseMove(e) {
                          const rect = e.currentTarget.getBoundingClientRect();
                          this.mouseX = ((e.clientX - rect.left) / rect.width) * 100;
@@ -511,38 +594,60 @@
                  x-init="initHero()"
                  @mousemove="handleMouseMove($event)"
                  @mouseleave="spotlightActive = false"
-                 class="relative bg-white dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800 py-12 sm:py-20 overflow-hidden select-none"
-                 @if(!empty($settings?->hero_bg_image)) style="background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.90), rgba(255, 255, 255, 0.97)), url('{{ asset('storage/' . $settings->hero_bg_image) }}'); background-size: cover; background-position: center;" @endif>
+                 class="relative bg-zinc-950 border-b border-zinc-800 pt-24 pb-20 sm:pt-32 sm:pb-28 lg:pt-36 lg:pb-32 overflow-hidden select-none min-h-[540px] sm:min-h-[620px] lg:min-h-[670px] flex items-center">
 
-            <!-- 1. Luz Spotlight Interactiva que sigue el cursor -->
-            <div class="pointer-events-none absolute inset-0 transition-opacity duration-500"
-                 :class="spotlightActive ? 'opacity-100' : 'opacity-60'"
-                 :style="`background: radial-gradient(560px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.16), rgba(16, 185, 129, 0.05) 45%, transparent 75%);`">
+            <!-- 0. Carrusel Fotográfico Real de Montajes con Crossfade & Zoom Suave (Ken Burns) -->
+            <div class="absolute inset-0 z-0 overflow-hidden bg-zinc-950">
+                <template x-for="(slide, idx) in slides" :key="idx">
+                    <div x-show="activeSlide === idx"
+                         x-transition:enter="transition ease-out duration-1000"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="transition ease-in duration-1000"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="absolute inset-0">
+                        <img :src="slide.url"
+                             :alt="slide.caption"
+                             :fetchpriority="idx === 0 ? 'high' : 'low'"
+                             class="w-full h-full object-cover object-center hero-ken-burns">
+                    </div>
+                </template>
+                <!-- Fallback estático instantáneo para primer pintado (LCP) antes de Alpine -->
+                <img src="{{ $heroSlides[0]['url'] }}"
+                     alt="{{ $heroSlides[0]['caption'] }}"
+                     fetchpriority="high"
+                     class="w-full h-full object-cover object-center opacity-100"
+                     :class="'opacity-0 pointer-events-none'">
             </div>
 
-            <!-- 2. Orbes Flotantes de Luz Ambiental (Aurora Luxury) -->
-            <div class="hero-orb-1 pointer-events-none absolute -top-24 left-1/4 w-80 h-80 sm:w-[26rem] sm:h-[26rem] rounded-full bg-amber-400/15 dark:bg-amber-500/10 blur-3xl"></div>
-            <div class="hero-orb-2 pointer-events-none absolute -bottom-28 right-1/4 w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-emerald-400/10 dark:bg-amber-300/10 blur-3xl"></div>
+            <!-- 1. Velo Cinematográfico Cálido (contraste AAA en texto blanco/dorado + profundidad) -->
+            <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-zinc-950/75 via-zinc-950/55 to-zinc-950/88"></div>
+            <div class="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_at_center,rgba(234,183,89,0.14)_0%,transparent_65%)]"></div>
 
-            <!-- 3. Retícula Arquitectónica con Máscara Radial -->
-            <div class="hero-grid-mask absolute inset-0 pointer-events-none"></div>
+            <!-- 2. Luz Spotlight Interactiva Dorada que sigue el cursor -->
+            <div class="pointer-events-none absolute inset-0 z-[2] transition-opacity duration-500"
+                 :class="spotlightActive ? 'opacity-100' : 'opacity-40'"
+                 :style="`background: radial-gradient(560px circle at ${mouseX}% ${mouseY}%, rgba(234, 183, 89, 0.18), rgba(16, 185, 129, 0.05) 45%, transparent 75%);`">
+            </div>
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                <!-- Badge Superior con Pulso Vivo + Rotador Dinámico de Especialidades -->
+            <!-- Contenido Editorial Principal -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 w-full">
+                <!-- Badges Superiores en Cristal (Glassmorphism) + Rotador de Especialidades -->
                 <div class="hero-reveal-1 flex flex-col sm:flex-row items-center justify-center gap-2.5 mb-5 sm:mb-7">
-                    <div class="inline-flex items-center gap-2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 px-4 py-1.5 rounded-full shadow-sm">
+                    <div class="inline-flex items-center gap-2 bg-zinc-950/55 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full shadow-lg">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
                         </span>
-                        <span class="text-[10px] sm:text-xs font-mono font-semibold tracking-widest uppercase text-zinc-700 dark:text-zinc-300">
+                        <span class="text-[10px] sm:text-xs font-mono font-semibold tracking-widest uppercase text-zinc-100">
                             {{ $settings->hero_badge ?? 'Catálogo Oficial • Temporada 2026' }}
                         </span>
                     </div>
 
-                    <!-- Píldora Dinámica Cambiante (Rotador en vivo) -->
-                    <div class="inline-flex items-center gap-2 bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-medium text-amber-800 dark:text-amber-300 shadow-sm overflow-hidden max-w-full h-7 sm:h-8">
-                        <svg class="w-3.5 h-3.5 text-amber-500 shrink-0 animate-spin" style="animation-duration: 9s;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <!-- Píldora Dinámica Cambiante en Champaña Dorado -->
+                    <div class="inline-flex items-center gap-2 bg-amber-400/15 backdrop-blur-md border border-amber-300/35 px-3 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-medium text-amber-200 shadow-lg overflow-hidden max-w-full h-7 sm:h-8">
+                        <svg class="w-3.5 h-3.5 text-amber-300 shrink-0 animate-spin" style="animation-duration: 9s;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
                         </svg>
                         <div class="relative flex items-center justify-center min-w-0 w-[205px] max-w-[74vw] sm:w-[240px] sm:max-w-none">
@@ -561,58 +666,76 @@
                     </div>
                 </div>
 
-                <!-- Título Principal Editorial con Efecto de Entrada y Brillo Sutil -->
-                <h1 class="hero-reveal-2 font-serif text-[1.95rem] sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-zinc-900 dark:text-white max-w-4xl mx-auto leading-[1.12] drop-shadow-sm break-words">
-                    {{ $settings->hero_title ?? 'Equipamiento y ambientación para ocasiones extraordinarias' }}
+                <!-- Título Principal Editorial Cinematográfico -->
+                <h1 class="hero-reveal-2 font-serif text-[2rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] font-light tracking-tight text-white max-w-4xl mx-auto leading-[1.09] drop-shadow-[0_4px_24px_rgba(0,0,0,0.45)] break-words">
+                    @if(!empty($settings?->hero_title) && $settings->hero_title !== 'Equipamiento y ambientación para ocasiones extraordinarias')
+                        {{ $settings->hero_title }}
+                    @else
+                        Equipamiento y ambientación para <span class="italic font-normal bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent">ocasiones extraordinarias</span>
+                    @endif
                 </h1>
 
                 <!-- Subtítulo Editorial -->
-                <p class="hero-reveal-3 text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-400 mt-4 sm:mt-6 max-w-2xl mx-auto font-light leading-relaxed">
+                <p class="hero-reveal-3 text-xs sm:text-sm md:text-base text-zinc-200/95 mt-4 sm:mt-6 max-w-2xl mx-auto font-light leading-relaxed drop-shadow-sm">
                     {{ $settings->hero_subtitle ?? 'Mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y celebraciones corporativas. Celebra con distinción y logística puntual garantizada.' }}
                 </p>
 
-                <!-- Mini-Stats Interactivas Proporcionales (3 columnas desde móvil) -->
-                <div class="hero-reveal-4 mt-7 sm:mt-10 grid grid-cols-3 gap-2 sm:gap-5 max-w-3xl mx-auto">
-                    <!-- Tarjeta 1 -->
-                    <a href="#catalogo" class="group relative min-w-0 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/60 dark:hover:border-amber-400/60 p-2.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1.5 transition-all duration-300 text-center overflow-hidden">
-                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span class="block font-serif text-lg sm:text-3xl font-bold text-zinc-900 dark:text-white group-hover:scale-105 transition-transform duration-300"
-                              x-text="'+' + (itemsCounter || 190)">+190</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5 block leading-tight">Ítems de colección</span>
+                <!-- Botones CTA de Alto Contraste (Dorado Luxury + Cristal Transparente) -->
+                <div class="hero-reveal-4 mt-7 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-3.5 max-w-md sm:max-w-none mx-auto">
+                    <a href="#catalogo" class="hero-btn-shimmer group inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 via-amber-500 to-amber-400 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-xs sm:text-sm px-7 py-3.5 rounded-full shadow-xl shadow-amber-500/25 hover:shadow-2xl hover:shadow-amber-400/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                        <span>Explorar Catálogo</span>
+                        <svg class="w-4 h-4 text-zinc-950 group-hover:translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
                     </a>
-
-                    <!-- Tarjeta 2 -->
-                    <a href="#como-cotizar" class="group relative min-w-0 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 hover:border-emerald-500/60 dark:hover:border-emerald-400/60 p-2.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1.5 transition-all duration-300 text-center overflow-hidden">
-                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span class="block font-serif text-lg sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform duration-300"
-                              x-text="(sanitizedCounter || 100) + '%'">100%</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5 block leading-tight">Sanitización certificada</span>
-                    </a>
-
-                    <!-- Tarjeta 3 -->
-                    <a href="#envios" class="group relative min-w-0 bg-white/85 dark:bg-zinc-900/85 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/60 dark:hover:border-amber-400/60 p-2.5 sm:p-5 rounded-xl sm:rounded-2xl shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1.5 transition-all duration-300 text-center overflow-hidden">
-                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-500/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span class="block font-serif text-lg sm:text-3xl font-bold text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform duration-300">Puntual</span>
-                        <span class="text-[10px] sm:text-xs text-zinc-600 dark:text-zinc-400 font-medium mt-0.5 block leading-tight">Entrega coordinada</span>
+                    <a href="{{ route('catalog.montajes') }}" class="group inline-flex items-center justify-center gap-2.5 bg-white/12 hover:bg-white/22 backdrop-blur-md text-white border border-white/25 hover:border-amber-300/60 font-medium text-xs sm:text-sm px-6 py-3.5 rounded-full shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+                        <span>Montajes Realizados</span>
+                        <span class="text-[10px] font-mono bg-amber-400/20 text-amber-200 px-2 py-0.5 rounded-full font-bold border border-amber-300/30 group-hover:bg-amber-400 group-hover:text-zinc-950 transition-colors duration-300">2023-2026</span>
                     </a>
                 </div>
 
-                <!-- Botones CTA con Barrido de Luz (Shimmer) y Micro-interacción -->
-                <div class="hero-reveal-5 mt-7 sm:mt-9 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2.5 sm:gap-3.5 max-w-md sm:max-w-none mx-auto">
-                    <a href="#destacados" class="hero-btn-shimmer group inline-flex items-center justify-center gap-2.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 font-semibold text-xs sm:text-sm px-6 sm:px-7 py-3 sm:py-3.5 rounded-full shadow-lg hover:shadow-2xl hover:shadow-amber-500/20 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
-                        <span>Ver Vitrina en Carrusel</span>
-                        <svg class="w-4 h-4 text-amber-400 dark:text-zinc-950 group-hover:translate-y-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <!-- Mini-Stats en Cristal Oscuro Frosted (Proporcionales desde móvil) -->
+                <div class="hero-reveal-5 mt-8 sm:mt-11 grid grid-cols-3 gap-2 sm:gap-4 max-w-3xl mx-auto">
+                    <a href="#catalogo" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-amber-400/50 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span class="block font-serif text-lg sm:text-3xl font-bold text-white group-hover:scale-105 transition-transform duration-300"
+                              x-text="'+' + (itemsCounter || 190)">+190</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-300 font-medium mt-0.5 block leading-tight">Ítems de colección</span>
                     </a>
-                    <a href="{{ route('catalog.montajes') }}" class="group inline-flex items-center justify-center gap-2.5 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white border border-zinc-300 dark:border-zinc-700 hover:border-amber-500/50 dark:hover:border-amber-400/50 font-medium text-xs sm:text-sm px-5 sm:px-6 py-3 sm:py-3.5 rounded-full shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
-                        <span>Montajes Realizados</span>
-                        <span class="text-[10px] font-mono bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full font-bold group-hover:bg-amber-500 group-hover:text-zinc-950 transition-colors duration-300">2023-2026</span>
+
+                    <a href="#como-cotizar" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-emerald-400/50 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span class="block font-serif text-lg sm:text-3xl font-bold text-emerald-400 group-hover:scale-105 transition-transform duration-300"
+                              x-text="(sanitizedCounter || 100) + '%'">100%</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-300 font-medium mt-0.5 block leading-tight">Lavado incluido</span>
                     </a>
+
+                    <a href="#envios" class="group relative min-w-0 bg-zinc-950/45 hover:bg-zinc-950/65 backdrop-blur-md border border-white/15 hover:border-amber-400/50 p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-lg hover:-translate-y-1 transition-all duration-300 text-center overflow-hidden">
+                        <div class="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span class="block font-serif text-lg sm:text-3xl font-bold text-amber-300 group-hover:scale-105 transition-transform duration-300">Puntual</span>
+                        <span class="text-[10px] sm:text-xs text-zinc-300 font-medium mt-0.5 block leading-tight">Entrega coordinada</span>
+                    </a>
+                </div>
+
+                <!-- Control Discreto de Escenas Reales del Hero -->
+                <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-4 text-[10px] sm:text-[11px] font-mono text-zinc-300/90">
+                    <span class="inline-flex items-center gap-1.5 bg-zinc-950/45 backdrop-blur-md border border-white/10 px-3 py-1 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                        <span x-text="slides[activeSlide]?.caption"></span>
+                    </span>
+                    <div class="flex items-center gap-1.5">
+                        <template x-for="(slide, idx) in slides" :key="'dot-' + idx">
+                            <button type="button"
+                                    @click="goToSlide(idx)"
+                                    :aria-label="'Ver escena ' + (idx + 1)"
+                                    :class="activeSlide === idx ? 'w-7 bg-amber-400' : 'w-2 bg-white/35 hover:bg-white/60'"
+                                    class="h-1.5 rounded-full transition-all duration-300"></button>
+                        </template>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Barra de 3 Pasos de Reserva Visual con Pulso Luminoso Conector -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 relative z-20">
             <div class="relative bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl rounded-2xl border border-zinc-200/90 dark:border-zinc-800 p-4 sm:p-6 shadow-xl shadow-zinc-900/5 overflow-hidden">
                 <!-- Haz de luz animado recorriendo el borde superior de los 3 pasos -->
                 <div class="absolute inset-x-0 top-0 h-[2px] bg-zinc-100 dark:bg-zinc-800 overflow-hidden">
