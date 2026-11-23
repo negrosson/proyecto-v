@@ -3,3 +3,7 @@ Disallow: /admin
 Disallow: /admin/
 Disallow: /livewire/
 Disallow: /storage/app/
+Disallow: /catalogo/buscar
+Disallow: /*?buscar=
+
+Sitemap: https://arriendomobiliario.cl/sitemap.xml

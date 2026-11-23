@@ -5,11 +5,14 @@ declare(strict_types=1);
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/arriendo/{category:slug}', [CatalogController::class, 'category'])->name('catalog.category');
 Route::get('/montajes', [CatalogController::class, 'montajes'])->name('catalog.montajes');
 Route::get('/como-cotizar', [CatalogController::class, 'comoCotizar'])->name('catalog.como-cotizar');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('seo.sitemap');
 Route::get('/catalogo/buscar', [CatalogController::class, 'search'])
     ->name('catalog.search')
     ->middleware('throttle:catalog-search');

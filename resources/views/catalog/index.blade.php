@@ -1,23 +1,56 @@
 @php
     $getProductImage = static fn ($item): string => $item->display_image_url;
+    $activeCategory = $activeCategory ?? null;
+    $siteBrand = $settings->site_name ?? 'VYS · Productora de Eventos';
+    $seoTitle = $activeCategory
+        ? "Arriendo de {$activeCategory->name} para Eventos en Santiago | {$siteBrand}"
+        : "{$siteBrand} | ".($settings->site_tagline ?? 'Arriendo de Mobiliario, Vajilla y Menaje para Eventos en Santiago');
+    $seoDescription = $activeCategory
+        ? "Arriendo de {$activeCategory->name} para bodas, matrimonios, galas y eventos corporativos en Santiago y regiones. Cotiza online directo por WhatsApp con {$siteBrand}."
+        : ($settings->hero_subtitle ?? 'Arriendo de mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y eventos corporativos en Santiago.');
+    $canonicalUrl = $activeCategory
+        ? route('catalog.category', $activeCategory->slug)
+        : route('catalog.index');
+    $seoBreadcrumbs = $activeCategory
+        ? [
+            ['name' => 'Inicio', 'url' => route('catalog.index')],
+            ['name' => "Arriendo de {$activeCategory->name}", 'url' => $canonicalUrl],
+        ]
+        : [];
 @endphp
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es-CL" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $settings->site_name ?? 'Arriendos & Eventos' }} | {{ $settings->site_tagline ?? 'Banquetería, Mobiliario & Vajilla Premium' }}</title>
-    <meta name="description" content="{{ $settings->hero_subtitle ?? 'Arriendo de mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y eventos corporativos en Santiago.' }}">
+    <title>{{ $seoTitle }}</title>
+    <meta name="description" content="{{ $seoDescription }}">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
 
     <!-- OpenGraph & WhatsApp Preview -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="{{ $settings->site_name ?? 'Arriendos & Eventos' }} | {{ $settings->site_tagline ?? 'Banquetería, Mobiliario & Vajilla Premium' }}">
-    <meta property="og:description" content="{{ $settings->hero_subtitle ?? 'Mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y celebraciones corporativas.' }}">
+    <meta property="og:locale" content="es_CL">
+    <meta property="og:site_name" content="{{ $siteBrand }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
     <meta property="og:image" content="{{ !empty($settings?->hero_bg_image) ? asset('storage/' . $settings->hero_bg_image) : asset('images/montajes/teno-mesa-principal.jpg') }}">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $seoTitle }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+
+    <!-- Datos Estructurados Schema.org (JSON-LD para Google y Bing) -->
+    <x-seo-json-ld
+        :settings="$settings"
+        :page-type="$activeCategory ? 'category' : 'home'"
+        :faqs="$faqs"
+        :categories="$categories"
+        :active-category="$activeCategory"
+        :breadcrumbs="$seoBreadcrumbs"
+    />
 
     <!-- Google Fonts: Cormorant Garamond (Editorial Luxury) & Plus Jakarta Sans (UI Clean) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

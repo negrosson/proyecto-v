@@ -25,9 +25,44 @@ class CatalogController extends Controller
         $search = $request->query('buscar');
         $categoria = $request->query('categoria');
 
-        $products = $filterProducts->execute(
+        return $this->renderCatalogView(
+            request: $request,
+            filterProducts: $filterProducts,
             search: is_string($search) ? $search : null,
-            categorySlug: is_string($categoria) ? $categoria : null,
+            categoria: is_string($categoria) ? $categoria : null,
+            activeCategory: null,
+        );
+    }
+
+    /**
+     * Página SEO dedicada por categoría (/arriendo/{category:slug}) para posicionamiento en Google y Bing.
+     */
+    public function category(Request $request, Category $category, FilterProductsAction $filterProducts): View|JsonResponse
+    {
+        $search = $request->query('buscar');
+
+        return $this->renderCatalogView(
+            request: $request,
+            filterProducts: $filterProducts,
+            search: is_string($search) ? $search : null,
+            categoria: $category->slug,
+            activeCategory: $category,
+        );
+    }
+
+    /**
+     * Construye y renderiza la vista del catálogo (portada o landing SEO por categoría).
+     */
+    private function renderCatalogView(
+        Request $request,
+        FilterProductsAction $filterProducts,
+        ?string $search,
+        ?string $categoria,
+        ?Category $activeCategory,
+    ): View|JsonResponse {
+        $products = $filterProducts->execute(
+            search: $search,
+            categorySlug: $categoria,
         );
 
         $getProductImage = static fn (Product $product): string => $product->display_image_url;
@@ -102,7 +137,9 @@ class CatalogController extends Controller
             'carouselProducts',
             'montajes',
             'settings',
-            'faqs'
+            'faqs',
+            'activeCategory',
+            'categoria'
         ));
     }
 

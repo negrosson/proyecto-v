@@ -1,17 +1,30 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es-CL" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Montaje de Eventos en Santiago & Regiones | {{ $settings->site_name ?? 'Arriendos & Eventos' }}</title>
+    <title>Montaje de Eventos en Santiago & Regiones | {{ $settings->site_name ?? 'VYS · Productora de Eventos' }}</title>
     <meta name="description" content="Montaje integral de eventos, mobiliario, vajilla, mantelería y ambientación para bodas, galas y eventos corporativos en Santiago y regiones.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="{{ route('catalog.montajes') }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="Montajes & Galerías | {{ $settings->site_name ?? 'Arriendos & Eventos' }}">
+    <meta property="og:locale" content="es_CL">
+    <meta property="og:site_name" content="{{ $settings->site_name ?? 'VYS · Productora de Eventos' }}">
+    <meta property="og:url" content="{{ route('catalog.montajes') }}">
+    <meta property="og:title" content="Montajes & Galerías | {{ $settings->site_name ?? 'VYS · Productora de Eventos' }}">
     <meta property="og:description" content="Portafolio fotográfico real de montajes de eventos, bodas y cenas corporativas.">
     <meta property="og:image" content="{{ asset('images/montajes/teno-mesa-principal.jpg') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <x-seo-json-ld
+        :settings="$settings"
+        page-type="montajes"
+        :breadcrumbs="[
+            ['name' => 'Inicio', 'url' => route('catalog.index')],
+            ['name' => 'Montajes y Galerías', 'url' => route('catalog.montajes')],
+        ]"
+    />
 
     <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

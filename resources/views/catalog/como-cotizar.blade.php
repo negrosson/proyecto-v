@@ -1,17 +1,31 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es-CL" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Guía Completa: Cómo Cotizar Mobiliario para tu Evento | {{ $settings->site_name ?? 'Arriendos & Eventos' }}</title>
-    <meta name="description" content="Aprende cómo cotizar mobiliario para tu evento en {{ $settings->site_name ?? 'Arriendos & Eventos' }}. Proceso simple en 5 pasos: cotiza, abona, recibe, devuelve y garantía. Nosotros lavamos por ti.">
+    <title>Guía Completa: Cómo Cotizar Mobiliario para tu Evento | {{ $settings->site_name ?? 'VYS · Productora de Eventos' }}</title>
+    <meta name="description" content="Aprende cómo cotizar mobiliario para tu evento en {{ $settings->site_name ?? 'VYS · Productora de Eventos' }}. Proceso simple en 5 pasos: cotiza, abona, recibe, devuelve y garantía. Nosotros lavamos por ti.">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="{{ route('catalog.como-cotizar') }}">
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="Cómo Cotizar Mobiliario | {{ $settings->site_name ?? 'Arriendos & Eventos' }}">
+    <meta property="og:locale" content="es_CL">
+    <meta property="og:site_name" content="{{ $settings->site_name ?? 'VYS · Productora de Eventos' }}">
+    <meta property="og:url" content="{{ route('catalog.como-cotizar') }}">
+    <meta property="og:title" content="Cómo Cotizar Mobiliario | {{ $settings->site_name ?? 'VYS · Productora de Eventos' }}">
     <meta property="og:description" content="Proceso simple en 5 pasos para reservar vajilla, mantelería y mobiliario de gala.">
     <meta property="og:image" content="{{ asset('images/montajes/teno-mesa-principal.jpg') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <x-seo-json-ld
+        :settings="$settings"
+        page-type="como-cotizar"
+        :categories="$categories"
+        :breadcrumbs="[
+            ['name' => 'Inicio', 'url' => route('catalog.index')],
+            ['name' => 'Cómo Cotizar', 'url' => route('catalog.como-cotizar')],
+        ]"
+    />
 
     <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
