@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
 
 class ContactMessage extends Model
@@ -24,6 +25,7 @@ class ContactMessage extends Model
     }
 
     protected $fillable = [
+        'customer_id',
         'name',
         'email',
         'phone',
@@ -45,5 +47,24 @@ class ContactMessage extends Model
             'event_date' => 'date',
             'is_read' => 'boolean',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Customer, $this>
+     */
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    public function whatsappUrl(): ?string
+    {
+        $phone = filled($this->phone)
+            ? (string) $this->phone
+            : ($this->relationLoaded('customer') ? $this->customer?->phone : null);
+
+        $greeting = "Hola {$this->name}, te escribimos de VYS Productora de Eventos en respuesta a tu consulta web.";
+
+        return Customer::buildWhatsappUrl($phone, $greeting);
     }
 }
