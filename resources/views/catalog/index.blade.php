@@ -746,7 +746,7 @@
                         @foreach ($carouselProducts as $item)
                             @php
                                 $imgSrc = $getProductImage($item);
-                                $isStudioPackshot = $item->usesFallbackImage();
+                                $isStudioPackshot = $item->usesWhiteStudioBackground();
                             @endphp
                             <div class="w-full sm:w-1/2 lg:w-1/4 shrink-0 p-2 sm:p-2.5">
                                 <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between h-full group">

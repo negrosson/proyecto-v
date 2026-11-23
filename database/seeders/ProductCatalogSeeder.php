@@ -103,7 +103,7 @@ class ProductCatalogSeeder extends Seeder
             ['code' => 214, 'name' => 'CUCHILLO ENTRADA DORADO', 'stock' => 200, 'rental_price' => 200, 'category' => 'vajilla'],
             ['code' => 215, 'name' => 'CUCHARA CHICA TE DORADO', 'stock' => 200, 'rental_price' => 200, 'category' => 'vajilla'],
             ['code' => 220, 'name' => 'COPA VINO', 'stock' => 700, 'rental_price' => 120, 'category' => 'vajilla', 'is_featured' => true, 'image' => 'images/products/copa-vino.jpg', 'description' => 'Cristalería fina de transparencia cristalina con tallo estilizado para servicio de vino tinto o blanco.'],
-            ['code' => 230, 'name' => 'COPA BRINDIS', 'stock' => 700, 'rental_price' => 120, 'category' => 'vajilla', 'is_featured' => true, 'image' => 'images/products/copa-vino.jpg', 'description' => 'Copa tipo flauta estilizada para brindis con espumante o champaña en celebraciones especiales.'],
+            ['code' => 230, 'name' => 'COPA BRINDIS', 'stock' => 700, 'rental_price' => 120, 'category' => 'vajilla', 'is_featured' => true, 'image' => 'images/products/catalog-copa-brindis.webp', 'description' => 'Copa tipo flauta estilizada para brindis con espumante o champaña en celebraciones especiales.'],
             ['code' => 240, 'name' => 'COPA AGUA', 'stock' => 500, 'rental_price' => 120, 'category' => 'vajilla', 'image' => 'images/products/copa-vino.jpg'],
             ['code' => 250, 'name' => 'COPA TEQUILA', 'stock' => 100, 'rental_price' => 200, 'category' => 'vajilla'],
             ['code' => 260, 'name' => 'COPA APEROL', 'stock' => 200, 'rental_price' => 150, 'category' => 'vajilla'],

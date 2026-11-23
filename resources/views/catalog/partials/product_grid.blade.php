@@ -7,7 +7,7 @@
     @forelse ($products as $prod)
         @php
             $cardImg = $getProductImage($prod);
-            $isStudioPackshot = $prod->usesFallbackImage();
+            $isStudioPackshot = $prod->usesWhiteStudioBackground();
         @endphp
         <div class="min-w-0 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/90 dark:border-zinc-800 hover:border-amber-500/50 dark:hover:border-amber-400/50 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group">
             <div>

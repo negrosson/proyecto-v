@@ -76,12 +76,44 @@ class Product extends Model
     }
 
     /**
-     * Obtiene la URL completa de la fotografía o render 3D del producto.
+     * Archivos de estudio con fondo blanco puro (#FFFFFF) que deben mostrarse con object-contain.
+     *
+     * @var list<string>
+     */
+    private const WHITE_STUDIO_PACKSHOTS = [
+        'default-platos.webp',
+        'default-plato-base.webp',
+        'default-vajilla.webp',
+        'default-cubiertos.webp',
+        'default-cubiertos-dorados.webp',
+        'default-copas.webp',
+        'default-vasos.webp',
+        'default-manteleria.webp',
+        'default-mobiliario.webp',
+        'default-bar-decoracion.webp',
+        'default-arrocera.webp',
+        'copa-vino.jpg',
+        'silla-chiavari-dorada.jpg',
+    ];
+
+    /**
+     * Obtiene la URL completa de la fotografía o render del producto.
      */
     public function getImageUrlAttribute(): ?string
     {
         if (! $this->image) {
             return null;
+        }
+
+        $normalizedName = Str::upper(Str::ascii((string) $this->name));
+
+        // Sobrescribe referencias heredadas de seeders cuando existe una foto más específica para esa pieza.
+        if ($this->image === 'images/products/copa-vino.jpg' && str_contains($normalizedName, 'BRINDIS')) {
+            return asset('images/products/catalog-copa-brindis.webp');
+        }
+
+        if ($this->image === 'images/products/mesa-banquete.jpg' && str_contains($normalizedName, 'NOVIOS')) {
+            return asset('images/products/catalog-mesa-novios.webp');
         }
 
         if (str_starts_with($this->image, 'http://') || str_starts_with($this->image, 'https://') || str_starts_with($this->image, 'images/')) {
@@ -92,7 +124,7 @@ class Product extends Model
     }
 
     /**
-     * Indica si el producto utiliza una miniatura comercial de estudio por defecto.
+     * Indica si el producto utiliza una miniatura por defecto (sin fotografía propia subida).
      */
     public function usesFallbackImage(): bool
     {
@@ -100,13 +132,24 @@ class Product extends Model
     }
 
     /**
-     * Resuelve la miniatura comercial de estudio (fondo blanco hotelero) según el tipo de artículo y categoría.
+     * Indica si la imagen final es un packshot recortado sobre fondo blanco puro (#FFFFFF).
+     */
+    public function usesWhiteStudioBackground(): bool
+    {
+        $filename = basename((string) parse_url($this->display_image_url, PHP_URL_PATH));
+
+        return in_array($filename, self::WHITE_STUDIO_PACKSHOTS, true);
+    }
+
+    /**
+     * Resuelve una fotografía coherente según el tipo específico de artículo y su categoría.
      */
     public function resolveFallbackImageUrl(): string
     {
         $normalizedName = Str::upper(Str::ascii((string) $this->name));
         $categorySlug = $this->category?->slug ?? '';
 
+        // 1. Vajilla, Cristalería y Cubertería
         if (str_contains($normalizedName, 'PLATO BASE')
             || str_contains($normalizedName, 'PLATO DORADO')
             || str_contains($normalizedName, 'PLATO PLAQUET')) {
@@ -122,6 +165,10 @@ class Product extends Model
             return str_contains($normalizedName, 'DORAD')
                 ? asset('images/products/default-cubiertos-dorados.webp')
                 : asset('images/products/default-cubiertos.webp');
+        }
+
+        if (str_contains($normalizedName, 'COPA') && str_contains($normalizedName, 'BRINDIS')) {
+            return asset('images/products/catalog-copa-brindis.webp');
         }
 
         if (str_contains($normalizedName, 'COPA')) {
@@ -147,12 +194,123 @@ class Product extends Model
             return asset('images/products/default-platos.webp');
         }
 
+        // 2. Equipamiento de Cocina & Banquetería Industrial
+        if ($categorySlug === 'equipamiento-cocina') {
+            if (str_contains($normalizedName, 'ARROCERA') || str_contains($normalizedName, 'FONDO GRANDE')) {
+                return asset('images/products/default-arrocera.webp');
+            }
+
+            if (str_contains($normalizedName, 'BANDEJA HORNO')
+                || str_contains($normalizedName, 'BUDINERA')
+                || str_contains($normalizedName, 'TABLA PICAR')) {
+                return asset('images/products/catalog-bandeja-horno.webp');
+            }
+
+            if (str_contains($normalizedName, 'HORNO')) {
+                return asset('images/products/catalog-horno-industrial.webp');
+            }
+
+            if (str_contains($normalizedName, 'JUGUERA') || str_contains($normalizedName, 'PICADORA DE HIELO')) {
+                return asset('images/products/catalog-juguera.webp');
+            }
+
+            if (str_contains($normalizedName, 'PERCOLADORA')
+                || str_contains($normalizedName, 'TERMO HERVIDOR')
+                || str_contains($normalizedName, 'DISPENSADOR')
+                || str_contains($normalizedName, 'CAMBRO')) {
+                return asset('images/products/catalog-percoladora.webp');
+            }
+
+            if (str_contains($normalizedName, 'COOLER') || str_contains($normalizedName, 'HIELERA')) {
+                return asset('images/products/catalog-cooler.webp');
+            }
+
+            return asset('images/products/catalog-chaffer.webp');
+        }
+
+        // 3. Bar, Ambientación y Decoración
+        if ($categorySlug === 'bar-decoracion') {
+            if (str_contains($normalizedName, 'ARCO DE NOVIO') || str_contains($normalizedName, 'CORTINAJE')) {
+                return asset('images/products/catalog-arco-novio.webp');
+            }
+
+            if (str_contains($normalizedName, 'CALEFACTOR')
+                || str_contains($normalizedName, 'ESTUFA')
+                || str_contains($normalizedName, 'PARAFINA')) {
+                return asset('images/products/calefactor-gas.jpg');
+            }
+
+            if (str_contains($normalizedName, 'FLOR')
+                || str_contains($normalizedName, 'PORTA VELA')
+                || str_contains($normalizedName, 'PESCERA')
+                || str_contains($normalizedName, 'PEDESTAL')
+                || str_contains($normalizedName, 'JAULA DORADA')
+                || str_contains($normalizedName, 'PLATO MADERA')
+                || str_contains($normalizedName, 'ATRIL')
+                || str_contains($normalizedName, 'PASTO ARTIFICIAL')) {
+                return asset('images/products/catalog-decoracion-floral.webp');
+            }
+
+            if (str_contains($normalizedName, 'LUCES')
+                || str_contains($normalizedName, 'MAQUINA HUMO')
+                || str_contains($normalizedName, 'ENCHUFE')) {
+                return asset('images/products/catalog-iluminacion.webp');
+            }
+
+            if (str_contains($normalizedName, 'BARTENDER')) {
+                return asset('images/products/catalog-bartender.webp');
+            }
+
+            return asset('images/products/default-bar-decoracion.webp');
+        }
+
+        // 4. Mantelería, Caminos, Carpetas, Cubre Sillas y Lazos
+        if ($categorySlug === 'manteleria') {
+            if (str_contains($normalizedName, 'CAMINO')) {
+                return asset('images/products/catalog-camino-mesa.webp');
+            }
+
+            if (str_contains($normalizedName, 'CARPETA')) {
+                return asset('images/products/catalog-carpeta-mantel.webp');
+            }
+
+            if (str_contains($normalizedName, 'CUBRE SILLA') || str_contains($normalizedName, 'COJIN')) {
+                return asset('images/products/catalog-cubre-silla.webp');
+            }
+
+            if (str_contains($normalizedName, 'LAZO')) {
+                return asset('images/products/catalog-lazos-silla.webp');
+            }
+
+            return asset('images/products/default-manteleria.webp');
+        }
+
+        // 5. Mobiliario, Carpas y Lounge
+        if ($categorySlug === 'mobiliario') {
+            if (str_contains($normalizedName, 'CARPA')) {
+                return asset('images/products/catalog-carpa-evento.webp');
+            }
+
+            if (str_contains($normalizedName, 'PUFF')) {
+                return asset('images/products/catalog-puff-lounge.webp');
+            }
+
+            if (str_contains($normalizedName, 'NOVIOS')
+                || str_contains($normalizedName, 'MESON BAR')
+                || str_contains($normalizedName, 'TRIO MESA')
+                || str_contains($normalizedName, 'MESA DE APOYO')) {
+                return asset('images/products/catalog-mesa-novios.webp');
+            }
+
+            if (str_contains($normalizedName, 'ALFOMBRA')) {
+                return asset('images/products/silla-plegable-blanca.jpg');
+            }
+
+            return asset('images/products/default-mobiliario.webp');
+        }
+
         return match ($categorySlug) {
             'vajilla' => asset('images/products/default-platos.webp'),
-            'manteleria' => asset('images/products/default-manteleria.webp'),
-            'mobiliario' => asset('images/products/default-mobiliario.webp'),
-            'equipamiento-cocina' => asset('images/products/default-equipamiento-cocina.webp'),
-            'bar-decoracion' => asset('images/products/default-bar-decoracion.webp'),
             default => asset('images/products/default-platos.webp'),
         };
     }
