@@ -357,11 +357,7 @@
                    class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200">
                     Inicio
                 </a>
-                <a href="#catalogo"
-                   :class="(hasHero && !scrolled) ? 'hover:bg-white/10 hover:text-white' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60'"
-                   class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200">
-                    Catálogo
-                </a>
+                <x-catalog-nav-dropdown :categories="$categories" :interactive="true" :adaptive="true" />
                 <a href="{{ route('catalog.montajes') }}"
                    :class="(hasHero && !scrolled) ? 'hover:bg-white/10 hover:text-white' : 'hover:text-zinc-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-zinc-800/60'"
                    class="px-3 xl:px-3.5 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1.5">
@@ -476,10 +472,7 @@
                     <span>Colección en Carrusel</span>
                     <span class="text-xs text-zinc-400 font-mono">02</span>
                 </a>
-                <a @click="mobileMenuOpen = false" href="#catalogo" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
-                    <span>Catálogo Completo</span>
-                    <span class="text-xs text-zinc-400 font-mono">03</span>
-                </a>
+                <x-catalog-mobile-categories :categories="$categories" :interactive="true" step-number="03" />
                 <a @click="mobileMenuOpen = false" href="{{ route('catalog.montajes') }}" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between font-bold text-amber-700 dark:text-amber-400">
                     <span class="flex items-center gap-2">
                         <span>Montajes & Puesta en Escena</span>

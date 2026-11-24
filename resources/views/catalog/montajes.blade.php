@@ -101,9 +101,7 @@
                 <a href="{{ route('catalog.index') }}#destacados" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Destacados
                 </a>
-                <a href="{{ route('catalog.index') }}#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
-                    Catálogo
-                </a>
+                <x-catalog-nav-dropdown :categories="$categories" :interactive="false" :adaptive="false" />
                 <a href="{{ route('catalog.montajes') }}" class="text-zinc-950 dark:text-white font-bold border-b-2 border-zinc-900 dark:border-amber-400 py-1 flex items-center gap-1">
                     <span>Montajes</span>
                     <span class="text-[9px] font-mono uppercase bg-amber-500/10 text-amber-700 dark:text-amber-400 px-1.5 py-0.2 rounded border border-amber-500/30">Nuevo</span>
@@ -174,7 +172,7 @@
              style="display: none;">
             <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Inicio</a>
             <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#destacados" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Destacados</a>
-            <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#catalogo" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Catálogo</a>
+            <x-catalog-mobile-categories :categories="$categories" :interactive="false" />
             <a @click="mobileMenuOpen = false" href="{{ route('catalog.montajes') }}" class="block px-3 py-2 rounded-lg text-sm font-bold bg-zinc-100 dark:bg-zinc-800 text-amber-700 dark:text-amber-400">Montajes & Puesta en Escena</a>
             <a @click="mobileMenuOpen = false" href="{{ route('catalog.como-cotizar') }}" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Cómo Cotizar</a>
             <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#envios" class="block px-3 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800">Envíos</a>

@@ -12,6 +12,7 @@ use App\Models\Montaje;
 use App\Models\Product;
 use App\Models\SiteSetting;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -83,10 +84,7 @@ class CatalogController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        $categories = Category::query()
-            ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
-            ->orderBy('name')
-            ->get();
+        $categories = $this->getNavigationCategories();
 
         $featuredProducts = Product::query()
             ->where('is_active', true)
@@ -150,8 +148,9 @@ class CatalogController extends Controller
     {
         $settings = SiteSetting::current();
         $montajes = $this->getMontajesData();
+        $categories = $this->getNavigationCategories();
 
-        return view('catalog.montajes', compact('settings', 'montajes'));
+        return view('catalog.montajes', compact('settings', 'montajes', 'categories'));
     }
 
     /**
@@ -160,9 +159,22 @@ class CatalogController extends Controller
     public function comoCotizar(): View
     {
         $settings = SiteSetting::current();
-        $categories = Category::query()->orderBy('name')->get();
+        $categories = $this->getNavigationCategories();
 
         return view('catalog.como-cotizar', compact('settings', 'categories'));
+    }
+
+    /**
+     * Obtiene las categorías activas con su conteo de productos disponibles para la barra de navegación.
+     *
+     * @return Collection<int, Category>
+     */
+    private function getNavigationCategories(): Collection
+    {
+        return Category::query()
+            ->withCount(['products' => fn ($q) => $q->where('is_active', true)])
+            ->orderBy('name')
+            ->get();
     }
 
     /**

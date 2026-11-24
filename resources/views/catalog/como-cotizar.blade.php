@@ -71,9 +71,7 @@
                 <a href="{{ route('catalog.index') }}#destacados" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Destacados
                 </a>
-                <a href="{{ route('catalog.index') }}#catalogo" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
-                    Catálogo
-                </a>
+                <x-catalog-nav-dropdown :categories="$categories" :interactive="false" :adaptive="false" />
                 <a href="{{ route('catalog.montajes') }}" class="hover:text-zinc-900 dark:hover:text-white transition-colors py-1">
                     Montajes
                 </a>
@@ -167,10 +165,7 @@
                     <span>Colección en Carrusel</span>
                     <span class="text-xs text-zinc-400 font-mono">02</span>
                 </a>
-                <a @click="mobileMenuOpen = false" href="{{ route('catalog.index') }}#catalogo" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
-                    <span>Catálogo Completo</span>
-                    <span class="text-xs text-zinc-400 font-mono">03</span>
-                </a>
+                <x-catalog-mobile-categories :categories="$categories" :interactive="false" step-number="03" />
                 <a @click="mobileMenuOpen = false" href="{{ route('catalog.montajes') }}" class="px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between">
                     <span>Montajes Realizados</span>
                     <span class="text-xs text-zinc-400 font-mono">04</span>
