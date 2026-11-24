@@ -74,23 +74,6 @@
                 @endif
             </div>
 
-            <!-- Ver todo -->
-            <a href="{{ route('catalog.index') }}#catalogo"
-               @if($interactive)
-                   @click.prevent="open = false; filterCategory('', '{{ route('catalog.index') }}#catalogo'); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' })"
-                   :class="activeCategory === '' ? 'bg-amber-50/90 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-bold' : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80'"
-               @else
-                   @click="open = false"
-                   class="text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80"
-               @endif
-               class="flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition-colors mb-1">
-                <span class="flex items-center gap-2 min-w-0">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
-                    <span class="truncate">Ver Catálogo Completo</span>
-                </span>
-                <span class="text-[10px] font-mono text-zinc-400 dark:text-zinc-500 shrink-0">Todo &rarr;</span>
-            </a>
-
             <!-- Lista dinámica de categorías -->
             <div class="space-y-0.5 max-h-80 overflow-y-auto no-scrollbar">
                 @foreach($categories as $cat)

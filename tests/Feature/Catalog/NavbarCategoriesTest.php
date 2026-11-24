@@ -46,7 +46,7 @@ class NavbarCategoriesTest extends TestCase
             $response->assertOk();
             $response->assertSee(route('catalog.category', $vajilla->slug).'#catalogo', false);
             $response->assertSee(route('catalog.category', $mobiliario->slug).'#catalogo', false);
-            $response->assertSee('Ver Catálogo Completo');
+            $response->assertDontSee('Ver Catálogo Completo');
             $response->assertSee('Vajilla');
             $response->assertSee('Mobiliario');
         }

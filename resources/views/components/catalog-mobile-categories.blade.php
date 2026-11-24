@@ -10,7 +10,7 @@
             :aria-expanded="mobileCatalogOpen"
             class="w-full px-3 py-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition flex items-center justify-between text-left text-sm font-medium text-zinc-800 dark:text-zinc-200">
         <span class="flex items-center gap-2">
-            <span>Catálogo por Categoría</span>
+            <span>Catálogo</span>
         </span>
         <span class="flex items-center gap-2">
             @if($stepNumber)
@@ -35,17 +35,6 @@
          x-transition:leave-end="opacity-0 -translate-y-1"
          class="mt-1 ml-3 pl-3 border-l-2 border-amber-400/50 dark:border-amber-500/40 space-y-1 pb-1"
          style="display: none;">
-        <a href="{{ route('catalog.index') }}#catalogo"
-           @if($interactive)
-               @click.prevent="mobileCatalogOpen = false; mobileMenuOpen = false; filterCategory('', '{{ route('catalog.index') }}#catalogo'); document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' })"
-           @else
-               @click="mobileCatalogOpen = false; mobileMenuOpen = false"
-           @endif
-           class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition">
-            <span>Ver Catálogo Completo</span>
-            <span class="text-[10px] font-mono">&rarr;</span>
-        </a>
-
         @foreach($categories as $cat)
             <a href="{{ route('catalog.category', $cat->slug) }}#catalogo"
                @if($interactive)
