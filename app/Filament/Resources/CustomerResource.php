@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Throwable;
 
 class CustomerResource extends Resource
 {
@@ -36,13 +37,17 @@ class CustomerResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = cache()->remember(
-            'filament_badge_customers_count',
-            60,
-            static fn (): int => (int) static::getModel()::count()
-        );
+        try {
+            $count = cache()->remember(
+                'filament_badge_customers_count',
+                60,
+                static fn (): int => (int) static::getModel()::count()
+            );
 
-        return $count > 0 ? (string) $count : null;
+            return $count > 0 ? (string) $count : null;
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     public static function getNavigationBadgeColor(): string|array|null

@@ -13,11 +13,11 @@ use Filament\Forms\Form;
 use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Pages\Auth\Login as BaseLogin;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
+use Throwable;
 
 /**
  * Pantalla de inicio de sesión endurecida contra fuerza bruta, credential stuffing,
@@ -70,7 +70,25 @@ class AdminLogin extends BaseLogin
     {
         return TextInput::make('password')
             ->label('Contraseña')
-            ->hint(filament()->hasPasswordReset() ? new HtmlString(Blade::render('<x-filament::link :href="filament()->getRequestPasswordResetUrl()" tabindex="3">¿Olvidaste tu contraseña?</x-filament::link>')) : null)
+            ->hint(function (): ?HtmlString {
+                if (! filament()->hasPasswordReset()) {
+                    return null;
+                }
+
+                try {
+                    $url = filament()->getRequestPasswordResetUrl();
+                } catch (Throwable) {
+                    return null;
+                }
+
+                if (! is_string($url) || $url === '') {
+                    return null;
+                }
+
+                return new HtmlString(
+                    '<a href="'.e($url).'" tabindex="3" class="fi-link group/link relative inline-flex items-center justify-center outline-none text-sm font-semibold text-primary-600 dark:text-primary-400 hover:underline focus-visible:underline">¿Olvidaste tu contraseña?</a>'
+                );
+            })
             ->password()
             ->revealable(filament()->arePasswordsRevealable())
             ->autocomplete('current-password')
