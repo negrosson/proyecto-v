@@ -81,7 +81,20 @@ class SeoOptimizationTest extends TestCase
         $response->assertSee('Arriendo de Mobiliario para Eventos en Santiago', false);
         $response->assertSee('<link rel="canonical" href="'.route('catalog.category', 'mobiliario').'">', false);
         $response->assertSee('BreadcrumbList', false);
+        $response->assertSee('"@type":"ItemList"', false);
+        $response->assertSee('"@type":"Product"', false);
+        $response->assertSee('"priceCurrency":"CLP"', false);
+        $response->assertSee('Arriendo de Mobiliario para Eventos');
+        $response->assertSee('Explora otras categorías en arriendo');
+        $response->assertSee('Arriendo de Vajilla');
         $response->assertSee('Silla Tiffany Dorada SEO');
+
+        // Landing dedicada de Vajilla debe mostrar copy propio (lavado incluido) y sin duplicar H1 de portada
+        $vajillaResponse = $this->get(route('catalog.category', 'vajilla'));
+        $vajillaResponse->assertOk();
+        $vajillaResponse->assertSee('Arriendo de Vajilla, Platos, Copas y Cubiertos para Eventos en Santiago', false);
+        $vajillaResponse->assertSee('Arriendo de Vajilla y Cristalería');
+        $vajillaResponse->assertSee('Lavado y sanitización profesional 100% incluidos');
 
         // Categoría inexistente debe retornar 404 limpio
         $this->get('/arriendo/no-existe-esta-categoria')->assertNotFound();

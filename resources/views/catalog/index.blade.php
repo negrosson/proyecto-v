@@ -2,12 +2,13 @@
     $getProductImage = static fn ($item): string => $item->display_image_url;
     $activeCategory = $activeCategory ?? null;
     $siteBrand = $settings->site_name ?? 'VYS · Productora de Eventos';
-    $seoTitle = $activeCategory
-        ? "Arriendo de {$activeCategory->name} para Eventos en Santiago | {$siteBrand}"
-        : "{$siteBrand} | ".($settings->site_tagline ?? 'Arriendo de Mobiliario, Vajilla y Menaje para Eventos en Santiago');
-    $seoDescription = $activeCategory
-        ? "Arriendo de {$activeCategory->name} para bodas, matrimonios, galas y eventos corporativos en Santiago y regiones. Cotiza online directo por WhatsApp con {$siteBrand}."
-        : ($settings->hero_subtitle ?? 'Arriendo de mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y eventos corporativos en Santiago.');
+    $categorySeo = $activeCategory ? \App\Support\CategorySeoMeta::for($activeCategory, $siteBrand) : null;
+    $seoTitle = $categorySeo
+        ? $categorySeo['title']
+        : "Arriendo de Mobiliario, Vajilla y Menaje para Eventos en Santiago | {$siteBrand}";
+    $seoDescription = $categorySeo
+        ? $categorySeo['description']
+        : ($settings->hero_subtitle ?? 'Arriendo de mobiliario de etiqueta, vajilla fina, cristalería y mantelería para bodas, galas y eventos corporativos en Santiago y regiones. Cotiza online directo por WhatsApp.');
     $canonicalUrl = $activeCategory
         ? route('catalog.category', $activeCategory->slug)
         : route('catalog.index');
@@ -49,6 +50,7 @@
         :faqs="$faqs"
         :categories="$categories"
         :active-category="$activeCategory"
+        :products="$products"
         :breadcrumbs="$seoBreadcrumbs"
     />
 
@@ -304,7 +306,7 @@
       x-cloak>
 
     @php
-        $hasHeroBanner = !request('categoria') && !request('buscar');
+        $hasHeroBanner = ! $activeCategory && ! request('categoria') && ! request('buscar');
     @endphp
 
     <!-- Franja Superior Boutique (solo desde tablet/desktop para no saturar pantalla móvil) -->
@@ -663,7 +665,7 @@
                     @if(!empty($settings?->hero_title) && $settings->hero_title !== 'Equipamiento y ambientación para ocasiones extraordinarias')
                         {{ $settings->hero_title }}
                     @else
-                        Equipamiento y ambientación para <span class="italic font-normal bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent">ocasiones extraordinarias</span>
+                        Arriendo de mobiliario y vajilla para <span class="italic font-normal bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200 bg-clip-text text-transparent">ocasiones extraordinarias</span>
                     @endif
                 </h1>
 
@@ -1426,33 +1428,80 @@
 
     <!-- CONTENIDO PRINCIPAL: CATÁLOGO DE ARRIENDOS Y FILTROS -->
     <main id="catalogo" class="scroll-mt-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-14 sm:pt-8 sm:pb-16 flex-1 w-full">
-        
-        <div class="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div>
-                <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 py-1 rounded-full inline-block mb-2 font-semibold">
-                    Inventario Oficial
-                </span>
-                <h2 class="font-serif text-2xl sm:text-4xl font-light text-zinc-900 dark:text-white tracking-wide">
-                    Catálogo de <span class="italic font-normal text-amber-700 dark:text-amber-500">Arriendos</span>
-                </h2>
-                <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 font-light">
-                    Elige las piezas exactas de nuestros montajes o filtra por categoría para armar tu cotización.
-                </p>
-            </div>
 
-            <div class="flex flex-wrap items-center gap-2.5">
-                <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 shadow-xs">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span><strong class="font-mono text-zinc-900 dark:text-white">{{ $categories->sum('products_count') }}</strong> artículos activos</span>
-                </span>
-                <button type="button"
-                        @click="cartOpen = true"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition shadow-xs">
-                    <span>Mi Cotización</span>
-                    <span class="font-mono font-bold px-1.5 py-0.5 rounded-full bg-white/20 dark:bg-black/15" x-text="countItems()"></span>
-                </button>
+        @if($activeCategory && $categorySeo)
+            <!-- Encabezado SEO Dedicado por Categoría (H1 único + Breadcrumb + Propuesta de Valor) -->
+            <div class="mb-6 sm:mb-8 rounded-3xl bg-white dark:bg-zinc-900/90 border border-zinc-200/90 dark:border-zinc-800 p-5 sm:p-8 shadow-sm">
+                <nav aria-label="Ruta de navegación" class="flex flex-wrap items-center gap-1.5 text-[11px] font-medium text-zinc-500 dark:text-zinc-400 mb-3">
+                    <a href="{{ route('catalog.index') }}" class="hover:text-amber-700 dark:hover:text-amber-400 transition">Inicio</a>
+                    <span aria-hidden="true">/</span>
+                    <span class="text-zinc-900 dark:text-zinc-200 font-semibold">Arriendo de {{ $activeCategory->name }}</span>
+                </nav>
+
+                <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+                    <div class="max-w-3xl">
+                        <span class="text-[10px] font-mono uppercase tracking-[0.22em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3 py-1 rounded-full inline-block mb-2.5 font-semibold">
+                            Catálogo Especializado &bull; {{ $products->total() }} artículos disponibles
+                        </span>
+                        <h1 class="font-serif text-2xl sm:text-4xl lg:text-5xl font-light text-zinc-900 dark:text-white tracking-tight leading-tight">
+                            {{ $categorySeo['h1'] }} <span class="italic font-normal text-amber-700 dark:text-amber-400">{{ $categorySeo['h1_accent'] }}</span>
+                        </h1>
+                        <p class="text-xs sm:text-sm md:text-base text-zinc-600 dark:text-zinc-300 mt-3 leading-relaxed font-light">
+                            {{ $categorySeo['lead'] }}
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 shrink-0">
+                        <a href="{{ route('catalog.index') }}#catalogo"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 text-xs font-semibold transition">
+                            &larr; Ver todo el catálogo
+                        </a>
+                        <button type="button"
+                                @click="cartOpen = true"
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition shadow-xs">
+                            <span>Mi Cotización</span>
+                            <span class="font-mono font-bold px-1.5 py-0.5 rounded-full bg-white/20 dark:bg-black/15" x-text="countItems()"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <ul class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex flex-wrap gap-x-5 gap-y-2 text-xs text-zinc-600 dark:text-zinc-300">
+                    @foreach($categorySeo['highlights'] as $highlight)
+                        <li class="inline-flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span>{{ $highlight }}</span>
+                        </li>
+                    @endforeach
+                </ul>
             </div>
-        </div>
+        @else
+            <div class="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <span class="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 px-3.5 py-1 rounded-full inline-block mb-2 font-semibold">
+                        Inventario Oficial
+                    </span>
+                    <h2 class="font-serif text-2xl sm:text-4xl font-light text-zinc-900 dark:text-white tracking-wide">
+                        Catálogo de <span class="italic font-normal text-amber-700 dark:text-amber-500">Arriendos</span>
+                    </h2>
+                    <p class="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 font-light">
+                        Elige las piezas exactas de nuestros montajes o filtra por categoría para armar tu cotización.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 text-xs text-zinc-600 dark:text-zinc-300 shadow-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span><strong class="font-mono text-zinc-900 dark:text-white">{{ $categories->sum('products_count') }}</strong> artículos activos</span>
+                    </span>
+                    <button type="button"
+                            @click="cartOpen = true"
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-zinc-950 text-xs font-semibold transition shadow-xs">
+                        <span>Mi Cotización</span>
+                        <span class="font-mono font-bold px-1.5 py-0.5 rounded-full bg-white/20 dark:bg-black/15" x-text="countItems()"></span>
+                    </button>
+                </div>
+            </div>
+        @endif
 
         <!-- Buscador Integrado + Atajos Populares Balanceados -->
         <div class="mb-7 bg-white dark:bg-zinc-900 border border-zinc-200/90 dark:border-zinc-800 p-3 sm:p-4 rounded-2xl shadow-sm flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-3 relative">
@@ -1601,8 +1650,13 @@
                 Todos los productos
             </a>
             @foreach ($categories as $cat)
-                <a href="{{ route('catalog.index', array_filter(['categoria' => $cat->slug, 'buscar' => request('buscar')])) }}#catalogo" 
-                   @click.prevent="filterCategory('{{ $cat->slug }}', '{{ route('catalog.index', array_filter(['categoria' => $cat->slug, 'buscar' => request('buscar')])) }}#catalogo')"
+                @php
+                    $categoryUrl = request('buscar')
+                        ? route('catalog.category', ['category' => $cat->slug, 'buscar' => request('buscar')]).'#catalogo'
+                        : route('catalog.category', $cat->slug).'#catalogo';
+                @endphp
+                <a href="{{ $categoryUrl }}" 
+                   @click.prevent="filterCategory('{{ $cat->slug }}', '{{ $categoryUrl }}')"
                    :class="activeCategory === '{{ $cat->slug }}' ? 'bg-zinc-900 dark:bg-amber-500 text-white dark:text-zinc-950 shadow-md ring-2 ring-amber-500/20' : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 border border-zinc-200/90 dark:border-zinc-700'"
                    class="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer shadow-sm shrink-0">
                     {{ $cat->name }}
@@ -1636,6 +1690,38 @@
                 @include('catalog.partials.product_grid', ['products' => $products, 'getProductImage' => $getProductImage])
             </div>
         </div>
+
+        @if($activeCategory && $categorySeo)
+            <!-- Bloque Editorial SEO y Enlazado Interno entre Categorías -->
+            <section class="mt-12 rounded-3xl bg-white dark:bg-zinc-900/80 border border-zinc-200/90 dark:border-zinc-800 p-6 sm:p-8 shadow-xs">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    <div class="lg:col-span-7">
+                        <h2 class="font-serif text-xl sm:text-2xl font-medium text-zinc-900 dark:text-white">
+                            {{ $categorySeo['seo_heading'] }}
+                        </h2>
+                        <p class="mt-2.5 text-xs sm:text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed font-light">
+                            {{ $categorySeo['seo_paragraph'] }}
+                        </p>
+                    </div>
+                    <div class="lg:col-span-5 lg:border-l lg:border-zinc-100 lg:dark:border-zinc-800 lg:pl-6">
+                        <h3 class="text-[11px] font-mono uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400 font-semibold mb-3">
+                            Explora otras categorías en arriendo
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach($categories as $otherCat)
+                                @if($otherCat->id !== $activeCategory->id)
+                                    <a href="{{ route('catalog.category', $otherCat->slug) }}"
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-50 hover:bg-amber-50 dark:bg-zinc-800 dark:hover:bg-amber-950/40 border border-zinc-200 dark:border-zinc-700 hover:border-amber-300 dark:hover:border-amber-700 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:text-amber-800 dark:hover:text-amber-300 transition">
+                                        <span>Arriendo de {{ $otherCat->name }}</span>
+                                        <span class="text-[10px] font-mono opacity-70">({{ $otherCat->products_count }})</span>
+                                    </a>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
     </main>
 
     <!-- SECCIÓN CÓMO COTIZAR (GUÍA COMPLETA, CAJONES ELEGANTES Y MODO OSCURO CON LUZ SPOTLIGHT INTERACTIVA) -->
@@ -3003,7 +3089,7 @@
                 isDark: document.documentElement.classList.contains('dark'),
 
                 // Filtro Reactivo de Categorías y Carga Asíncrona (0ms de latencia con caché)
-                activeCategory: '{{ addslashes(request('categoria', '')) }}',
+                activeCategory: '{{ addslashes($activeCategory?->slug ?? request('categoria', '')) }}',
                 isFiltering: false,
                 categoryCache: {},
 
@@ -3030,7 +3116,8 @@
                     // Sincronizar con botones de navegación del explorador (Atrás / Adelante)
                     window.addEventListener('popstate', () => {
                         const params = new URLSearchParams(window.location.search);
-                        this.activeCategory = params.get('categoria') || '';
+                        const pathMatch = window.location.pathname.match(/^\/arriendo\/([^\/?#]+)/);
+                        this.activeCategory = pathMatch ? decodeURIComponent(pathMatch[1]) : (params.get('categoria') || '');
                         this.fetchGrid(window.location.href, false);
                     });
                 },
